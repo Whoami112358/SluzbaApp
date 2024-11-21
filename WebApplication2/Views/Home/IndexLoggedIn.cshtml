@@ -1,22 +1,60 @@
-﻿@{
-    ViewData["Title"] = "Strona Główna - Zalogowany";
-}
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Strona Główna - Zalogowany - Twoja Aplikacja</title>
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Strona Główna</a></li>
+                <li><a href="/Schedule">Harmonogram Służb</a></li>
+                <li><a href="/Profile">Mój Profil</a></li>
+                <li><a href="/Account/Logout">Wyloguj się</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<h1>Witaj, @User.Identity.Name!</h1>
-<p>To jest strona główna aplikacji dla zalogowanych użytkowników.</p>
+    <div class="content">
+        <h1>Witaj, @ViewBag.Imie @ViewBag.Nazwisko!</h1>
+        <p>To jest strona główna aplikacji dla zalogowanych użytkowników.</p>
 
-<!-- Menu nawigacyjne -->
-<nav>
-    <ul>
-        <li><a asp-controller="Home" asp-action="Index">Strona Główna</a></li>
-        <li><a asp-controller="Schedule" asp-action="Index">Harmonogram Służb</a></li>
-        <li><a asp-controller="Profile" asp-action="Index">Mój Profil</a></li>
-        <li><a asp-controller="Account" asp-action="Logout">Wyloguj się</a></li>
-    </ul>
-</nav>
+        <!-- Widok harmonogramu służb 
+        <div>
+            <h2>Twój Harmonogram Służb</h2>
+            @if (Model != null && Model.Any())
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Rodzaj Służby</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Data.ToShortDateString()</td>
+                                <td>@item.RodzajSluzby</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Brak harmonogramu służb dla tego żołnierza.</p>
+            }
+        </div>-->
+    </div>
 
-<!-- Widok harmonogramu służb -->
-<div>
-    <h2>Twój Harmonogram Służb</h2>
-    <!-- Tutaj będzie wyświetlany harmonogram użytkownika -->
-</div>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja</p>
+    </footer>
+
+    <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+</body>
+</html>

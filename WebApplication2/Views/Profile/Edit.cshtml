@@ -1,0 +1,25 @@
+﻿@model WebApplication2.Models.Zolnierz
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Edytuj Profil";
+}
+
+<h1>Edytuj Profil</h1>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <div>
+        <label for="Imie">Imię:</label>
+        <input type="text" id="Imie" name="Imie" value="@Model.Imie" required />
+    </div>
+    <div>
+        <label for="Nazwisko">Nazwisko:</label>
+        <input type="text" id="Nazwisko" name="Nazwisko" value="@Model.Nazwisko" required />
+    </div>
+    <div>
+        <label for="Stopien">Stopień:</label>
+        <input type="text" id="Stopien" name="Stopien" value="@Model.Stopien" required />
+    </div>
+    <button type="submit">Zapisz</button>
+</form>
