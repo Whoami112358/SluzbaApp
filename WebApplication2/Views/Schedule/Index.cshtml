@@ -1,0 +1,26 @@
+﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Harmonogram Służb";
+}
+
+<h1>Twój Harmonogram Służb</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Rodzaj Służby</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Data.ToShortDateString()</td>
+                <td>@item.RodzajSluzby</td>
+            </tr>
+        }
+    </tbody>
+</table>
