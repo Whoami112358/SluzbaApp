@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Twoja Aplikacja</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a asp-controller="Home" asp-action="Index">Strona Główna</a></li>
+                <li><a asp-controller="Schedule" asp-action="Index">Harmonogram Służb</a></li>
+                <li><a asp-controller="Profile" asp-action="Index">Mój Profil</a></li>
+                <li><a asp-controller="Account" asp-action="Logout">Wyloguj się</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        @RenderBody()
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja</p>
+    </footer>
+</body>
+</html>

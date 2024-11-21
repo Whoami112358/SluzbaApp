@@ -10,13 +10,19 @@
 }
 
 <form method="post" asp-controller="Account" asp-action="Login">
+    @Html.AntiForgeryToken()
+
     <div>
-        <label for="username">Nazwa użytkownika:</label>
-        <input type="text" id="username" name="Username" required />
+        <label for="Id">ID Żołnierza:</label>
+        <input type="number" id="Id" name="Id" required />
     </div>
+
     <div>
-        <label for="password">Hasło:</label>
-        <input type="password" id="password" name="Password" required />
+        <label for="Pesel">PESEL:</label>
+        <input type="password" id="Pesel" name="Pesel" required />
     </div>
+
+    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
     <button type="submit">Zaloguj się</button>
 </form>
