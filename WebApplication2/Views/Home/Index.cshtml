@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Strona Główna - Niezalogowany";
+}
+
+<h1>Witamy w naszej aplikacji!</h1>
+<p>Tutaj znajdziesz informacje o aplikacji.</p>
+
+@if (ViewBag.Error != null)
+{
+    <p style="color:red;">@ViewBag.Error</p>
+}
+
+<!-- Formularz logowania -->
+<form action="/Account/Login" method="post">
+    @Html.AntiForgeryToken()
+    <div>
+        <label for="username">Nazwa użytkownika:</label>
+        <input type="text" id="username" name="Username" required />
+    </div>
+    <div>
+        <label for="password">Hasło:</label>
+        <input type="password" id="password" name="Password" required />
+    </div>
+    <button type="submit">Zaloguj się</button>
+</form>
+
