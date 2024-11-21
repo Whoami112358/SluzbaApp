@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Strona Główna - Zalogowany";
+}
+
+<h1>Witaj, @User.Identity.Name!</h1>
+<p>To jest strona główna aplikacji dla zalogowanych użytkowników.</p>
+
+<!-- Menu nawigacyjne -->
+<nav>
+    <ul>
+        <li><a asp-controller="Home" asp-action="Index">Strona Główna</a></li>
+        <li><a asp-controller="Schedule" asp-action="Index">Harmonogram Służb</a></li>
+        <li><a asp-controller="Profile" asp-action="Index">Mój Profil</a></li>
+        <li><a asp-controller="Account" asp-action="Logout">Wyloguj się</a></li>
+    </ul>
+</nav>
+
+<!-- Widok harmonogramu służb -->
+<div>
+    <h2>Twój Harmonogram Służb</h2>
+    <!-- Tutaj będzie wyświetlany harmonogram użytkownika -->
+</div>
