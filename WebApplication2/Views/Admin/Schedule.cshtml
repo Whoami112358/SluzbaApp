@@ -1,0 +1,52 @@
+﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
+
+@{
+    ViewData["Title"] = "Tabela Harmonogramu";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/Admin">Panel Administratora</a></li>
+                <li><a href="/Admin/Soldiers">Tabela Żołnierzy</a></li>
+                <li><a href="/Account/Logout">Wyloguj się</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1>@ViewData["Title"]</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Rodzaj Służby</th>
+                    <th>Pododdział</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var schedule in Model)
+                {
+                    <tr>
+                        <td>@schedule.Data.ToShortDateString()</td>
+                        <td>@schedule.RodzajSluzby</td>
+                        <td>@(schedule.Pododdzial?.Nazwa ?? "Brak")</td> <!-- Sprawdzenie, czy Pododdzial jest null -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja</p>
+    </footer>
+</body>
+</html>

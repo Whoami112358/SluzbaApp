@@ -1,25 +1,57 @@
 ﻿@model WebApplication2.Models.Zolnierz
 
-@{
-    Layout = "_Layout";
-    ViewData["Title"] = "Edytuj Profil";
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Edytuj Profil - Twoja Aplikacja</title>
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Strona Główna</a></li>
+                <li><a href="/Schedule">Harmonogram Służb</a></li>
+                <li><a href="/Profile">Mój Profil</a></li>
+                <li><a href="/Account/Logout">Wyloguj się</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<h1>Edytuj Profil</h1>
+    <div class="content">
+        <h1>Edytuj Mój Profil</h1>
 
-<form asp-action="Edit" method="post">
-    @Html.AntiForgeryToken()
-    <div>
-        <label for="Imie">Imię:</label>
-        <input type="text" id="Imie" name="Imie" value="@Model.Imie" required />
+        <!-- Formularz do edycji danych użytkownika -->
+        <form method="post" asp-action="Edit">
+            @Html.AntiForgeryToken()
+
+            <div>
+                <label for="Imie">Imię:</label>
+                <input type="text" id="Imie" name="Imie" value="@Model.Imie" required />
+            </div>
+
+            <div>
+                <label for="Nazwisko">Nazwisko:</label>
+                <input type="text" id="Nazwisko" name="Nazwisko" value="@Model.Nazwisko" required />
+            </div>
+
+            <div>
+                <label for="Stopien">Stopień:</label>
+                <input type="text" id="Stopien" name="Stopien" value="@Model.Stopien" required />
+            </div>
+
+            <button type="submit">Zapisz zmiany</button>
+        </form>
     </div>
-    <div>
-        <label for="Nazwisko">Nazwisko:</label>
-        <input type="text" id="Nazwisko" name="Nazwisko" value="@Model.Nazwisko" required />
-    </div>
-    <div>
-        <label for="Stopien">Stopień:</label>
-        <input type="text" id="Stopien" name="Stopien" value="@Model.Stopien" required />
-    </div>
-    <button type="submit">Zapisz</button>
-</form>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja</p>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+</body>
+</html>
