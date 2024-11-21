@@ -22,6 +22,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Account/Logout";  // Œcie¿ka do wylogowania
     });
 
+
+
 // Dodaj us³ugê sesji
 builder.Services.AddSession(options =>
 {

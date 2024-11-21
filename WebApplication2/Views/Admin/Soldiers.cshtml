@@ -1,0 +1,56 @@
+﻿@model IEnumerable<WebApplication2.Models.Zolnierz>
+
+@{
+    ViewData["Title"] = "Tabela Żołnierzy";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/Admin">Panel Administratora</a></li>
+                <li><a href="/Admin/Schedule">Tabela Harmonogramu</a></li>
+                <li><a href="/Account/Logout">Wyloguj się</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1>@ViewData["Title"]</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Imię</th>
+                    <th>Nazwisko</th>
+                    <th>Stopień</th>
+                    <th>Pesel</th>
+                    <th>Pododdział</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var soldier in Model)
+                {
+                    <tr>
+                        <td>@soldier.Imie</td>
+                        <td>@soldier.Nazwisko</td>
+                        <td>@soldier.Stopien</td>
+                        <td>@soldier.Pesel</td>
+                        <td>@(soldier.Pododdzial?.Nazwa ?? "Brak")</td> <!-- Sprawdzenie, czy Pododdzial jest null -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja</p>
+    </footer>
+</body>
+</html>
