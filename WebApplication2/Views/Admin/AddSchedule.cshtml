@@ -1,0 +1,63 @@
+﻿@model WebApplication2.Models.Harmonogram
+
+@{
+    ViewData["Title"] = "Dodaj Harmonogram";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/Admin">Panel Administratora</a></li>
+                <li><a href="/Admin/Soldiers">Tabela Żołnierzy</a></li>
+                <li><a href="/Admin/AddSoldier">Dodaj Żołnierza</a></li>
+                <li><a href="/Admin/Schedule">Tabela Harmonogramu</a></li>
+                <li><a href="/Admin/AddSchedule">Dodaj Harmonogram</a></li>
+                <li><a href="/Account/Logout">Wyloguj się</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1>@ViewData["Title"]</h1>
+
+        <form method="post" asp-action="AddSchedule">
+            @Html.AntiForgeryToken()
+
+            <div>
+                <label for="Data">Data:</label>
+                <input type="date" id="Data" name="Data" required />
+            </div>
+
+            <div>
+                <label for="RodzajSluzby">Rodzaj Służby:</label>
+                <input type="text" id="RodzajSluzby" name="RodzajSluzby" required />
+            </div>
+
+            <div>
+                <label for="PrzypisanyPododdzial">Pododdział:</label>
+                <select id="PrzypisanyPododdzial" name="PrzypisanyPododdzial" required>
+                    @foreach (var pododdzial in ViewBag.Pododdzialy)
+                    {
+                        <option value="@pododdzial.ID_Pododdzialu">@pododdzial.Nazwa</option>
+                    }
+                </select>
+            </div>
+
+            <button type="submit">Zapisz Harmonogram</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja</p>
+    </footer>
+
+</body>
+</html>
