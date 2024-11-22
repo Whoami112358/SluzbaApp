@@ -24,4 +24,6 @@ namespace WebApplication2.Models
         [ForeignKey("PrzypisanyPododdzial")]
         public virtual Pododdzial Pododdzial { get; set; }
     };
+};
+
 
