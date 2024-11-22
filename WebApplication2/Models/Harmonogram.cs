@@ -23,5 +23,7 @@ namespace WebApplication2.Models
         // Nawigacja do Pododdziału
         [ForeignKey("PrzypisanyPododdzial")]
         public virtual Pododdzial Pododdzial { get; set; }
-    }
-}
+    };
+};
+
+
