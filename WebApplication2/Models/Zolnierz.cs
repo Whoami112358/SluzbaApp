@@ -28,5 +28,6 @@ namespace WebApplication2.Models
         // Nawigacja do Pododdziału
         [ForeignKey("IDPododdzialu")]
         public virtual Pododdzial Pododdzial { get; set; }
+        public virtual Login LoginData { get; set; }
     }
 }

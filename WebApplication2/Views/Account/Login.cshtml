@@ -13,16 +13,17 @@
     @Html.AntiForgeryToken()
 
     <div>
-        <label for="Id">ID Żołnierza:</label>
-        <input type="number" id="Id" name="Id" required />
+        <label for="login">Login:</label>
+        <input type="text" id="login" name="login" required />
     </div>
 
     <div>
-        <label for="Pesel">PESEL:</label>
-        <input type="password" id="Pesel" name="Pesel" required />
+        <label for="haslo">Hasło:</label>
+        <input type="password" id="haslo" name="haslo" required />
     </div>
 
     <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
 
     <button type="submit">Zaloguj się</button>
 </form>
+
