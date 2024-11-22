@@ -20,35 +20,6 @@
     <div class="content">
         <h1>Witaj, @ViewBag.Imie @ViewBag.Nazwisko!</h1>
         <p>To jest strona główna aplikacji dla zalogowanych użytkowników.</p>
-
-        <!-- Widok harmonogramu służb 
-        <div>
-            <h2>Twój Harmonogram Służb</h2>
-            @if (Model != null && Model.Any())
-            {
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Rodzaj Służby</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@item.Data.ToShortDateString()</td>
-                                <td>@item.RodzajSluzby</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p>Brak harmonogramu służb dla tego żołnierza.</p>
-            }
-        </div>-->
     </div>
 
     <footer>

@@ -29,17 +29,23 @@ namespace WebApplication2.Controllers
         // POST: /Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(int Id, string Pesel, string returnUrl = null)
+        public async Task<IActionResult> Login(string login, string haslo, string returnUrl = null)
         {
-            var zolnierz = await _context.Zolnierze
-                .FirstOrDefaultAsync(z => z.ID_Zolnierza == Id && z.Pesel == Pesel);
+            // Pobieramy dane logowania z tabeli Login_dane
+            var loginData = await _context.Login_dane
+                .Include(l => l.Zolnierz)  // Dołączamy dane żołnierza, aby mieć dostęp do jego ID_Zolnierza
+                .FirstOrDefaultAsync(l => l.LoginName == login); // Wyszukiwanie po loginie
 
-            if (zolnierz != null)
+            if (loginData != null && loginData.Haslo == haslo)  // Porównanie hasła
             {
+                // Tworzymy tożsamość użytkownika
                 var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, zolnierz.ID_Zolnierza.ToString())
-        };
+                {
+                    new Claim(ClaimTypes.Name, loginData.LoginName),
+                    new Claim(ClaimTypes.NameIdentifier, loginData.ID_Loginu.ToString()),
+                    new Claim("ID_Zolnierza", loginData.ID_Zolnierza.ToString())
+                };
+
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -47,16 +53,24 @@ namespace WebApplication2.Controllers
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
 
-                return RedirectToLocal(returnUrl); // Przekierowanie po zalogowaniu
+                // Pobieramy dane żołnierza, aby ustawić imię i nazwisko w ViewBag
+                var zolnierz = await _context.Zolnierze
+                    .FirstOrDefaultAsync(z => z.ID_Zolnierza == loginData.ID_Zolnierza);
+
+                // Ustawiamy imię i nazwisko w ViewBag
+                ViewBag.Imie = zolnierz?.Imie;
+                ViewBag.Nazwisko = zolnierz?.Nazwisko;
+
+                // Przekierowanie po zalogowaniu
+                return RedirectToLocal(returnUrl);
             }
             else
             {
-                ViewBag.Error = "Niepoprawne ID lub PESEL.";
+                // Jeśli dane logowania są niepoprawne
+                ViewBag.Error = "Niepoprawny login lub hasło.";
                 return View();
             }
         }
-
-        
 
         // GET: /Account/Logout
         [HttpGet]
@@ -81,9 +95,5 @@ namespace WebApplication2.Controllers
                 return RedirectToAction("Index", "Home"); // Jeśli nie lokalny, przekierowujemy na stronę główną
             }
         }
-
-
-
-
     }
 }

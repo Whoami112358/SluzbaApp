@@ -21,11 +21,20 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var username = User.Identity.Name;
+            // Pobierz ID_Zolnierza z Claims
+            var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
 
-            // Znajdź żołnierza na podstawie ID (loginu)
+            if (idZolnierzaClaim == null)
+            {
+                return NotFound("Nie znaleziono żołnierza.");
+            }
+
+            // Przekształcamy ID_Zolnierza na int
+            var idZolnierza = int.Parse(idZolnierzaClaim);
+
+            // Znajdź żołnierza na podstawie ID_Zolnierza
             var zolnierz = await _context.Zolnierze
-                .FirstOrDefaultAsync(z => z.ID_Zolnierza.ToString() == username); // Używamy ID_Zolnierza jako loginu
+                .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
 
             if (zolnierz == null)
             {
