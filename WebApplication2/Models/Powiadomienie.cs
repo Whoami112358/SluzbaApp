@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication2.Models
@@ -20,9 +21,13 @@ namespace WebApplication2.Models
         public string TypPowiadomienia { get; set; }
 
         [Column("Data_i_godzina_wyslania")]
-        public DateTime DataIGodzinaWyslania { get; set; }
+        public DateTime? DataIGodzinaWyslania { get; set; }
 
         [Column("Status")]
         public string Status { get; set; }
+
+        // Nawigacja do Zolnierz
+        [ForeignKey("ID_Zolnierza")]
+        public virtual Zolnierz Zolnierz { get; set; }
     }
 }

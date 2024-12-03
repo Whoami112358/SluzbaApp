@@ -21,7 +21,6 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            // Pobierz ID_Zolnierza z Claims
             var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
 
             if (idZolnierzaClaim == null)
@@ -29,39 +28,20 @@ namespace WebApplication2.Controllers
                 return NotFound("Nie znaleziono żołnierza.");
             }
 
-            // Przekształcamy ID_Zolnierza na int
             var idZolnierza = int.Parse(idZolnierzaClaim);
 
-            // Znajdź żołnierza na podstawie ID_Zolnierza
-            var zolnierz = await _context.Zolnierze
-                .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
-
-            if (zolnierz == null)
-            {
-                return NotFound("Nie znaleziono żołnierza.");
-            }
-
-            // Pobierz pododdział, do którego należy żołnierz
-            var pododdzial = await _context.Pododdzialy
-                .FirstOrDefaultAsync(p => p.ID_Pododdzialu == zolnierz.IDPododdzialu);
-
-            if (pododdzial == null)
-            {
-                return NotFound("Nie znaleziono pododdziału.");
-            }
-
-            // Pobierz harmonogramy dla tego pododdziału
+            // Fetch schedules for the logged-in soldier
             var harmonogramy = await _context.Harmonogramy
-                .Where(h => h.PrzypisanyPododdzial == pododdzial.ID_Pododdzialu)
+                .Where(h => h.ID_Zolnierza == idZolnierza)
+                .Include(h => h.Sluzba)
                 .ToListAsync();
 
-            // Jeśli brak harmonogramów, przekazujemy pustą listę
             if (harmonogramy == null)
             {
                 harmonogramy = new List<Harmonogram>();
             }
 
-            return View(harmonogramy); // Przekazujemy harmonogramy do widoku
+            return View(harmonogramy);
         }
     }
 }

@@ -18,5 +18,8 @@ namespace WebApplication2.Models
 
         [Column("Miejsce_pelnienia_sluzby")]
         public string MiejscePelnieniaSluzby { get; set; }
+
+        // Nawigacja do Harmonogram
+        public virtual ICollection<Harmonogram> Harmonogramy { get; set; }
     }
 }

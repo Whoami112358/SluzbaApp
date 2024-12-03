@@ -11,7 +11,7 @@
     <thead>
         <tr>
             <th>Data</th>
-            <th>Rodzaj Służby</th>
+            <th>Służba</th>
         </tr>
     </thead>
     <tbody>
@@ -19,7 +19,7 @@
         {
             <tr>
                 <td>@item.Data.ToShortDateString()</td>
-                <td>@item.RodzajSluzby</td>
+                <td>@(item.Sluzba != null ? item.Sluzba.Rodzaj : "Brak")</td>
             </tr>
         }
     </tbody>

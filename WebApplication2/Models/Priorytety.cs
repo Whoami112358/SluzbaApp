@@ -17,6 +17,14 @@ namespace WebApplication2.Models
         public int ID_Sluzby { get; set; }
 
         [Column("Priorytet")]
-        public int PriorytetValue { get; set; } // Wartość priorytetu
+        public int? PriorytetValue { get; set; } // Wartość priorytetu
+
+        // Nawigacja do Zolnierz
+        [ForeignKey("ID_Zolnierza")]
+        public virtual Zolnierz Zolnierz { get; set; }
+
+        // Nawigacja do Sluzba
+        [ForeignKey("ID_Sluzby")]
+        public virtual Sluzba Sluzba { get; set; }
     }
 }
