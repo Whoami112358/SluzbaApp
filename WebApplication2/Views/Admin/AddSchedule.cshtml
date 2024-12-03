@@ -12,18 +12,7 @@
     <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/Admin">Panel Administratora</a></li>
-                <li><a href="/Admin/Soldiers">Tabela Żołnierzy</a></li>
-                <li><a href="/Admin/AddSoldier">Dodaj Żołnierza</a></li>
-                <li><a href="/Admin/Schedule">Tabela Harmonogramu</a></li>
-                <li><a href="/Admin/AddSchedule">Dodaj Harmonogram</a></li>
-                <li><a href="/Account/Logout">Wyloguj się</a></li>
-            </ul>
-        </nav>
-    </header>
+    <!-- Nagłówek i nawigacja -->
 
     <div class="content">
         <h1>@ViewData["Title"]</h1>
@@ -37,16 +26,26 @@
             </div>
 
             <div>
-                <label for="RodzajSluzby">Rodzaj Służby:</label>
-                <input type="text" id="RodzajSluzby" name="RodzajSluzby" required />
+                <label for="Miesiac">Miesiąc:</label>
+                <input type="text" id="Miesiac" name="Miesiac" required />
             </div>
 
             <div>
-                <label for="PrzypisanyPododdzial">Pododdział:</label>
-                <select id="PrzypisanyPododdzial" name="PrzypisanyPododdzial" required>
-                    @foreach (var pododdzial in ViewBag.Pododdzialy)
+                <label for="ID_Zolnierza">Żołnierz:</label>
+                <select id="ID_Zolnierza" name="ID_Zolnierza" required>
+                    @foreach (var zolnierz in ViewBag.Zolnierze)
                     {
-                        <option value="@pododdzial.ID_Pododdzialu">@pododdzial.Nazwa</option>
+                        <option value="@zolnierz.ID_Zolnierza">@zolnierz.Imie @zolnierz.Nazwisko</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label for="ID_Sluzby">Służba:</label>
+                <select id="ID_Sluzby" name="ID_Sluzby" required>
+                    @foreach (var sluzba in ViewBag.Sluzby)
+                    {
+                        <option value="@sluzba.ID_Sluzby">@sluzba.Rodzaj</option>
                     }
                 </select>
             </div>
@@ -55,9 +54,6 @@
         </form>
     </div>
 
-    <footer>
-        <p>&copy; 2024 Twoja Aplikacja</p>
-    </footer>
-
+    <!-- Stopka -->
 </body>
 </html>
