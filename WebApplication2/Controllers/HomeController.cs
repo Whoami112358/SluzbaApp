@@ -2,6 +2,7 @@
 using WebApplication2.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace WebApplication2.Controllers
 {
@@ -24,8 +25,15 @@ namespace WebApplication2.Controllers
                     var zolnierz = await _context.Zolnierze
                         .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
 
-                    ViewBag.Imie = zolnierz?.Imie;
-                    ViewBag.Nazwisko = zolnierz?.Nazwisko;
+                    if (zolnierz != null)
+                    {
+                        ViewBag.Imie = zolnierz.Imie;
+                        ViewBag.Nazwisko = zolnierz.Nazwisko;
+                        ViewBag.Stopien = zolnierz.Stopien;
+                        ViewBag.Wiek = zolnierz.Wiek;
+                        ViewBag.Adres = zolnierz.Adres;
+                        ViewBag.ImieOjca = zolnierz.ImieOjca;
+                    }
                 }
                 return View("IndexLoggedIn");
             }

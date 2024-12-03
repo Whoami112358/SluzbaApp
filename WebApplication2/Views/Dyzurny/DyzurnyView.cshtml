@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Panel Oficera Dyżurnego";
+}
+
+<h1>Panel Oficera Dyżurnego</h1>
+
+<div>
+    <ul>
+        <li>
+            <a href="@Url.Action("Punktacja", "Dyzurny")">Modyfikowanie punktacji żołnierzy</a>
+        </li>
+        <li>
+            <a href="@Url.Action("HarmonogramKC", "Dyzurny")">Wgląd do harmonogramu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("ListaTygodniowa", "Dyzurny")">Lista żołnierzy pełniących służbę w nadchodzącym tygodniu</a>
+        </li>
+        <li><a href="/Account/Logout">Wyloguj się</a></li>
+    </ul>
+</div>
+
+<hr />
+
+<p>
+    <a asp-action="Index" asp-controller="Home">Powrót do strony głównej</a>
+</p>

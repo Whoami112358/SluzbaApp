@@ -1,0 +1,60 @@
+﻿@model IEnumerable<WebApplication2.Models.Zwolnienie>
+
+@{
+    ViewData["Title"] = "Lista Zwolnień";
+}
+
+<h1>Lista Zwolnień</h1>
+<li><a href="/Dowodca/DowodcaView">Wróć do strony głównej</a></li>
+
+<!-- Tabela z listą zwolnień -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Żołnierz</th>
+            <th>Data Rozpoczęcia</th>
+            <th>Data Zakończenia</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var zwolnienie in Model)
+        {
+            <tr>
+                <td>@zwolnienie.Zolnierz.Imie @zwolnienie.Zolnierz.Nazwisko</td>
+                <td>@zwolnienie.DataRozpoczeciaZwolnienia.("yyyy-MM-dd")</td>
+                <td>@zwolnienie.DataZakonczeniaZwolnienia.("yyyy-MM-dd")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<!-- Formularz do dodania nowego zwolnienia -->
+<h3>Dodaj Nowe Zwolnienie</h3>
+
+<form asp-action="DodajZwolnienie" method="post">
+    <div class="form-group">
+        <label for="ID_Zolnierza">Żołnierz</label>
+        <select class="form-control" id="ID_Zolnierza" name="ID_Zolnierza" required>
+            <option value="">Wybierz żołnierza</option>
+            @foreach (var zolnierz in (IEnumerable<WebApplication2.Models.Zolnierz>)ViewData["Zolnierze"])
+            {
+                <option value="@zolnierz.ID_Zolnierza">@zolnierz.Imie @zolnierz.Nazwisko</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="DataRozpoczeciaZwolnienia">Data Rozpoczęcia Zwolnienia</label>
+        <input type="date" class="form-control" id="DataRozpoczeciaZwolnienia" name="DataRozpoczeciaZwolnienia" required />
+    </div>
+
+    <div class="form-group">
+        <label for="DataZakonczeniaZwolnienia">Data Zakończenia Zwolnienia</label>
+        <input type="date" class="form-control" id="DataZakonczeniaZwolnienia" name="DataZakonczeniaZwolnienia" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Dodaj Zwolnienie</button>
+</form>
+

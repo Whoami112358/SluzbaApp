@@ -9,15 +9,13 @@
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
-    <!-- Nagłówek i nawigacja -->
-
+    <li><a href="/Dyzurny/HarmonogramKC">Wróć do Harmonogram</a></li>
     <div class="content">
         <h1>@ViewData["Title"]</h1>
 
-        <form method="post" asp-action="AddSchedule">
+        <form method="post" asp-action="DodajHarmonogramKC">
             @Html.AntiForgeryToken()
 
             <div>
@@ -35,7 +33,7 @@
                 <select id="ID_Zolnierza" name="ID_Zolnierza" required>
                     @foreach (var zolnierz in ViewBag.Zolnierze)
                     {
-                        <option value="@zolnierz.ID_Zolnierza">@zolnierz.Imie @zolnierz.Nazwisko</option>
+                            <option value="@zolnierz.ID_Zolnierza">@zolnierz.Imie @zolnierz.Nazwisko</option>
                     }
                 </select>
             </div>
@@ -45,7 +43,7 @@
                 <select id="ID_Sluzby" name="ID_Sluzby" required>
                     @foreach (var sluzba in ViewBag.Sluzby)
                     {
-                        <option value="@sluzba.ID_Sluzby">@sluzba.Rodzaj</option>
+                            <option value="@sluzba.ID_Sluzby">@sluzba.Rodzaj</option>
                     }
                 </select>
             </div>
@@ -54,6 +52,5 @@
         </form>
     </div>
 
-    <!-- Stopka -->
 </body>
 </html>

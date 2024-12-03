@@ -24,15 +24,22 @@ namespace WebApplication2.Controllers
                 var zolnierz = await _context.Zolnierze
                     .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
 
-                ViewBag.Imie = zolnierz?.Imie;
-                ViewBag.Nazwisko = zolnierz?.Nazwisko;
-                ViewBag.Stopien = zolnierz?.Stopien;
+                if (zolnierz == null)
+                {
+                    return NotFound("Nie znaleziono żołnierza.");
+                }
+
+                ViewBag.Imie = zolnierz.Imie;
+                ViewBag.Nazwisko = zolnierz.Nazwisko;
+                ViewBag.Stopien = zolnierz.Stopien;
+                ViewBag.Wiek = zolnierz.Wiek;
+                ViewBag.Adres = zolnierz.Adres;
+                ViewBag.ImieOjca = zolnierz.ImieOjca;
 
                 return View();
             }
             else
             {
-                // Jeśli nie można pobrać ID_Zolnierza, wyloguj użytkownika
                 return RedirectToAction("Logout", "Account");
             }
         }
@@ -41,7 +48,6 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit()
         {
-            // Pobierz ID_Zolnierza z Claims
             var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
 
             if (idZolnierzaClaim == null)
@@ -51,7 +57,6 @@ namespace WebApplication2.Controllers
 
             var idZolnierza = int.Parse(idZolnierzaClaim);
 
-            // Pobierz dane żołnierza z bazy danych
             var zolnierz = await _context.Zolnierze
                 .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
 
@@ -60,7 +65,7 @@ namespace WebApplication2.Controllers
                 return NotFound("Nie znaleziono żołnierza.");
             }
 
-            return View(zolnierz);  // Przekazujemy model żołnierza do widoku
+            return View(zolnierz);
         }
 
         // POST: /Profile/Edit
@@ -70,7 +75,6 @@ namespace WebApplication2.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Pobierz ID_Zolnierza z Claims
                 var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
 
                 if (idZolnierzaClaim == null)
@@ -80,7 +84,6 @@ namespace WebApplication2.Controllers
 
                 var idZolnierza = int.Parse(idZolnierzaClaim);
 
-                // Znajdź istniejącego żołnierza w bazie danych
                 var zolnierzDb = await _context.Zolnierze
                     .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
 
@@ -89,19 +92,19 @@ namespace WebApplication2.Controllers
                     return NotFound("Nie znaleziono żołnierza.");
                 }
 
-                // Zaktualizuj dane żołnierza
+                // Aktualizacja właściwości
                 zolnierzDb.Imie = zolnierz.Imie;
                 zolnierzDb.Nazwisko = zolnierz.Nazwisko;
                 zolnierzDb.Stopien = zolnierz.Stopien;
+                zolnierzDb.Wiek = zolnierz.Wiek;
+                zolnierzDb.Adres = zolnierz.Adres;
+                zolnierzDb.ImieOjca = zolnierz.ImieOjca;
 
-                // Zapisz zmiany do bazy danych
                 await _context.SaveChangesAsync();
 
-                // Przekierowanie po zapisaniu zmian
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Profile");
             }
 
-            // Jeśli model jest niepoprawny, zwróć formularz z błędami
             return View(zolnierz);
         }
     }

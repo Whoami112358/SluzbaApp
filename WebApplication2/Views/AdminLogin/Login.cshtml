@@ -23,6 +23,9 @@
         <form method="post" asp-action="Login">
             @Html.AntiForgeryToken()
 
+            <!-- Ukryte pole dla returnUrl -->
+            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
             <div>
                 <label for="Username">Nazwa użytkownika:</label>
                 <input type="text" id="Username" name="username" required />

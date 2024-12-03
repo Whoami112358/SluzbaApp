@@ -17,6 +17,8 @@
             <ul>
                 <li><a href="/Admin">Panel Administratora</a></li>
                 <li><a href="/Admin/Schedule">Tabela Harmonogramu</a></li>
+                <li><a href="/Admin/AddSoldier">Dodaj Żołnierza</a></li>
+                <li><a href="/Admin/AddSchedule">Dodaj Harmonogram</a></li>
                 <li><a href="/Account/Logout">Wyloguj się</a></li>
             </ul>
         </nav>
@@ -31,6 +33,9 @@
                     <th>Nazwisko</th>
                     <th>Stopień</th>
                     <th>Pesel</th>
+                    <th>Wiek</th>
+                    <th>Adres</th>
+                    <th>Imię Ojca</th>
                     <th>Pododdział</th>
                 </tr>
             </thead>
@@ -42,13 +47,17 @@
                         <td>@soldier.Nazwisko</td>
                         <td>@soldier.Stopien</td>
                         <td>@soldier.Pesel</td>
-                        <td>@(soldier.Pododdzial?.Nazwa ?? "Brak")</td> <!-- Sprawdzenie, czy Pododdzial jest null -->
+                        <td>@soldier.Wiek</td>
+                        <td>@soldier.Adres</td>
+                        <td>@soldier.ImieOjca</td>
+                        <td>@(soldier.Pododdzial?.Nazwa ?? "Brak")</td>
                     </tr>
                 }
             </tbody>
         </table>
+        <li><a href="/Admin/AddSoldier">Dodaj Żołnierza</a></li>
     </div>
-    <li><a href="/Admin/AddSoldier">Dodaj Żołnierza</a></li>
+
     <footer>
         <p>&copy; 2024 Twoja Aplikacja</p>
     </footer>
