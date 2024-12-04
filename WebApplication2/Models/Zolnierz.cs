@@ -25,6 +25,9 @@ namespace WebApplication2.Models
         [Column("ID_Pododdzialu")]
         public int IDPododdzialu { get; set; }
 
+        [Column("Punkty")]
+        public int Punkty { get; set; }
+
         // Nawigacja do Pododdziału
         [ForeignKey("IDPododdzialu")]
         public virtual Pododdzial Pododdzial { get; set; }
