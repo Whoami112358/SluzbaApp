@@ -15,10 +15,10 @@ namespace WebApplication2.Models
         public int ID_Zolnierza { get; set; }
 
         [Column("Data_rozpoczecia_zwolnienia")]
-        public DateTime? DataRozpoczeciaZwolnienia { get; set; }
+        public DateTime DataRozpoczeciaZwolnienia { get; set; }
 
         [Column("Data_zakonczenia_zwolnienia")]
-        public DateTime? DataZakonczeniaZwolnienia { get; set; }
+        public DateTime DataZakonczeniaZwolnienia { get; set; }
 
         // Nawigacja do Zolnierz
         [ForeignKey("ID_Zolnierza")]

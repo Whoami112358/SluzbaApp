@@ -9,8 +9,7 @@ using MySqlConnector;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApplication2.Controllers
-{
-    [Authorize(Roles = "Officer")]  // Zabezpieczenie kontrolera, aby dostęp miały tylko osoby z rolą "Officer"
+{  // Zabezpieczenie kontrolera, aby dostęp miały tylko osoby z rolą "Officer"
     public class DyzurnyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -68,6 +67,7 @@ namespace WebApplication2.Controllers
             var harmonogram = _context.Harmonogramy
                                         .Include(h => h.Zolnierz)  // Ładowanie powiązanych danych żołnierza
                                         .Include(h => h.Sluzba)    // Ładowanie powiązanych danych służby
+                                        .OrderBy(h => h.Data)
                                         .ToList();
 
             return View(harmonogram);  // Zwracanie widoku z danymi harmonogramu

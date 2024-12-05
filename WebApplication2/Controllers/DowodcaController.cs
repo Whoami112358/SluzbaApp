@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Models;
 using MySqlConnector;
+using System.Data.SqlClient;
+using Mysqlx.Crud;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApplication2.Controllers
 {
@@ -101,7 +104,8 @@ namespace WebApplication2.Controllers
             // Pobierz listę zwolnień z bazy danych wraz z powiązanymi danymi (np. Żołnierz)
             var zwolnienia = await _context.Zwolnienia.Include(z => z.Zolnierz).ToListAsync();
             // Pobierz wszystkich żołnierzy, aby wyświetlić ich w formularzu dodawania nowego zwolnienia
-            ViewData["Zolnierze"] = await _context.Zolnierze.ToListAsync();
+            ViewBag.Zolnierze = await _context.Zolnierze.ToListAsync();
+
 
             return View(zwolnienia);
         }
@@ -113,29 +117,21 @@ namespace WebApplication2.Controllers
         {
             if (zwolnienie.ID_Zolnierza != null)
             {
-                // Pobierz żołnierza z bazy
                 var zolnierz = await _context.Zolnierze.FirstOrDefaultAsync(z => z.ID_Zolnierza == zwolnienie.ID_Zolnierza);
-
                 if (zolnierz != null)
                 {
-                    // Budowanie zapytania SQL
-                    string sqlQuery = "INSERT INTO SluzbaApp.Zwolnienia_dane (ID_Zolnierza, Data_rozpoczecia_zwolnienia, Data_zakonczenia_zwolnienia) " +
-                                      "VALUES (@ID_Zolnierza, @Data_rozpoczecia_zwolnienia, @Data_zakonczenia_zwolnienia)";
-
-                    // Użycie ExecuteSqlRawAsync do wykonania zapytania SQL
-                    await _context.Database.ExecuteSqlRawAsync(sqlQuery,
+                    await _context.Database.ExecuteSqlRawAsync(
+                        "INSERT INTO SluzbaApp.Zwolnienia_dane (ID_Zolnierza, Data_rozpoczecia_zwolnienia, Data_zakonczenia_zwolnienia) " +
+                        "VALUES (@ID_Zolnierza, @DataRozpoczecia, @DataZakonczenia)",
                         new MySqlParameter("@ID_Zolnierza", zwolnienie.ID_Zolnierza),
-                        new MySqlParameter("@Data_rozpoczecia_zwolnienia", zwolnienie.DataRozpoczeciaZwolnienia),
-                        new MySqlParameter("@Data_zakonczenia_zwolnienia", zwolnienie.DataZakonczeniaZwolnienia));
-
-                    // Przekierowanie po dodaniu
+                        new MySqlParameter("@DataRozpoczecia", zwolnienie.DataRozpoczeciaZwolnienia),
+                        new MySqlParameter("@DataZakonczenia", zwolnienie.DataZakonczeniaZwolnienia));
                     return RedirectToAction(nameof(ListaZwolnien));
                 }
             }
 
-            // Jeśli dane są niepoprawne, ponownie załaduj żołnierzy do formularza
+            // Załaduj dane do formularza w przypadku błędów
             ViewData["Zolnierze"] = await _context.Zolnierze.ToListAsync();
-
             return View("ListaZwolnien", zwolnienie);
         }
 

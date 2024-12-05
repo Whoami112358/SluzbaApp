@@ -2,25 +2,126 @@
     ViewData["Title"] = "Panel Oficera Dyżurnego";
 }
 
-<h1>Panel Oficera Dyżurnego</h1>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Twoja Aplikacja</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif; /* Łatwiejsza do odczytania czcionka */
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50; /* Ciemny odcień zieleni */
+            color: #ecf0f1; /* Jasny tekst */
+            box-sizing: border-box;
+        }
 
-<div>
-    <ul>
-        <li>
-            <a href="@Url.Action("Punktacja", "Dyzurny")">Modyfikowanie punktacji żołnierzy</a>
-        </li>
-        <li>
-            <a href="@Url.Action("HarmonogramKC", "Dyzurny")">Wgląd do harmonogramu</a>
-        </li>
-        <li>
-            <a href="@Url.Action("ListaTygodniowa", "Dyzurny")">Lista żołnierzy pełniących służbę w nadchodzącym tygodniu</a>
-        </li>
-        <li><a href="/Account/Logout">Wyloguj się</a></li>
-    </ul>
-</div>
+        header {
+            background-color: #27ae60; /* Jasny zielony */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2.5em;
+            text-transform: uppercase;
+        }
 
-<hr />
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
 
-<p>
-    <a asp-action="Index" asp-controller="Home">Powrót do strony głównej</a>
-</p>
+            nav ul li {
+                display: block;
+            }
+
+        /* Styl dla przycisków w menu */
+        .button-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px 20px;
+            display: block;
+            background-color: #34495e; /* Ciemny kolor tła */
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+            /* Efekt hover dla przycisków */
+            .button-link:hover {
+                background-color: #16a085; /* Jaśniejszy odcień przy hover */
+            }
+
+        .content {
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 900px;
+            background-color: #34495e; /* Ciemny odcień zieleni */
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        hr {
+            border: 1px solid #7f8c8d; /* Odcień brązowy */
+            margin: 20px 0;
+        }
+
+        footer {
+            background-color: #34495e; /* Ciemny kolor stopki */
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Dodatkowe style dla linków wewnętrznych */
+        a {
+            color: #1abc9c; /* Jasny zielony */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            a:hover {
+                color: #34495e; /* Jaśniejszy odcień na hover */
+            }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
+
+    <div class="content">
+        <ul>
+            <li>
+                <a href="@Url.Action("Punktacja", "Dyzurny")" class="button-link">➤ Modyfikowanie punktacji żołnierzy</a>
+            </li>
+            <li>
+                <a href="@Url.Action("HarmonogramKC", "Dyzurny")" class="button-link">➤ Wgląd do harmonogramu</a>
+            </li>
+            <li>
+                <a href="@Url.Action("ListaTygodniowa", "Dyzurny")" class="button-link">➤ Lista żołnierzy pełniących służbę w nadchodzącym tygodniu</a>
+            </li>
+            <li>
+                <a href="/Account/Logout" class="button-link">➤ Wyloguj się</a>
+            </li>
+        </ul>
+
+        <hr />
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+    </footer>
+</body>
+</html>
