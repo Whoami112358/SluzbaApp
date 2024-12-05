@@ -1,0 +1,47 @@
+﻿@model IEnumerable<WebApplication2.Models.Zolnierz>
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Żołnierzy</title>
+</head>
+<body>
+    <h1>Lista Żołnierzy</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID Zolnierza</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Stopień</th>
+                <th>Punkty</th>
+                <th>Dodaj Punkty</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ID_Zolnierza</td>
+                    <td>@item.Imie</td>
+                    <td>@item.Nazwisko</td>
+                    <td>@item.Stopien</td>
+                    <td>@item.Punkty</td>
+
+                    <!-- Formularz do dodawania punktów -->
+                    <td>
+                        <form method="post" action="/Dyzurny/DodajPunkty">
+                            <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
+                            <input type="number" name="punkty" min="0" step="1" />
+                            <button type="submit">Dodaj Punkty</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

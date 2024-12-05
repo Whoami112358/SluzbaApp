@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Models;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace WebApplication2.Controllers
 {
+    [Authorize(AuthenticationSchemes = "AdminScheme", Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,22 +17,10 @@ namespace WebApplication2.Controllers
             _context = context;
         }
 
-        // Metoda pomocnicza do sprawdzenia, czy użytkownik jest zalogowany jako admin
-        private bool IsAdmin()
-        {
-            // Sprawdzamy, czy użytkownik jest zalogowany jako admin na podstawie roli
-            return User.Identity.IsAuthenticated && User.IsInRole("Admin");
-        }
-
         // GET: /Admin
         [HttpGet]
         public IActionResult Index()
         {
-            if (!IsAdmin())
-            {
-                return RedirectToAction("Login", "AdminLogin");
-            }
-
             return View();
         }
 
@@ -38,13 +28,8 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public async Task<IActionResult> Soldiers()
         {
-            if (!IsAdmin())
-            {
-                return RedirectToAction("Login", "AdminLogin");
-            }
-
             var soldiers = await _context.Zolnierze
-                .Include(z => z.Pododdzial)  // Ładujemy powiązane dane Pododdzialu
+                .Include(z => z.Pododdzial)
                 .ToListAsync();
 
             return View(soldiers);
@@ -54,13 +39,9 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public async Task<IActionResult> Schedule()
         {
-            if (!IsAdmin())
-            {
-                return RedirectToAction("Login", "AdminLogin");
-            }
-
             var schedules = await _context.Harmonogramy
-                .Include(h => h.Pododdzial)  // Ładujemy powiązane dane Pododdzialu
+                .Include(h => h.Zolnierz)
+                .Include(h => h.Sluzba)
                 .ToListAsync();
 
             return View(schedules);
@@ -70,7 +51,6 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public async Task<IActionResult> AddSoldier()
         {
-            // Pobierz listę pododdziałów, aby można było przypisać żołnierza do jednego z nich
             var pododdzialy = await _context.Pododdzialy.ToListAsync();
             ViewBag.Pododdzialy = pododdzialy;
 
@@ -84,26 +64,26 @@ namespace WebApplication2.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Dodajemy nowego żołnierza do bazy
                 _context.Zolnierze.Add(zolnierz);
                 await _context.SaveChangesAsync();
 
-                // Po dodaniu żołnierza przekierowujemy na stronę z tabelą żołnierzy
                 return RedirectToAction("Soldiers");
             }
 
-            // Jeśli model jest niepoprawny, ponownie wyświetlamy formularz z błędami
             var pododdzialy = await _context.Pododdzialy.ToListAsync();
             ViewBag.Pododdzialy = pododdzialy;
 
             return View(zolnierz);
         }
+
         // GET: /Admin/AddSchedule
-        public IActionResult AddSchedule()
+        [HttpGet]
+        public async Task<IActionResult> AddSchedule()
         {
-            // Pobieramy dostępne pododdziały i rodzaje służb
-            var pododdzialy = _context.Pododdzialy.ToList();
-            ViewBag.Pododdzialy = pododdzialy;
+            var zolnierze = await _context.Zolnierze.ToListAsync();
+            var sluzby = await _context.Sluzby.ToListAsync();
+            ViewBag.Zolnierze = zolnierze;
+            ViewBag.Sluzby = sluzby;
 
             return View();
         }
@@ -115,17 +95,17 @@ namespace WebApplication2.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Zapisujemy nowy harmonogram w bazie danych
                 _context.Harmonogramy.Add(harmonogram);
                 await _context.SaveChangesAsync();
 
-                // Po zapisaniu przekierowujemy do tabeli harmonogramów
                 return RedirectToAction("Schedule");
             }
 
-            // Jeśli model jest niepoprawny, wyświetlamy formularz z błędami
-            var pododdzialy = _context.Pododdzialy.ToList();
-            ViewBag.Pododdzialy = pododdzialy;
+            var zolnierze = await _context.Zolnierze.ToListAsync();
+            var sluzby = await _context.Sluzby.ToListAsync();
+            ViewBag.Zolnierze = zolnierze;
+            ViewBag.Sluzby = sluzby;
+
             return View(harmonogram);
         }
     }

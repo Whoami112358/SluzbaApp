@@ -8,20 +8,27 @@ namespace WebApplication2.Models
     public class Harmonogram
     {
         [Key]
-        [Column("ID_Harmonogramu")]
-        public int ID_Harmonogramu { get; set; }
+        [Column("ID_Harmonogram")]
+        public int ID_Harmonogram { get; set; }
+
+        [Column("ID_Zolnierza")]
+        public int ID_Zolnierza { get; set; }
+
+        [Column("ID_Sluzby")]
+        public int ID_Sluzby { get; set; }
 
         [Column("Data")]
         public DateTime Data { get; set; }
 
-        [Column("Rodzaj_sluzby")]
-        public string RodzajSluzby { get; set; }
+        [Column("Miesiac")]
+        public string Miesiac { get; set; }
 
-        [Column("Przypisany_pododdzial")]
-        public int PrzypisanyPododdzial { get; set; }
+        // Nawigacja do Zolnierz
+        [ForeignKey("ID_Zolnierza")]
+        public virtual Zolnierz Zolnierz { get; set; }
 
-        // Nawigacja do Pododdziału
-        [ForeignKey("PrzypisanyPododdzial")]
-        public virtual Pododdzial Pododdzial { get; set; }
+        // Nawigacja do Sluzba
+        [ForeignKey("ID_Sluzby")]
+        public virtual Sluzba Sluzba { get; set; }
     }
 }

@@ -1,11 +1,11 @@
-﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
+@model IEnumerable<WebApplication2.Models.Harmonogram>
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Strona Główna - Niezalogowany";
 }
 
 <h1>Witamy w naszej aplikacji!</h1>
-<p>Tutaj znajdziesz informacje o aplikacji.</p>
+<p>Aplikacja służy do monitorowania systemu służb - harmonogramu i punktów</p>
 
 @if (ViewBag.Error != null)
 {
@@ -16,13 +16,13 @@
 <form action="/Account/Login" method="post">
     @Html.AntiForgeryToken()
     <div>
-        <label for="Id">ID Żołnierza:</label>
-        <input type="number" id="Id" name="Id" required />
+        <label for="login">Login:</label>
+        <input type="text" id="login" name="login" required />
     </div>
 
     <div>
-        <label for="Pesel">PESEL:</label>
-        <input type="password" id="Pesel" name="Pesel" required />
+        <label for="haslo">Haslo:</label>
+        <input type="password" id="haslo" name="haslo" required />
     </div>
     <button type="submit">Zaloguj się</button>
 </form>
