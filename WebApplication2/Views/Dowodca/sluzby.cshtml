@@ -1,0 +1,83 @@
+﻿@model WebApplication2.Models.Harmonogram
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dodaj Harmonogram</title>
+</head>
+<body>
+    <h1>Dodaj Harmonogram</h1>
+
+    <form asp-action="sluzby" method="post">
+        <div>
+            <label for="ID_Zolnierza">ID Żołnierza:</label>
+            <input type="number" id="ID_Zolnierza" name="ID_Zolnierza" required />
+        </div>
+
+        <div>
+            <label for="ID_Sluzby">ID Służby:</label>
+            <input type="number" id="ID_Sluzby" name="ID_Sluzby" required />
+        </div>
+
+        <div>
+            <label for="Data">Data:</label>
+            <input type="date" id="Data" name="Data" required />
+        </div>
+
+        <div>
+            <label for="Miesiac">Miesiąc:</label>
+            <input type="text" id="Miesiac" name="Miesiac" required />
+        </div>
+
+        <button type="submit">Dodaj</button>
+    </form>
+
+    <hr />
+
+    <h2>Lista Żołnierzy</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Stopień</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var zolnierz in (IEnumerable<WebApplication2.Models.Zolnierz>)ViewData["Zolnierze"])
+            {
+                <tr>
+                    <td>@zolnierz.ID_Zolnierza</td>
+                    <td>@zolnierz.Imie</td>
+                    <td>@zolnierz.Nazwisko</td>
+                    <td>@zolnierz.Stopien</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h2>Lista Służb</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Rodzaj</th>
+                <th>MiejscePelnieniaSluzby</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sluzba in (IEnumerable<WebApplication2.Models.Sluzba>)ViewData["Sluzby"])
+            {
+                <tr>
+                    <td>@sluzba.ID_Sluzby</td>
+                    <td>@sluzba.Rodzaj</td>
+                    <td>@sluzba.MiejscePelnieniaSluzby</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

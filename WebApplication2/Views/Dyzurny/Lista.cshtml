@@ -1,0 +1,37 @@
+﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmonogram</title>
+</head>
+<body>
+    <h1>Harmonogram Służb</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID Harmonogramu</th>
+                <th>Data</th>
+                <th>Imie</th>
+                <th>Nazwisko</th>
+                <th>Służba</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                    <tr>
+                        <td>@item.ID_Harmonogram</td>
+                        <td>@item.Data.ToString("yyyy-MM-dd")</td>
+                        <td>@item.Zolnierz?.Imie</td>
+                        <td>@item.Zolnierz?.Nazwisko</td>   <!-- Wyświetlenie imienia żołnierza -->
+                        <td>@item.Sluzba?.Rodzaj</td>    <!-- Wyświetlenie nazwy służby -->
+                    </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

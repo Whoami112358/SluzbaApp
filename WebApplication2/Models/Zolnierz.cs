@@ -35,6 +35,9 @@ namespace WebApplication2.Models
         [Column("Imie_ojca")]
         public string ImieOjca { get; set; }
 
+        [Column("Punkty")]
+        public int Punkty { get; set; }
+
         // Nawigacja do Pododdziału
         [ForeignKey("ID_Pododdzialu")]
         public virtual Pododdzial Pododdzial { get; set; }

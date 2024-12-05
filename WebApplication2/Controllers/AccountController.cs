@@ -36,6 +36,44 @@ namespace WebApplication2.Controllers
                 .Include(l => l.Zolnierz)  // Dołączamy dane żołnierza, aby mieć dostęp do jego ID_Zolnierza
                 .FirstOrDefaultAsync(l => l.LoginName == login); // Wyszukiwanie po loginie
 
+            if (login == "oficerdyzurny" && haslo == "haslo")
+            {
+                // Tworzenie tożsamości użytkownika
+                var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, "oficerdyzurny"),
+                new Claim(ClaimTypes.Role, "Officer") // Możesz dodać rolę, jeśli potrzebujesz
+            };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+
+                // Przekierowanie na dedykowany widok dla oficera dyżurnego
+                return RedirectToAction("DyzurnyView", "Dyzurny");
+            }
+
+            if (login == "Dowodca" && haslo == "haslo")
+            {
+                // Tworzenie tożsamości użytkownika
+                var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, "Dowodca"),
+                new Claim(ClaimTypes.Role, "Dowodca") // Możesz dodać rolę, jeśli potrzebujesz
+            };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+
+                // Przekierowanie na dedykowany widok dla oficera dyżurnego
+                return RedirectToAction("DowodcaView", "Dowodca");
+            }
+
             if (loginData != null && loginData.Haslo == haslo)  // Porównanie hasła
             {
                 // Tworzymy tożsamość użytkownika
