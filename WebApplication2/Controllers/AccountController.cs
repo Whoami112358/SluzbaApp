@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -36,7 +36,7 @@ namespace WebApplication2.Controllers
                 .Include(l => l.Zolnierz)  // Dołączamy dane żołnierza, aby mieć dostęp do jego ID_Zolnierza
                 .FirstOrDefaultAsync(l => l.LoginName == login); // Wyszukiwanie po loginie
 
-            if (login == "OficerDyżurny" && haslo == "pass")
+            if (login == "oficerdyzurny" && haslo == "haslo")
             {
                 // Tworzenie tożsamości użytkownika
                 var claims = new List<Claim>
@@ -55,7 +55,7 @@ namespace WebApplication2.Controllers
                 return RedirectToAction("DyzurnyView", "Dyzurny");
             }
 
-            if (login == "Dowódca" && haslo == "pass")
+            if (login == "Dowodca" && haslo == "haslo")
             {
                 // Tworzenie tożsamości użytkownika
                 var claims = new List<Claim>

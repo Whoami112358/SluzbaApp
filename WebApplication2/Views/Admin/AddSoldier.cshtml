@@ -1,4 +1,4 @@
-@model WebApplication2.Models.Zolnierz
+﻿@model WebApplication2.Models.Zolnierz
 
 @{
     ViewData["Title"] = "Dodaj Żołnierza";
@@ -10,143 +10,13 @@
     <meta charset="utf-8" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="/css/site.css" />
-    <style>
-        /* Tło strony */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #ecf0f1; /* Jasny tekst */
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* Nagłówek */
-        header {
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #27ae60; /* Jasny zielony dla nagłówka */
-            text-align: center;
-            padding: 20px 0;
-        }
-
-            header h1 {
-                font-size: 2.5em;
-                color: #27ae60; /* Jasny zielony nagłówka */
-            }
-
-        /* Nawigacja */
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            background-color: #34495e; /* Ciemny odcień zieleni */
-            padding: 10px;
-        }
-
-            nav ul li {
-                display: inline;
-            }
-
-                nav ul li a {
-                    color: #ecf0f1;
-                    text-decoration: none;
-                    font-weight: bold;
-                    transition: color 0.3s ease;
-                }
-
-                    nav ul li a:hover {
-                        color: #1abc9c; /* Jasny zielony przy hover */
-                    }
-
-        /* Formularz */
-        .content {
-            max-width: 800px;
-            margin: 40px auto;
-            background-color: #34495e; /* Ciemny odcień zieleni */
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-            .content h1 {
-                color: #27ae60; /* Jasny zielony nagłówka */
-            }
-
-            .content label {
-                color: #27ae60; /* Ciemniejszy odcień zieleni dla etykiet */
-                display: block;
-                margin: 10px 0 5px;
-            }
-
-            .content input, .content select {
-                background-color: #2c3e50; /* Tło w ciemnym odcieniu zieleni */
-                color: #ecf0f1; /* Jasny tekst */
-                border: 1px solid #27ae60; /* Zielona obramowanie */
-                border-radius: 4px;
-                padding: 10px;
-                width: 100%;
-                margin-bottom: 20px;
-            }
-
-                .content input:focus, .content select:focus {
-                    outline-color: #1abc9c; /* Jasnozielona ramka na fokus */
-                }
-
-            .content button {
-                background-color: #1abc9c; /* Jasny zielony przycisk */
-                color: #fff;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 4px;
-                font-size: 1.1em;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-                .content button:hover {
-                    background-color: #16a085; /* Ciemniejszy odcień zieleni przy hover */
-                }
-
-        /* Wiadomości o błędach */
-        .error-message {
-            background-color: rgba(231, 76, 60, 0.1); /* Jasno czerwone tło z przezroczystością */
-            color: #e74c3c; /* Czerwony kolor tekstu */
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-
-        /* Stopka */
-        footer {
-            background-color: #34495e; /* Ciemny kolor stopki */
-            color: #ecf0f1;
-            text-align: center;
-            padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-    </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/Admin/Index">Panel Administratora</a></li>
-            </ul>
-        </nav>
-    </header>
+    <!-- Nagłówek i nawigacja -->
 
     <div class="content">
         <h1>@ViewData["Title"]</h1>
 
-        
-
-        <!-- Formularz dodawania żołnierza -->
         <form method="post" asp-action="AddSoldier">
             @Html.AntiForgeryToken()
 
@@ -199,8 +69,6 @@
         </form>
     </div>
 
-    <footer>
-        <p>&copy; 2024 Twoja Aplikacja</p>
-    </footer>
+    <!-- Stopka -->
 </body>
 </html>

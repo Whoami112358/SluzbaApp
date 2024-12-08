@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -36,7 +36,8 @@ namespace WebApplication2.Models
         public string ImieOjca { get; set; }
 
         [Column("Punkty")]
-        public int Punkty {  get; set; }
+        public int Punkty { get; set; }
+
         // Nawigacja do Pododdziału
         [ForeignKey("ID_Pododdzialu")]
         public virtual Pododdzial Pododdzial { get; set; }
