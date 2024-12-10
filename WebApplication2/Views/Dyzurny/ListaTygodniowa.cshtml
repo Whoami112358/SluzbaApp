@@ -1,17 +1,19 @@
-@model IEnumerable<WebApplication2.Models.Zolnierz>
+﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
 
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista Żołnierzy - Twoja Aplikacja</title>
+    <title>Harmonogram Służb - Twoja Aplikacja</title>
     <link rel="stylesheet" href="~/css/site.css" />
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #2c3e50; /* Ciemny odcień zieleni */
+            color: #ecf0f1; /* Jasny tekst */
             box-sizing: border-box;
         }
 
@@ -46,10 +48,15 @@
 
         .content {
             padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #34495e; /* Ciemny odcień zieleni */
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         footer {
-            background-color: #2c3e50;
+            background-color: #34495e; /* Ciemny kolor stopki */
             color: white;
             text-align: center;
             padding: 10px 20px;
@@ -71,36 +78,27 @@
             }
 
             table th {
-                background-color: #2c3e50;
+                background-color: #27ae60; /* Jasny zielony nagłówki */
                 color: white;
             }
 
-        form {
-            display: flex;
-            align-items: center;
+            table td {
+                background-color: #34495e; /* Jasny szary */
+            }
+
+        /* Linki w tabeli */
+        a {
+            color: #1abc9c; /* Jasny zielony */
+            text-decoration: none;
         }
 
-            form input[type="number"] {
-                padding: 5px;
-                margin-right: 10px;
-                width: 70px;
+            a:hover {
+                color: #34495e; /* Ciemniejszy zielony przy hover */
             }
-
-            form button {
-                padding: 5px 10px;
-                background-color: #1abc9c;
-                border: none;
-                color: white;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-                form button:hover {
-                    background-color: #16a085;
-                }
     </style>
 </head>
 <body>
+
     <header>
         <nav>
             <ul>
@@ -108,38 +106,29 @@
             </ul>
         </nav>
     </header>
+
     <div class="content">
-        <h1>Lista Żołnierzy</h1>
+        <h1>Harmonogram Służb</h1>
 
         <table>
             <thead>
                 <tr>
-                    <th>ID Żołnierza</th>
+                    <th>ID Harmonogramu</th>
+                    <th>Data</th>
                     <th>Imię</th>
                     <th>Nazwisko</th>
-                    <th>Stopień</th>
-                    <th>Punkty</th>
-                    <th>Dodaj Punkty</th>
+                    <th>Służba</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.ID_Zolnierza</td>
-                        <td>@item.Imie</td>
-                        <td>@item.Nazwisko</td>
-                        <td>@item.Stopien</td>
-                        <td>@item.Punkty</td>
-
-                        <!-- Formularz do dodawania punktów -->
-                        <td>
-                            <form method="post" action="/Dyzurny/DodajPunkty">
-                                <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
-                                <input type="number" name="punkty" min="0" step="1" />
-                                <button type="submit">Dodaj Punkty</button>
-                            </form>
-                        </td>
+                        <td>@item.ID_Harmonogram</td>
+                        <td>@item.Data.ToString("yyyy-MM-dd")</td>
+                        <td>@item.Zolnierz?.Imie</td>
+                        <td>@item.Zolnierz?.Nazwisko</td> <!-- Wyświetlenie imienia żołnierza -->
+                        <td>@item.Sluzba?.Rodzaj</td> <!-- Wyświetlenie nazwy służby -->
                     </tr>
                 }
             </tbody>
