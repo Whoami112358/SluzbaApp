@@ -9,16 +9,12 @@
   <ItemGroup>
     <Compile Remove="Views\Nowy folder1\**" />
     <Compile Remove="Views\Nowy folder2\**" />
-    <Compile Remove="Views\Nowy folder\**" />
     <Content Remove="Views\Nowy folder1\**" />
     <Content Remove="Views\Nowy folder2\**" />
-    <Content Remove="Views\Nowy folder\**" />
     <EmbeddedResource Remove="Views\Nowy folder1\**" />
     <EmbeddedResource Remove="Views\Nowy folder2\**" />
-    <EmbeddedResource Remove="Views\Nowy folder\**" />
     <None Remove="Views\Nowy folder1\**" />
     <None Remove="Views\Nowy folder2\**" />
-    <None Remove="Views\Nowy folder\**" />
   </ItemGroup>
 
   <ItemGroup>
