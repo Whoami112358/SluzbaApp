@@ -1,0 +1,46 @@
+﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Kalendarz Służb";
+}
+
+<h1>Kalendarz Służb</h1>
+
+<div id="calendar"></div>
+
+<!-- Styl dla FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+
+<!-- Skrypty FullCalendar -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            locale: 'pl', // Ustawienie języka na polski
+            events: [
+    @foreach (var item in Model)
+    {
+        <text>
+                        {
+                            title: "@(item.Sluzba?.Rodzaj ?? "Służba")",
+                            start: "@item.Data.ToString("yyyy-MM-dd")",
+                            allDay: true
+                        },
+        </text>
+    }
+            ],
+            eventColor: '#007bff', // Kolor wydarzeń
+        });
+
+        calendar.render();
+    });
+</script>
