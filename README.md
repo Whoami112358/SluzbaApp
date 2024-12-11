@@ -35,8 +35,8 @@ System Zarządzania Służbami to aplikacja internetowa mająca na celu automaty
 ### 1. Klonowanie repozytorium
 
 ```bash
-git clone https://github.com/uzytkownik/system-zarzadzania-sluzbami.git
-cd system-zarzadzania-sluzbami
+git clone https://github.com/Whoami112358/SluzbaApp.git
+cd SluzbaApp
 ```
 
 ### 2. Konfiguracja środowiska
@@ -56,7 +56,6 @@ cd system-zarzadzania-sluzbami
 
 #### Backend:
 ```bash
-cd Backend
  dotnet restore
  dotnet build
  dotnet run
