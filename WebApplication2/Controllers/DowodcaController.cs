@@ -179,6 +179,54 @@ namespace WebApplication2.Controllers
             return View(); // przydzielzastepce.cshtml
         }
 
+        // GET: /Dowodca/ListaPowiadomien
+        // sortColumn może być np. "Zolnierz", "Tresc", "DataWyslania", "Status"
+        // sortOrder "asc" lub "desc"
+        public async Task<IActionResult> ListaPowiadomien(string sortColumn, string sortOrder)
+        {
+            // 1) Pobieramy wszystkie powiadomienia wraz z danymi żołnierza
+            var query = _context.Powiadomienia
+                .Include(p => p.Zolnierz)
+                .AsQueryable();
+
+            // 2) Domyślne sortowanie: DataIGodzinaWyslania desc
+            if (string.IsNullOrEmpty(sortColumn)) sortColumn = "Data";
+            if (string.IsNullOrEmpty(sortOrder)) sortOrder = "desc";
+
+            // 3) Sortowanie wg. parametru
+            // Używamy switch, by sortować różne kolumny
+            // (lub można użyć dynamicznej biblioteki do sortowania)
+            query = sortColumn switch
+            {
+                "Zolnierz" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.Zolnierz.Nazwisko)
+                    : query.OrderByDescending(p => p.Zolnierz.Nazwisko),
+
+                "Tresc" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.TrescPowiadomienia)
+                    : query.OrderByDescending(p => p.TrescPowiadomienia),
+
+                "Status" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.Status)
+                    : query.OrderByDescending(p => p.Status),
+
+                "Data" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.DataIGodzinaWyslania)
+                    : query.OrderByDescending(p => p.DataIGodzinaWyslania),
+
+                _ => query.OrderByDescending(p => p.DataIGodzinaWyslania) // domyślne
+            };
+
+            // 4) Pobieramy z bazy
+            var powiadomienia = await query.ToListAsync();
+
+            // 5) Przekazujemy do widoku
+            // By wiedzieć, jaka aktualnie kolumna i order
+            ViewBag.CurrentSortColumn = sortColumn;
+            ViewBag.CurrentSortOrder = sortOrder;
+
+            return View(powiadomienia);
+        }
         // POST: /Dowodca/PrzydzielZastepce
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -220,5 +268,88 @@ namespace WebApplication2.Controllers
             // Powrót do listy harmonogramu, aby zobaczyć zmiany
             return RedirectToAction("HarmonogramKC", "Dyzurny");
         }
+        // ===============================================
+        // 1) GET: Wybór służby, aby sprawdzić powiadomienia
+        // ===============================================
+        [HttpGet]
+        public async Task<IActionResult> SprawdzPowiadomienia()
+        {
+            // Pobieramy listę służb, żeby Dowódca mógł wybrać z dropdown
+            var sluzby = await _context.Sluzby.ToListAsync();
+
+            // Można też posortować, albo wybrać te, które mają powiadomienia.
+            // Dla uproszczenia pobieramy wszystkie.
+            ViewBag.Sluzby = sluzby;
+
+            // Zwracamy pusty model, czekając na wybór służby
+            return View();
+        }
+
+        // ===============================================
+        // 2) POST: Po wybraniu służby -> sprawdź status
+        // ===============================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SprawdzPowiadomienia(int ID_Sluzby)
+        {
+            // Znajdź wskazaną służbę
+            var sluzba = await _context.Sluzby.FindAsync(ID_Sluzby);
+            if (sluzba == null)
+            {
+                ModelState.AddModelError("", "Nie znaleziono wybranej służby.");
+                // Przekazujemy listę służb ponownie, aby można było wybrać
+                ViewBag.Sluzby = await _context.Sluzby.ToListAsync();
+                return View();
+            }
+
+            // Teraz chcemy wybrać powiadomienia, które dotyczą tej służby.
+            // Łączymy tabele: Powiadomienie -> Zolnierz -> Harmonogram -> Sluzba
+            // Sposób 1: Z użyciem LINQ
+            // Pseudokod:
+            var query =
+                from p in _context.Powiadomienia
+                join z in _context.Zolnierze on p.ID_Zolnierza equals z.ID_Zolnierza
+                join h in _context.Harmonogramy on z.ID_Zolnierza equals h.ID_Zolnierza
+                where h.ID_Sluzby == ID_Sluzby
+                select new { Powiadomienie = p, Zolnierz = z };
+
+            var powiadomieniaSluzby = await query.ToListAsync();
+
+            // Liczymy ile jest odebranych / nieodebranych
+            // Zakładamy, że p.Status = "Odebrane" / "Wysłano" / "Nieodebrane" itd.
+            int total = powiadomieniaSluzby.Count;
+            int odebraneCount = powiadomieniaSluzby.Count(x => x.Powiadomienie.Status == "Odebrane");
+            int nieodebraneCount = total - odebraneCount;
+
+            // Lista nieodebranych
+            var nieodebrani = powiadomieniaSluzby
+                .Where(x => x.Powiadomienie.Status != "Odebrane")
+                .Select(x => x.Zolnierz.Imie + " " + x.Zolnierz.Nazwisko)
+                .ToList();
+
+            // Przygotowujemy ViewModel z danymi do wyświetlenia
+            var vm = new PowiadomieniaStatusViewModel
+            {
+                NazwaSluzby = sluzba.Rodzaj,
+                LiczbaPowiadomien = total,
+                LiczbaOdebranych = odebraneCount,
+                LiczbaNieodebranych = nieodebraneCount,
+                NieodebraniZolnierze = nieodebrani
+            };
+
+            return View("WynikPowiadomien", vm);
+        }
+    }
+
+    // ========================================
+    // ViewModel do wyświetlania wyników
+    // ========================================
+    public class PowiadomieniaStatusViewModel
+    {
+        public string NazwaSluzby { get; set; }
+        public int LiczbaPowiadomien { get; set; }
+        public int LiczbaOdebranych { get; set; }
+        public int LiczbaNieodebranych { get; set; }
+        public List<string> NieodebraniZolnierze { get; set; }
     }
 }
