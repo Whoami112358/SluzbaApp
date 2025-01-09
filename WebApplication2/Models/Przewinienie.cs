@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication2.Models
@@ -14,12 +15,16 @@ namespace WebApplication2.Models
         public int ID_Zolnierza { get; set; }
 
         [Column("Liczba_dodatkowych_sluzb")]
-        public int LiczbaDodatkowychSluzb { get; set; }
+        public int? LiczbaDodatkowychSluzb { get; set; }
 
         [Column("Data_wprowadzenia")]
-        public DateTime DataWprowadzenia { get; set; }
+        public DateTime? DataWprowadzenia { get; set; }
 
         [Column("Opis_przewinienia")]
         public string OpisPrzewinienia { get; set; }
+
+        // Nawigacja do Zolnierz
+        [ForeignKey("ID_Zolnierza")]
+        public virtual Zolnierz Zolnierz { get; set; }
     }
 }

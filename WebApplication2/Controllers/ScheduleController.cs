@@ -21,38 +21,27 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var username = User.Identity.Name;
+            var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
 
-            // Znajdź żołnierza na podstawie ID (loginu)
-            var zolnierz = await _context.Zolnierze
-                .FirstOrDefaultAsync(z => z.ID_Zolnierza.ToString() == username); // Używamy ID_Zolnierza jako loginu
-
-            if (zolnierz == null)
+            if (idZolnierzaClaim == null)
             {
                 return NotFound("Nie znaleziono żołnierza.");
             }
 
-            // Pobierz pododdział, do którego należy żołnierz
-            var pododdzial = await _context.Pododdzialy
-                .FirstOrDefaultAsync(p => p.ID_Pododdzialu == zolnierz.IDPododdzialu);
+            var idZolnierza = int.Parse(idZolnierzaClaim);
 
-            if (pododdzial == null)
-            {
-                return NotFound("Nie znaleziono pododdziału.");
-            }
-
-            // Pobierz harmonogramy dla tego pododdziału
+            // Fetch schedules for the logged-in soldier
             var harmonogramy = await _context.Harmonogramy
-                .Where(h => h.PrzypisanyPododdzial == pododdzial.ID_Pododdzialu)
+                .Where(h => h.ID_Zolnierza == idZolnierza)
+                .Include(h => h.Sluzba)
                 .ToListAsync();
 
-            // Jeśli brak harmonogramów, przekazujemy pustą listę
             if (harmonogramy == null)
             {
                 harmonogramy = new List<Harmonogram>();
             }
 
-            return View(harmonogramy); // Przekazujemy harmonogramy do widoku
+            return View(harmonogramy);
         }
     }
 }

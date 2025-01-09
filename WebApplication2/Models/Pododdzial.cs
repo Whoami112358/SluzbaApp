@@ -20,10 +20,10 @@ namespace WebApplication2.Models
         [Column("Dowodca")]
         public string Dowodca { get; set; }
 
+        [Column("Nr_kontaktowy")]
+        public string NrKontaktowy { get; set; }
+
         // Lista żołnierzy przypisanych do tego pododdziału
         public virtual ICollection<Zolnierz> Zolnierze { get; set; }
-
-        // Lista harmonogramów przypisanych do tego pododdziału
-        public virtual ICollection<Harmonogram> Harmonogramy { get; set; }
     }
 }
