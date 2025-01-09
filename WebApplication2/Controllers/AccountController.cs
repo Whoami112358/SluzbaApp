@@ -17,6 +17,8 @@ namespace WebApplication2.Controllers
             _context = context;
         }
 
+        // Test nowego brancha - Grunt2
+
         // GET: /Account/Login
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
