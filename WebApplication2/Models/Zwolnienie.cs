@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication2.Models
@@ -18,5 +19,9 @@ namespace WebApplication2.Models
 
         [Column("Data_zakonczenia_zwolnienia")]
         public DateTime DataZakonczeniaZwolnienia { get; set; }
+
+        // Nawigacja do Zolnierz
+        [ForeignKey("ID_Zolnierza")]
+        public virtual Zolnierz Zolnierz { get; set; }
     }
 }
