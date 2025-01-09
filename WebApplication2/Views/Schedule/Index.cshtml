@@ -9,7 +9,6 @@
 <html lang="pl">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="/css/site.css" />
     <style>
@@ -78,7 +77,7 @@
         }
 
         th {
-            background-color: #27ae60; /* Zielony wojskowy nagłówek tabeli */
+            background-color: #27ae60; /* Zielony wojskowy nagłówek */
             color: #fff;
         }
 
@@ -88,7 +87,7 @@
         }
 
         tr:hover {
-            background-color: #616f39; /* Jaśniejszy odcień zieleni przy najechaniu na wiersz */
+            background-color: #616f39; /* Jaśniejszy odcień zieleni przy najechaniu */
         }
 
         footer {
@@ -107,13 +106,24 @@
 
         /* Styl dla wiadomości o błędach */
         .error-message {
-            background-color: rgba(231, 76, 60, 0.1); /* Jasno-czerwony z delikatną przezroczystością */
-            color: #e74c3c; /* Czerwony tekst */
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
             padding: 10px;
             border: 1px solid #e74c3c;
             border-radius: 5px;
             margin-bottom: 15px;
         }
+
+        /* Styl linku w kolumnie Przypomnienie */
+        .reminder-link {
+            color: #1abc9c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            .reminder-link:hover {
+                color: #34495e;
+            }
     </style>
 </head>
 <body>
@@ -125,6 +135,7 @@
                 <tr>
                     <th>Data</th>
                     <th>Służba</th>
+                    <th>Przypomnienie</th>
                 </tr>
             </thead>
             <tbody>
@@ -133,6 +144,13 @@
                     <tr>
                         <td>@item.Data.ToShortDateString()</td>
                         <td>@(item.Sluzba != null ? item.Sluzba.Rodzaj : "Brak")</td>
+                        <td>
+                            <a href="@Url.Action("AddReminder", "Schedule", new { idHarmonogram = item.ID_Harmonogram })"
+                               class="reminder-link">
+                                Dodaj przypomnienie
+                            </a>
+                        </td>
+
                     </tr>
                 }
             </tbody>
