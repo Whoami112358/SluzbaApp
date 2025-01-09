@@ -27,7 +27,7 @@ namespace WebApplication2.Models
         public int? Wiek { get; set; }
 
         [Column("Adres")]
-        public string Adres { get; set; }
+        public string? Adres { get; set; }
 
         [Column("Pesel")]
         public string Pesel { get; set; }

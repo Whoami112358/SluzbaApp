@@ -1,22 +1,13 @@
 using System.Data;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Models;
-using System.Data.SqlClient;
-using Mysqlx.Crud;
 using MySqlConnector;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Microsoft.AspNetCore.Hosting.Server;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
-using System.Reflection.Metadata;
-using iText.Layout.Properties;
+using iText.Layout.Properties; 
 using iText.IO.Font;
 using iText.Kernel.Font;
-using System.Web;
-using Microsoft.Extensions.Hosting.Internal;
-using System.Net;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace WebApplication2.Controllers
@@ -123,7 +114,7 @@ namespace WebApplication2.Controllers
                                                 .ToList();
                 }
 
-                if (harmonogram == null)
+                if (harmonogram == null || harmonogram.Count <= 0)
                 {
                     throw new Exception("No data to parse.");
                 }
