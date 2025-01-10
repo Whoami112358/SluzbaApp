@@ -106,7 +106,7 @@ namespace WebApplication2.Controllers
             {
                 // Jeśli dane logowania są niepoprawne
                 ViewBag.Error = "Niepoprawny login lub hasło.";
-                return View();
+                return View("/Views/Home/Index.cshtml");
             }
         }
 
