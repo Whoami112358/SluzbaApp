@@ -1,0 +1,120 @@
+﻿@model IEnumerable<WebApplication2.Models.Powiadomienie>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Moje Powiadomienia";
+}
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #34495e;
+            padding: 20px;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+            color: #ecf0f1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #27ae60;
+        }
+
+        th {
+            background-color: #27ae60;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #616f39;
+        }
+
+        a.button-link {
+            text-decoration: none;
+            color: #1abc9c;
+            font-weight: bold;
+        }
+
+            a.button-link:hover {
+                color: #34495e;
+            }
+
+        .status-odebrane {
+            color: #2ecc71; /* zielony */
+            font-weight: bold;
+        }
+
+        .status-wyslano {
+            color: #e74c3c; /* czerwony */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>@ViewData["Title"]</h2>
+
+        @if (Model == null || !Model.Any())
+        {
+            <p>Brak powiadomień do wyświetlenia.</p>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Treść</th>
+                        <th>Typ</th>
+                        <th>Wysłano</th>
+                        <th>Status</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>@p.TrescPowiadomienia</td>
+                            <td>@p.TypPowiadomienia</td>
+                            <td>
+                                @p.DataIGodzinaWyslania?.ToString("yyyy-MM-dd HH:mm")
+                            </td>
+                            <td>
+                                @if (p.Status == "Odebrane")
+                                {
+                                    <span class="status-odebrane">Odebrane</span>
+                                }
+                                else
+                                {
+                                    <span class="status-wyslano">@(p.Status ?? "Wysłano")</span>
+                                }
+                            </td>
+                            <td>
+                                @if (p.Status != "Odebrane")
+                                {
+                                    <!-- ZAMIENIAMY tag helper na bezpośrednie href -->
+                                    <a href="/Powiadomienia/Odbierz?idPowiadomienia=@p.ID_Powiadomienia"
+                                       class="button-link">
+                                        Odbierz
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</body>
+</html>
