@@ -1,0 +1,48 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Przypomnienie utworzone";
+    var link = ViewBag.GoogleLink as string;
+}
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Aplikacja</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #34495e;
+            padding: 20px;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+        }
+
+        a {
+            color: #1abc9c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>@ViewData["Title"]</h2>
+
+        <p>Link do dodania wydarzenia w Google Calendar:</p>
+        @if (!string.IsNullOrEmpty(link))
+        {
+            <p>
+                <a href="@link" target="_blank">Dodaj do kalendarza</a>
+            </p>
+        }
+        else
+        {
+            <p>Nie wygenerowano linku.</p>
+        }
+
+        <p><a href="@Url.Action("Index", "Schedule")">Powrót do harmonogramu</a></p>
+    </div>
+</body>
+</html>

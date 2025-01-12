@@ -4,6 +4,7 @@ using WebApplication2.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Jedrych tu byl
 // Pobierz connection string z appsettings.json
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 

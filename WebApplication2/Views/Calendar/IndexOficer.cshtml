@@ -1,0 +1,61 @@
+﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
+
+@{
+    ViewData["Title"] = "Kalendarz Oficera Dyżurnego";
+}
+
+<h1>Kalendarz Oficera Dyżurnego</h1>
+
+<div id="calendar"></div>
+
+<!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+<style>
+    /* Zawijanie tekstu i poprawki dla kalendarza */
+    .fc-daygrid-event {
+        white-space: normal !important; /* Zawijanie tekstu */
+        line-height: 1.2; /* Większy odstęp między liniami */
+        font-size: 0.85em; /* Mniejszy rozmiar czcionki */
+        text-align: left; /* Wyrównanie tekstu do lewej */
+        padding: 3px; /* Dodatkowy odstęp wewnętrzny */
+    }
+
+    .fc-daygrid-day-frame {
+        height: auto !important; /* Dynamiczna wysokość kratki */
+    }
+
+    /* Opcjonalne: Poprawki wyglądu przy wielu wydarzeniach w jednym dniu */
+    .fc-daygrid-day-events {
+        max-height: 100px; /* Maksymalna wysokość dla wydarzeń */
+        overflow-y: auto; /* Dodanie scrolla, jeśli wydarzeń jest za dużo */
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        var eventsData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(item => new
+        {
+            title = $"{item.Zolnierz.Imie} {item.Zolnierz.Nazwisko} - {item.Sluzba.Rodzaj}",
+            start = item.Data.ToString("yyyy-MM-dd"),
+            allDay = true
+        })));
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            locale: 'pl', // Język polski
+            events: eventsData, // Przekazywanie wydarzeń z bazy danych
+            eventColor: '#28a745', // Zielony kolor wydarzeń
+        });
+
+        calendar.render();
+    });
+</script>

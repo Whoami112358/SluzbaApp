@@ -1,21 +1,28 @@
 using System.Data;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Models;
-using System.Data.SqlClient;
-using Mysqlx.Crud;
 using MySqlConnector;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
+using iText.Layout.Properties; 
+using iText.IO.Font;
+using iText.Kernel.Font;
+using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics;
 
 namespace WebApplication2.Controllers
 {  // Zabezpieczenie kontrolera, aby dostęp miały tylko osoby z rolą "Officer"
     public class DyzurnyController : Controller
     {
+        private readonly IHostEnvironment _hostEnvironment;
         private readonly ApplicationDbContext _context;
-        public DyzurnyController(ApplicationDbContext context)
+        IMemoryCache _memoryCache;
+        public DyzurnyController(ApplicationDbContext context, IHostEnvironment hostEnvironment, IMemoryCache memoryCache)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
+            _memoryCache = memoryCache;
         }
         public IActionResult DyzurnyView()
         {
@@ -62,6 +69,39 @@ namespace WebApplication2.Controllers
             // Po zaktualizowaniu danych przekieruj z powrotem do listy żołnierzy
             return RedirectToAction("Punktacja");
         }
+
+        // Akcja POST do usuwania punktów
+        [HttpPost]
+        public IActionResult UsunPunkty(int ID_Zolnierza, int punkty)
+        {
+            // Logowanie początku akcji
+            Debug.WriteLine($"UsunPunkty wywołane dla ID_Zolnierza: {ID_Zolnierza}, punkty: {punkty}");
+
+            // Znajdź żołnierza w bazie danych
+            var zolnierz = _context.Zolnierze.FirstOrDefault(z => z.ID_Zolnierza == ID_Zolnierza);
+            if (zolnierz != null)
+            {
+                // Sprawdź, czy punkty do usunięcia są większe niż obecne punkty
+                if (zolnierz.Punkty >= punkty)
+                {
+                    // Odejmij punkty od żołnierza
+                    zolnierz.Punkty -= punkty;
+                }
+                else
+                {
+                    // Dodanie logiki do obsługi błędu, np. przekierowanie z komunikatem
+                    TempData["Error"] = "Nie można usunąć więcej punktów niż aktualnie posiadane.";
+                    return RedirectToAction("Punktacja");
+                }
+
+                // Zapisz zmiany w bazie danych
+                _context.SaveChanges();
+            }
+
+            // Po zaktualizowaniu danych przekieruj z powrotem do listy żołnierzy
+            return RedirectToAction("Punktacja");
+        }
+
         public IActionResult HarmonogramKC()
         {
             var harmonogram = _context.Harmonogramy
@@ -70,6 +110,7 @@ namespace WebApplication2.Controllers
                                         .OrderBy(h => h.Data)
                                         .ToList();
 
+            _memoryCache.Set("Harmonogram", harmonogram, TimeSpan.FromMinutes(10));
             return View(harmonogram);  // Zwracanie widoku z danymi harmonogramu
         }
 
@@ -88,6 +129,85 @@ namespace WebApplication2.Controllers
             return View();
         }
 
+        public ActionResult Download()
+        {
+            try
+            {
+                List<Harmonogram> harmonogram;
+
+                if (_memoryCache.TryGetValue("Harmonogram", out List<Harmonogram>? _harmonogram))
+                {
+                    harmonogram = _harmonogram;
+                }
+                else
+                {
+                    harmonogram = _context.Harmonogramy
+                                                .Include(h => h.Zolnierz)  // Ładowanie powiązanych danych żołnierza
+                                                .Include(h => h.Sluzba)    // Ładowanie powiązanych danych służby
+                                                .OrderBy(h => h.Data)
+                                                .ToList();
+                }
+
+                if (harmonogram == null || harmonogram.Count <= 0)
+                {
+                    throw new Exception("No data to parse.");
+                }
+
+                // Generate PDF
+                using (var memoryStream = new MemoryStream())
+                {
+                    PdfWriter writer = new PdfWriter(memoryStream);
+                    PdfDocument pdf = new PdfDocument(writer);
+                    iText.Layout.Document document = new iText.Layout.Document(pdf);
+
+                    var fontPath = Path.Combine(_hostEnvironment.ContentRootPath, "fonts/Roboto-Medium.ttf");
+                    var regularFont = PdfFontFactory.CreateFont(fontPath, PdfEncodings.IDENTITY_H);
+
+                    // Add a title
+                    document.Add(new Paragraph("Harmonogram Służb").SetFont(regularFont).SetFontSize(18).SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER));
+
+                    // Create a table with the same number of columns as the data
+                    var table = new iText.Layout.Element.Table(5).SetHorizontalAlignment(HorizontalAlignment.CENTER);
+
+                    string[] headers = { "ID", "Data", "Imie", "Nazwisko", "Służba" };
+                    foreach (var header in headers)
+                    {
+                        table.AddHeaderCell(
+                            new Cell().Add(new Paragraph(header).SimulateBold()) // Make header bold
+                                .SetBackgroundColor(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY) // Background color
+                                .SetTextAlignment(TextAlignment.CENTER) // Center-align header text
+                                .SetFont(regularFont)); //set bold font
+                    }
+
+                    // Add rows to the table
+                    foreach (var row in harmonogram)
+                    {
+                        string[] data = [row.ID_Harmonogram.ToString(),
+                        row.Data.ToString("yyyy-MM-dd"),
+                        row.Zolnierz?.Imie,
+                        row.Zolnierz?.Nazwisko,
+                        row.Sluzba?.Rodzaj];
+
+                        foreach (var dt in data)
+                        {
+                            table.AddCell(new Cell().Add(new Paragraph(dt)).SetPadding(10).SetFont(regularFont));
+                        }
+
+                    }
+
+                    document.Add(table);
+                    document.Close();
+
+                    // Return the PDF as a downloadable file
+                    byte[] fileBytes = memoryStream.ToArray();
+                    string fileName = "Harmonogram.pdf";
+                    return File(fileBytes, "application/pdf", fileName);
+                }
+            }
+            catch (Exception e) {
+                return null;
+            }
+        }
 
         // POST: /Admin/AddSchedule
         [HttpPost]

@@ -1,3 +1,9 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Mój Profil";
+}
+
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -111,16 +117,6 @@
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/">Strona Główna</a></li>
-                <li><a href="/Schedule">Harmonogram Służb</a></li>
-                <li><a href="/Profile">Mój Profil</a></li>
-                <li><a href="/Account/Logout">Wyloguj się</a></li>
-            </ul>
-        </nav>
-    </header>
     <div class="content">
         <h1>Mój Profil</h1>
         <p><strong>Imię:</strong> @ViewBag.Imie</p>
@@ -129,6 +125,8 @@
         <p><strong>Wiek:</strong> @ViewBag.Wiek</p>
         <p><strong>Adres:</strong> @ViewBag.Adres</p>
         <p><strong>Imię Ojca:</strong> @ViewBag.ImieOjca</p>
+        <p><strong>Punkty:</strong> @ViewBag.Punkty</p>
+
 
         <a href="/Profile/Edit">Edytuj Profil</a>
     </div>
