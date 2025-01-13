@@ -1,0 +1,162 @@
+@model IEnumerable<WebApplication2.Models.Zolnierz>
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Żołnierzy - Twoja Aplikacja</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 20px;
+        }
+
+            nav ul li {
+                display: inline;
+            }
+
+                nav ul li a {
+                    color: white;
+                    text-decoration: none;
+                    font-weight: bold;
+                    transition: color 0.3s ease;
+                }
+
+                    nav ul li a:hover {
+                        color: #1abc9c;
+                    }
+
+        .content {
+            padding: 20px;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 10px 20px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+            table th, table td {
+                padding: 10px;
+                text-align: left;
+                border: 1px solid #ddd;
+            }
+
+            table th {
+                background-color: #2c3e50;
+                color: white;
+            }
+
+        form {
+            display: flex;
+            align-items: center;
+        }
+
+            form input[type="number"] {
+                padding: 5px;
+                margin-right: 10px;
+                width: 70px;
+            }
+
+            form button {
+                padding: 5px 10px;
+                background-color: #1abc9c;
+                border: none;
+                color: white;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+                form button:hover {
+                    background-color: #16a085;
+                }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/Dyzurny/DyzurnyView" style="color: #1abc9c;">Wróć do Strony głównej</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="content">
+        <h1>Lista Żołnierzy</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Żołnierza</th>
+                    <th>Imię</th>
+                    <th>Nazwisko</th>
+                    <th>Stopień</th>
+                    <th>Punkty</th>
+                    <th>Dodaj Punkty</th>
+                    <th>Usuń Punkty</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.ID_Zolnierza</td>
+                        <td>@item.Imie</td>
+                        <td>@item.Nazwisko</td>
+                        <td>@item.Stopien</td>
+                        <td>@item.Punkty</td>
+
+                        <!-- Formularz do dodawania punktów -->
+                        <td>
+                            <form method="post" action="/Dyzurny/DodajPunkty">
+                                <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
+                                <input type="number" name="punkty" min="0" step="1" />
+                                <button type="submit">Dodaj Punkty</button>
+                            </form>
+                        </td>
+                        <!-- Formularz do usuwania punktów -->
+                        <td>
+                            <form method="post" action="/Dyzurny/UsunPunkty">
+                                <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
+                                <input type="number" name="punkty" min="0" step="1" required />
+                                <button type="submit">Usuń Punkty</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+    </footer>
+</body>
+</html>
