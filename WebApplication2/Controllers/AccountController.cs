@@ -21,7 +21,6 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
-            // Ustawienie returnUrl w ViewBag, aby można było go użyć w formularzu
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -33,17 +32,17 @@ namespace WebApplication2.Controllers
         {
             // Pobieramy dane logowania z tabeli Login_dane
             var loginData = await _context.Login_dane
-                .Include(l => l.Zolnierz)  // Dołączamy dane żołnierza, aby mieć dostęp do jego ID_Zolnierza
+                .Include(l => l.Zolnierz)
                 .FirstOrDefaultAsync(l => l.LoginName == login); // Wyszukiwanie po loginie
 
+            // Logowanie oficera dyżurnego
             if (login == "OficerDyżurny" && haslo == "pass")
             {
-                // Tworzenie tożsamości użytkownika
                 var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, "oficerdyzurny"),
-                new Claim(ClaimTypes.Role, "Officer") // Możesz dodać rolę, jeśli potrzebujesz
-            };
+                {
+                    new Claim(ClaimTypes.Name, "oficerdyzurny"),
+                    new Claim(ClaimTypes.Role, "Officer")
+                };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -51,86 +50,79 @@ namespace WebApplication2.Controllers
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
 
-                // Przekierowanie na dedykowany widok dla oficera dyżurnego
                 return RedirectToAction("DyzurnyView", "Dyzurny");
             }
 
-            if (login == "Dowódca" && haslo == "pass")
+            // Logowanie dowódców pododdziałów
+            if (loginData != null && loginData.Haslo == haslo)
             {
-                // Tworzenie tożsamości użytkownika
-                var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, "Dowodca"),
-                new Claim(ClaimTypes.Role, "Dowodca") // Możesz dodać rolę, jeśli potrzebujesz
-            };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity));
-
-                // Przekierowanie na dedykowany widok dla oficera dyżurnego
-                return RedirectToAction("DowodcaView", "Dowodca");
-            }
-
-            if (loginData != null && loginData.Haslo == haslo)  // Porównanie hasła
-            {
-                // Tworzymy tożsamość użytkownika
-                var claims = new List<Claim>
+                if (loginData.Email != null && loginData.Email.StartsWith("pododdzial"))
                 {
-                    new Claim(ClaimTypes.Name, loginData.LoginName),
-                    new Claim(ClaimTypes.NameIdentifier, loginData.ID_Loginu.ToString()),
-                    new Claim("ID_Zolnierza", loginData.ID_Zolnierza.ToString())
-                };
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, loginData.LoginName),
+                        new Claim(ClaimTypes.Role, "Dowodca"), // Rola dla dowódców pododdziałów
+                        new Claim("Pododdzial", loginData.Email) // Informacja o pododdziale
+                    };
 
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity));
 
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity));
+                    // Przekierowanie do widoku dowódców
+                    return RedirectToAction("DowodcaView", "Dowodca");
+                }
 
-                // Pobieramy dane żołnierza, aby ustawić imię i nazwisko w ViewBag
-                var zolnierz = await _context.Zolnierze
-                    .FirstOrDefaultAsync(z => z.ID_Zolnierza == loginData.ID_Zolnierza);
+                // Logowanie zwykłego żołnierza
+                if (loginData.Email != null && loginData.Email.Contains(login))
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, loginData.LoginName),
+                        new Claim(ClaimTypes.NameIdentifier, loginData.ID_Loginu.ToString()),
+                        new Claim("ID_Zolnierza", loginData.ID_Zolnierza.ToString())
+                    };
 
-                // Ustawiamy imię i nazwisko w ViewBag
-                ViewBag.Imie = zolnierz?.Imie;
-                ViewBag.Nazwisko = zolnierz?.Nazwisko;
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                // Przekierowanie po zalogowaniu
-                return RedirectToLocal(returnUrl);
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity));
+
+                    var zolnierz = await _context.Zolnierze
+                        .FirstOrDefaultAsync(z => z.ID_Zolnierza == loginData.ID_Zolnierza);
+
+                    ViewBag.Imie = zolnierz?.Imie;
+                    ViewBag.Nazwisko = zolnierz?.Nazwisko;
+
+                    return RedirectToLocal(returnUrl);
+                }
             }
-            else
-            {
-                // Jeśli dane logowania są niepoprawne
-                ViewBag.Error = "Niepoprawny login lub hasło.";
-                return View();
-            }
+
+            // Jeśli dane logowania są niepoprawne
+            ViewBag.Error = "Niepoprawny login lub hasło.";
+            return View("/Views/Home/Index.cshtml");
         }
 
         // GET: /Account/Logout
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme);
-
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
 
-        // Pomocnicza metoda do obsługi returnUrl
         private IActionResult RedirectToLocal(string returnUrl)
         {
-            // Sprawdzamy, czy returnUrl jest lokalny
             if (Url.IsLocalUrl(returnUrl))
             {
-                return Redirect(returnUrl); // Jeśli lokalny, przekierowujemy
+                return Redirect(returnUrl);
             }
             else
             {
-                return RedirectToAction("Index", "Home"); // Jeśli nie lokalny, przekierowujemy na stronę główną
+                return RedirectToAction("Index", "Home");
             }
         }
     }

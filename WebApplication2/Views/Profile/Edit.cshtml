@@ -1,4 +1,8 @@
 ﻿@model WebApplication2.Models.Zolnierz
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Edytuj Profil";
+}
 
 <!DOCTYPE html>
 <html lang="pl">
@@ -127,16 +131,6 @@
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/">Strona Główna</a></li>
-                <li><a href="/Schedule">Harmonogram Służb</a></li>
-                <li><a href="/Profile">Mój Profil</a></li>
-                <li><a href="/Account/Logout">Wyloguj się</a></li>
-            </ul>
-        </nav>
-    </header>
     <div class="content">
         <h1>Edytuj Mój Profil</h1>
 

@@ -71,6 +71,6 @@ Testy jednostkowe zostały przygotowane w technologii NUnit.
 
 Aby uruchomić testy, wykonaj:
 ```bash
-cd Tests
+cd TestProject
  dotnet test
 ```
