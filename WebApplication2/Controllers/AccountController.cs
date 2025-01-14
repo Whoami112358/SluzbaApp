@@ -35,6 +35,24 @@ namespace WebApplication2.Controllers
                 .Include(l => l.Zolnierz)
                 .FirstOrDefaultAsync(l => l.LoginName == login); // Wyszukiwanie po loginie
 
+            // Logowanie oficera dyżurnego
+            if (login == "OficerDyżurny" && haslo == "pass")
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, "oficerdyzurny"),
+                    new Claim(ClaimTypes.Role, "Officer")
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+
+                return RedirectToAction("DyzurnyView", "Dyzurny");
+            }
+
             // Logowanie dowódców pododdziałów
             if (loginData != null && loginData.Haslo == haslo)
             {
@@ -55,23 +73,6 @@ namespace WebApplication2.Controllers
 
                     // Przekierowanie do widoku dowódców
                     return RedirectToAction("DowodcaView", "Dowodca");
-                }
-
-                if (loginData.Email != null && loginData.Email.StartsWith("OficerDyżurny"))
-                {
-                    var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, "oficerdyzurny"),
-                    new Claim(ClaimTypes.Role, "Officer")
-                };
-
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity));
-
-                    return RedirectToAction("DyzurnyView", "Dyzurny");
                 }
 
                 // Logowanie zwykłego żołnierza

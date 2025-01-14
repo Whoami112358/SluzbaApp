@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "PANEL OFICERA DYŻURNEGO";
+    ViewData["Title"] = "Panel Oficera Dyżurnego";
 }
 
 <!DOCTYPE html>
@@ -10,69 +10,88 @@
     <title>@ViewData["Title"] - Twoja Aplikacja</title>
     <style>
         body {
-            font-family: 'Poppins', Arial, sans-serif;
+            font-family: Arial, sans-serif; /* Łatwiejsza do odczytania czcionka */
             margin: 0;
             padding: 0;
-            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../home.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            color: #ecf0f1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100vh;
-        }
-
-        header {
-            text-align: center;
-            padding: 20px 0;
-            height: 20%;
-        }
-
-        h1 {
-            font-family: 'Special Elite', cursive;
-            font-size: 64px;
-            text-align: center;
-            margin-top: 50px;
-            color: #ffffff;
-        }
-
-        .content {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            height: 80%;
-            width: 100%;
-            padding: 20px;
-            margin: 0 auto;
+            background-color: #2c3e50; /* Ciemny odcień zieleni */
+            color: #ecf0f1; /* Jasny tekst */
             box-sizing: border-box;
         }
 
-        .card {
-            background-color: rgba(119, 131, 83, 0.7);
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 1);
+        header {
+            background-color: #27ae60; /* Jasny zielony */
+            color: white;
+            padding: 20px;
             text-align: center;
-            height: 250px;
-            width: 250px;
+            font-size: 2.5em;
+            text-transform: uppercase;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+            nav ul li {
+                display: block;
+            }
+
+        /* Styl dla przycisków w menu */
+        .button-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px 20px;
+            display: block;
+            background-color: #34495e; /* Ciemny kolor tła */
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+            /* Efekt hover dla przycisków */
+            .button-link:hover {
+                background-color: #16a085; /* Jaśniejszy odcień przy hover */
+            }
+
+        .content {
             padding: 30px;
-            color: #ffffff;
-            font-size: 24px;
-            font-family: 'Poppins', Arial, sans-serif;
-            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 40px auto;
+            max-width: 900px;
+            background-color: #34495e; /* Ciemny odcień zieleni */
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        hr {
+            border: 1px solid #7f8c8d; /* Odcień brązowy */
+            margin: 20px 0;
         }
 
         footer {
+            background-color: #34495e; /* Ciemny kolor stopki */
+            color: white;
             text-align: center;
             padding: 10px;
-            color: #ffffff;
-            font-size: 14px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
         }
-            footer p {
-                margin: 0;
+
+        /* Dodatkowe style dla linków wewnętrznych */
+        a {
+            color: #1abc9c; /* Jasny zielony */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            a:hover {
+                color: #34495e; /* Jaśniejszy odcień na hover */
             }
     </style>
 </head>
@@ -81,41 +100,35 @@
     <header>
         <h1>@ViewData["Title"]</h1>
     </header>
-    <button onclick="location.href='@Url.Action("Index", "Home")'"
-            style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; top: 10px; right: 10px;">
-        <img src="../Wyloguj.png" style="width: 49px; height: 49px;" alt="Wyloguj" />
-    </button>
 
     <div class="content">
-        <div class="card">
-            <button onclick="location.href='@Url.Action("IndexOficer", "Calendar")'" style="border: none; background: none; padding: 0; cursor: pointer;">
-                <img src="../kalendarz.png" style="width: 108px; height: 124px;" />
-                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Kalendarz służb żołnierzy</span>
-            </button>
-        </div>
-        <div class="card">
-            <button onclick="location.href='@Url.Action("Punktacja", "Dyzurny")'" style="border: none; background: none; padding: 0; cursor: pointer;">
-                <img src="../punktacja.png" style="width: 108px; height: 124px;" />
-                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Modyfikowanie punktacji żołnierzy</span>
-            </button>
-        </div>
-        <div class="card">
-            <button onclick="location.href='@Url.Action("HarmonogramKC", "Dyzurny")'" style="border: none; background: none; padding: 0; cursor: pointer;">
-                <img src="../harmonogram.png" style="width: 108px; height: 124px;" />
-                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Wgląd do harmonogramu</span>
-            </button>
-        </div>
+        <ul>
+          
+             <li>
+                <a href="@Url.Action("Index", "DyzurnyCalendar")" class="button-link">➤ Kalendarz służb żołnierzy</a>
+            </li>
+            <li>
+                <a href="@Url.Action("Punktacja", "Dyzurny")" class="button-link">➤ Modyfikowanie punktacji żołnierzy</a>
+            </li>
+            <li>
+                <a href="@Url.Action("HarmonogramKC", "Dyzurny")" class="button-link">➤ Wgląd do harmonogramu</a>
+            </li>
+            <li>
+                <a href="@Url.Action("ListaTygodniowa", "Dyzurny")" class="button-link">➤ Lista żołnierzy pełniących służbę w nadchodzącym tygodniu</a>
+            </li>
+            <li>
+                <a href="/Account/Logout" class="button-link">➤ Wyloguj się</a>
+            </li>
+        </ul>
 
-        <div class="card">
-            <button onclick="location.href='@Url.Action("ListaTygodniowa", "Dyzurny")'" style="border: none; background: none; padding: 0; cursor: pointer;">
-                <img src="../lista.png" style="width: 108px; height: 124px;" />
-                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Lista żołnierzy pełniących służbę w nadchodzącym tygodniu</span>
-            </button>
-        </div>
+
+
+
+        <hr />
     </div>
+
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
     </footer>
-    
 </body>
 </html>

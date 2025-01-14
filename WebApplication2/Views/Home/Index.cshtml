@@ -8,92 +8,110 @@
     <title>Logowanie</title>
     <style>
         body {
-            font-family: 'Poppins', Arial, sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('home.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 100vh;
-            color: #ecf0f1;
-        }
-
-        h1 {
-            font-family: 'Special Elite', cursive;
-            font-size: 96px;
-            text-align: center;
-            margin-top: 50px;
-            color: #ffffff;
-        }
-
-        p {
-            font-family: 'Poppins', Arial, sans-serif;
-            font-size: 24px;
-            text-align: center;
-            margin-bottom: 30px;
-            color: #ffffff;
-        }
-
-        .container {
-            max-width: 500px;
-            max-height: 500px;
-            margin: 0 auto;
-            padding: 30px;
-            background-color: rgba(255, 255, 255, 0.4);
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        label {
-            display: block;
-            font-size: 24px;
-            font-family: 'Poppins', Arial, sans-serif;
-            color: #ffffff;
-            margin-bottom: 10px;
-        }
-
-        input {
-            width: calc(100% - 5px);
-            padding: 10px;
-            font-size: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            outline: none;
-            margin: 0 auto;
-            margin-bottom: 10px;
+            background-color: #2c3e50; /* ciemny odcień zieleni */
+            color: #ecf0f1; /* jasny szary tekst */
             box-sizing: border-box;
         }
 
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 18px; 
-            font-family: 'Poppins', Arial, sans-serif;
+        h1 {
+            text-align: center;
+            margin-top: 40px;
+            color: #27ae60; /* ciemny odcień zieleni */
+            font-size: 2.5em;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1.2em;
+            color: #7f8c8d; /* odcień brązowy */
+            margin-bottom: 20px;
+        }
+
+        /* Style dla formularza */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 40px 30px;
+            background-color: #34495e; /* odcień ciemnej zieleni */
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #27ae60; /* ciemna zieleń */
+        }
+
+        input {
+            padding: 12px;
+            font-size: 1em;
+            border: 1px solid #2c3e50; /* ciemny brązowy */
+            border-radius: 5px;
+            background-color: #2c3e50; /* ciemny odcień zieleni */
+            width: 100%;
+            margin: 0;
+            color: #ecf0f1; /* jasny tekst w polu */
         }
 
         button {
-            width: 100%;
             padding: 12px;
-            font-size: 24px;
-            font-family: 'Poppins', Arial, sans-serif;
-            background-image: linear-gradient(to right, #03340B, #152416);
-            color: #ffffff;
+            font-size: 1.2em;
+            background-color: #1abc9c; /* jasny zielony */
+            color: #fff;
             border: none;
-            border-radius: 10px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 20px;
+            transition: background-color 0.3s ease;
+            width: 100%;
         }
 
             button:hover {
-                background-image: linear-gradient(to right, #152416, #03340B);
+                background-color: #16a085; /* ciemniejszy odcień zieleni */
+            }
+
+        .error-message {
+            color: #e74c3c; /* czerwona */
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            border: 2px solid #e74c3c;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: rgba(231, 76, 60, 0.1);
+            width: 100%;
+        }
+
+        .button-header {
+            background-color: #1abc9c; /* jasny zielony */
+            padding: 12px;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+            .button-header:hover {
+                background-color: #16a085; /* ciemniejszy zielony */
             }
     </style>
 </head>
 <body>
-    <h1>WITAMY W NASZEJ APLIKACJI!</h1>
+    <h1>Witamy w naszej aplikacji!</h1>
     <p>Aplikacja służy do monitorowania systemu służb - harmonogramu i punktów</p>
 
     @if (ViewBag.Error != null)
@@ -110,12 +128,12 @@
 
             <div>
                 <label for="login">Login:</label>
-                <input type="text" id="login" name="login" placeholder="example@gmail.com" required />
+                <input type="text" id="login" name="login" required />
             </div>
 
             <div>
                 <label for="haslo">Hasło:</label>
-                <input type="password" id="haslo" name="haslo" placeholder="********" required />
+                <input type="password" id="haslo" name="haslo" required />
             </div>
 
             <button type="submit">Zaloguj się</button>
