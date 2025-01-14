@@ -8,6 +8,7 @@ using System.Web; // do ewentualnego HttpUtility.UrlEncode
 using System.Collections.Generic;
 using WebApplication2.Models;
 using System.ComponentModel.DataAnnotations;
+using MySqlConnector;
 
 namespace WebApplication2.Controllers
 {
@@ -47,6 +48,94 @@ namespace WebApplication2.Controllers
 
             return View(harmonogramy);
         }
+
+        // POST: /Schedule/ZlozWniosekZmianyTerminu
+        // POST: /Schedule/ZlozWniosekZmianyTerminu
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ZlozWniosekZmianyTerminu(WniosekZmianyTerminuViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Błąd walidacji - wracamy do widoku
+                return RedirectToAction("Index");
+            }
+
+            // Znalezienie wpisu w harmonogramie
+            var harmItem = await _context.Harmonogramy
+                .Include(h => h.Sluzba)
+                .FirstOrDefaultAsync(h => h.ID_Harmonogram == model.ID_Harmonogramu);
+
+            if (harmItem == null)
+            {
+                ModelState.AddModelError("", "Nie znaleziono służby w harmonogramie.");
+                return RedirectToAction("Index");
+            }
+
+            // Pobranie ID żołnierza z jego roli (claim)
+            var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
+            if (idZolnierzaClaim == null)
+            {
+                return NotFound("Nie znaleziono żołnierza.");
+            }
+            var idZolnierza = int.Parse(idZolnierzaClaim);
+
+            // Pobranie danych żołnierza z tabeli Zolnierze
+            var zolnierz = await _context.Zolnierze
+                .Where(z => z.ID_Zolnierza == idZolnierza)
+                .Select(z => new { z.Imie, z.Nazwisko, z.Stopien, z.ID_Pododdzialu })
+                .FirstOrDefaultAsync();
+
+            if (zolnierz == null)
+            {
+                ModelState.AddModelError("", "Nie znaleziono danych żołnierza.");
+                return RedirectToAction("Index");
+            }
+
+            // Wyszukiwanie dowódcy (kapitana) w tym samym pododdziale
+            var dowodca = await _context.Zolnierze
+                .Where(z => z.ID_Pododdzialu == zolnierz.ID_Pododdzialu && z.Stopien == "kpt")
+                .FirstOrDefaultAsync();
+
+            if (dowodca == null)
+            {
+                ModelState.AddModelError("", "Nie znaleziono dowódcy o stopniu kpt.");
+                return RedirectToAction("Index");
+            }
+
+            int IDdowodca = dowodca.ID_Zolnierza;
+
+            // Konwersja daty z formularza (ProponowanaData)
+            DateTime proponowanaData;
+            if (!DateTime.TryParse(model.ProponowanaData, out proponowanaData))
+            {
+                ModelState.AddModelError("", "Nieprawidłowy format daty.");
+                return RedirectToAction("Index");
+            }
+
+            // Tworzenie treści powiadomienia z dodaniem danych żołnierza
+            string tresc = $"Proszę o zmianę terminu służby z dnia {harmItem.Data.ToString("yyyy-MM-dd")} " +
+                           $"z powodu {model.Uzasadnienie} na dzień {proponowanaData.ToString("yyyy-MM-dd")} " +
+                           $"/ {zolnierz.Stopien} {zolnierz.Imie} {zolnierz.Nazwisko}";
+
+            // Zapisanie powiadomienia w bazie danych
+            string sqlQuery = @"INSERT INTO SluzbaApp.Powiadomienia_dane 
+(ID_Zolnierza, Tresc_powiadomienia, Typ_powiadomienia, Data_i_godzina_wyslania, Status)
+VALUES (@ID_Zolnierza, @Tresc, @Typ, @DataIGodzina, @Status)";
+
+            await _context.Database.ExecuteSqlRawAsync(sqlQuery,
+                new MySqlParameter("@ID_Zolnierza", IDdowodca),
+                new MySqlParameter("@Tresc", tresc),
+                new MySqlParameter("@Typ", "Wniosek"),
+                new MySqlParameter("@DataIGodzina", DateTime.Now),
+                new MySqlParameter("@Status", "Wysłano"));
+
+            // Powiadomienie zostało wysłane, przekierowanie na stronę główną lub wynikową
+            return RedirectToAction("Index");
+        }
+
+
+
 
         // ------------------------------------------------------------
         // GET: /Schedule/AddReminder?idHarmonogram=XYZ

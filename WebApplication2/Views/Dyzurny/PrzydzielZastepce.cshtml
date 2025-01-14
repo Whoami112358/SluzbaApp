@@ -1,6 +1,4 @@
-﻿@model WebApplication2.Models.Harmonogram
-
-@{
+﻿@{
     ViewData["Title"] = "Przydziel Zastępcę";
     var harmonogramItem = ViewBag.HarmonogramItem as WebApplication2.Models.Harmonogram;
     var zolnierze = ViewBag.DostepniZolnierze as List<WebApplication2.Models.Zolnierz>;
@@ -13,7 +11,6 @@
     <title>@ViewData["Title"] - Twoja Aplikacja</title>
     <style>
         /* Stylizacja podobna do poprzednich widoków */
-        /* ... */
         body {
             font-family: Arial, sans-serif;
             background-color: #2c3e50; /* Ciemny odcień zieleni */
@@ -131,29 +128,42 @@
         }
 
         <div>
-            <p><strong>ID Harmonogramu:</strong> @harmonogramItem.ID_Harmonogram</p>
-            <p><strong>Data:</strong> @harmonogramItem.Data.ToString("yyyy-MM-dd")</p>
-            <p><strong>Obecnie przypisany:</strong> @harmonogramItem.Zolnierz?.Imie @harmonogramItem.Zolnierz?.Nazwisko</p>
-            <p><strong>Służba:</strong> @harmonogramItem.Sluzba?.Rodzaj</p>
+            @if (harmonogramItem != null)
+            {
+                <p><strong>ID Harmonogramu:</strong> @harmonogramItem.ID_Harmonogram</p>
+                <p><strong>Data:</strong> @harmonogramItem.Data.ToString("yyyy-MM-dd")</p>
+                <p><strong>Obecnie przypisany:</strong> @harmonogramItem.Zolnierz?.Imie @harmonogramItem.Zolnierz?.Nazwisko</p>
+                <p><strong>Służba:</strong> @harmonogramItem.Sluzba?.Rodzaj</p>
+            }
+            else
+            {
+                <p>Brak danych harmonogramu.</p>
+            }
         </div>
 
         <hr />
 
         <div class="form-container">
-            <form asp-controller="Dowodca"
+            <form asp-controller="Dyzurny"
                   asp-action="PrzydzielZastepce"
                   method="post">
                 @Html.AntiForgeryToken()
 
                 <!-- Przekazanie ID harmonogramu w ukrytym polu -->
-                <input type="hidden" name="ID_Harmonogram" value="@harmonogramItem.ID_Harmonogram" />
+                @if (harmonogramItem != null)
+                {
+                    <input type="hidden" name="ID_Harmonogram" value="@harmonogramItem.ID_Harmonogram" />
+                }
 
                 <label for="ZastepcaId">Wybierz żołnierza zastępcę:</label>
                 <select id="ZastepcaId" name="ZastepcaId" required>
                     <option value="">-- Wybierz zastępcę --</option>
-                    @foreach (var z in zolnierze)
+                    @if (zolnierze != null)
                     {
-                        <option value="@z.ID_Zolnierza">@z.Imie @z.Nazwisko</option>
+                        foreach (var z in zolnierze)
+                        {
+                            <option value="@z.ID_Zolnierza">@z.Imie @z.Nazwisko</option>
+                        }
                     }
                 </select>
 
@@ -162,7 +172,7 @@
         </div>
 
         <!-- Przycisk powrotu do harmonogramu -->
-        <a class="btn-back" href="@Url.Action("HarmonogramKC", "Dowodca")">
+        <a class="btn-back" href="@Url.Action("HarmonogramKC", "Dyzurny")">
             Powrót do Harmonogramu
         </a>
     </div>
