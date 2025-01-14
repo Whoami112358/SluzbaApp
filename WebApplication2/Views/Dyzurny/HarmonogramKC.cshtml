@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
-
+@{
+    ViewData["Title"] = "HARMONOGRAM SŁUŻB";
+}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -8,94 +10,76 @@
     <title>Harmonogram</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            box-sizing: border-box;
-            text-align: center;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
         }
 
         header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px 20px;
+            text-align: center;
+            padding: 20px 0;
+            height: 10%;
         }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 20px;
-        }
-
-            nav ul li {
-                display: inline;
-            }
-
-                nav ul li a {
-                    color: white;
-                    text-decoration: none;
-                    font-weight: bold;
-                    transition: color 0.3s ease;
-                }
-
-                    nav ul li a:hover {
-                        color: #1abc9c;
-                    }
 
         h1 {
+            font-family: 'Special Elite', cursive;
+            font-size: 48px;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            color: #ffffff;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 20px 0;
+        footer {
             text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
         }
 
-            ul li {
-                display: inline;
-                margin-right: 10px;
-            }
-
-        a {
-            text-decoration: none;
-            color: #1abc9c;
-            font-weight: bold;
-            transition: color 0.3s ease;
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 90%;
+            width: 100%;
+            overflow: auto;
+            margin: 0 auto;
+            box-sizing: border-box;
         }
 
-            a:hover {
-                color: #34495e;
-            }
 
         table {
-            width: 80%;
-            margin: 20px auto;
+            margin-right: 50px;
+            margin-left: 50px;
+            width: 100%;
             border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        th, td {
-            padding: 12px 15px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
+            table th, table td {
+                padding: 10px;
+                text-align: center;
+                border: 1px solid #ddd;
+            }
 
-        th {
-            background-color: #34495e;
-            color: white;
-        }
+            table th {
+                top: 0;
+                background-color: rgba(119, 131, 83, 1);
+                color: white;
+            }
 
-        td {
-            background-color: #f9f9f9;
-        }
-
+            table td {
+                background-color: rgba(172, 174, 165, 0.7);
+            }
         /* Styl przekreślenia starego żołnierza */
         .strikethrough {
             text-decoration: line-through;
@@ -110,78 +94,87 @@
         // Ewentualnie pełna lista żołnierzy do odnalezienia starego soldiera
         var zolnierzeDb = ViewBag.ZolnierzeDb as List<WebApplication2.Models.Zolnierz>;
     }
-
     <header>
-        <nav>
-            <ul>
-                <li><a href="/Dyzurny/DyzurnyView" style="color: #1abc9c;">Wróć do Strony głównej</a></li>
-                <li><a href="/Dyzurny/DodajHarmonogramKC">Dodaj Harmonogram</a></li>
-            </ul>
-        </nav>
+        <h1>@ViewData["Title"]</h1>
     </header>
-
-    <h1>Harmonogram Służb</h1>
-
-    <!-- Przykładowy link do pobrania pliku (jeśli istnieje w kontrolerze) -->
-    <a href="@Url.Action("Download")" class="harm-downloadButt">
-        Pobierz harmonogram
-    </a>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID Harmonogramu</th>
-                <th>Data</th>
-                <th>Żołnierz</th>
-                <th>Służba</th>
-                <th>Akcje</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                // Sprawdzamy, czy dany ID_Harmonogram był już zmieniany (ma starego żołnierza)
-                bool isReplaced = replacedSoldiers != null && replacedSoldiers.ContainsKey(item.ID_Harmonogram);
-                int? oldZolnierzId = isReplaced ? replacedSoldiers[item.ID_Harmonogram] : (int?)null;
-
+    <button onclick="location.href='@Url.Action("Download")'"
+            style="border: none; background: none; padding: 0; cursor: pointer; margin-bottom: 20px; ">
+        <span style="font-family: 'Poppins', Arial, sans-serif; font-size: 24px; color: #ffffff;">
+            Pobierz plik
+        </span>
+        <img src="../download.png" style="width: 25px; height: 24px;" />
+    </button>
+    <div class="content">
+        <table>
+            <thead>
                 <tr>
-                    <td>@item.ID_Harmonogram</td>
-                    <td>@item.Data.ToString("yyyy-MM-dd")</td>
-                    <td>
-                        @if (isReplaced && oldZolnierzId.HasValue)
-                        {
-                            // Spróbuj odnaleźć starego żołnierza w bazie (lub w Modelu)
-                            var oldZolnierz = (zolnierzeDb != null)
-                            ? zolnierzeDb.FirstOrDefault(z => z.ID_Zolnierza == oldZolnierzId.Value)
-                            : null;
-
-                            // Jeśli nie ma w bazie, ewentualnie pominąć
-                            if (oldZolnierz != null)
-                            {
-                                <span class="strikethrough">
-                                    @oldZolnierz.Imie @oldZolnierz.Nazwisko
-                                </span>
-                                <span> → </span>
-                            }
-                        }
-
-                        <!-- Wyświetlamy aktualnie przypisanego żołnierza -->
-                        @(item.Zolnierz != null
-                            ? $"{item.Zolnierz.Imie} {item.Zolnierz.Nazwisko}"
-                            : "Brak")
-                    </td>
-                    <td>@(item.Sluzba?.Rodzaj ?? "Brak")</td>
-
-                    <!-- Dodajemy kolumnę z przyciskiem "Przydziel zastępcę" -->
-                    <td>
-                        <a href="@Url.Action("PrzydzielZastepce", "Dowodca", new { idHarmonogram = item.ID_Harmonogram })"
-                           style="color: #e74c3c; font-weight: bold; text-decoration: none;">
-                            Przydziel zastępcę
-                        </a>
-                    </td>
+                    <th>ID Harmonogramu</th>
+                    <th>Data</th>
+                    <th>Żołnierz</th>
+                    <th>Służba</th>
+                    <th>Akcje</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    // Sprawdzamy, czy dany ID_Harmonogram był już zmieniany (ma starego żołnierza)
+                    bool isReplaced = replacedSoldiers != null && replacedSoldiers.ContainsKey(item.ID_Harmonogram);
+                    int? oldZolnierzId = isReplaced ? replacedSoldiers[item.ID_Harmonogram] : (int?)null;
+
+                    <tr>
+                        <td>@item.ID_Harmonogram</td>
+                        <td>@item.Data.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            @if (isReplaced && oldZolnierzId.HasValue)
+                            {
+                                // Spróbuj odnaleźć starego żołnierza w bazie (lub w Modelu)
+                                var oldZolnierz = (zolnierzeDb != null)
+                                ? zolnierzeDb.FirstOrDefault(z => z.ID_Zolnierza == oldZolnierzId.Value)
+                                : null;
+
+                                // Jeśli nie ma w bazie, ewentualnie pominąć
+                                if (oldZolnierz != null)
+                                {
+                                    <span class="strikethrough">
+                                        @oldZolnierz.Imie @oldZolnierz.Nazwisko
+                                    </span>
+                                    <span> → </span>
+                                }
+                            }
+
+                            <!-- Wyświetlamy aktualnie przypisanego żołnierza -->
+                            @(item.Zolnierz != null
+                                ? $"{item.Zolnierz.Imie} {item.Zolnierz.Nazwisko}"
+                                : "Brak")
+                        </td>
+                        <td>@(item.Sluzba?.Rodzaj ?? "Brak")</td>
+
+                        <!-- Dodajemy kolumnę z przyciskiem "Przydziel zastępcę" -->
+                        <td>
+                            <button onclick="location.href='@Url.Action("PrzydzielZastepce", "Dowodca", new { idHarmonogram = item.ID_Harmonogram })'"
+                                    style="font-family: 'Poppins', Arial, sans-serif;
+                                    font-size: 18px;
+                                    font-weight: bold;
+                                    cursor: pointer;
+                                    color: white;
+                                    background-color: rgba(119, 131, 83, 1);
+                                    border: none;
+                                    border-radius: 30px;
+                                    padding: 10px 20px;"> Przydziel zastępcę
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <button onclick="location.href='@Url.Action("DyzurnyView", "Dyzurny")'"
+            style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; bottom: 35px; left: 10px;">
+        <img src="../back.png" style="width: 25px; height: 24px;" />
+    </button>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+    </footer>
 </body>
 </html>
