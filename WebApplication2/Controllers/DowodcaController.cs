@@ -39,10 +39,39 @@ namespace WebApplication2.Controllers
         // ----------------------------------
         public IActionResult HarmonogramKC()
         {
+            Console.WriteLine("Metoda HarmonogramKC została wywołana!");
+            // Pobieramy aktualnie zalogowanego dowódcę
+            var dowodcaId = User.Identity.Name; // Zmienna zależna od sposobu autentykacji
+
+            // Rozdzielamy login na imię i nazwisko
+            var imieNazwisko = dowodcaId.Split('.'); // Zakładamy, że login ma postać Imie.Nazwisko
+            if (imieNazwisko.Length != 2)
+            {
+                return BadRequest("Niepoprawny format loginu.");
+            }
+
+            var imie = imieNazwisko[0]; // Imie
+            var nazwisko = imieNazwisko[1]; // Nazwisko
+
+            // Znajdź żołnierza w tabeli Zolnierze, który ma przypisane imię i nazwisko
+            var zolnierz = _context.Zolnierze
+                .FirstOrDefault(z => z.Imie == imie && z.Nazwisko == nazwisko); // Porównanie z imieniem i nazwiskiem
+
+            // Sprawdzamy, czy żołnierz istnieje
+            if (zolnierz == null)
+            {
+                return NotFound("Nie znaleziono żołnierza o tym imieniu i nazwisku.");
+            }
+
+            // Pobieramy ID pododdziału przypisane temu żołnierzowi
+            var pododdzialId = zolnierz.ID_Pododdzialu;
+
+            // Pobieramy harmonogramy tylko dla żołnierzy przypisanych do tego samego pododdziału
             var harmonogram = _context.Harmonogramy
                 .Include(h => h.Zolnierz)
                 .Include(h => h.Sluzba)
-                .OrderBy(h => h.Data)
+                .Where(h => h.Zolnierz.ID_Pododdzialu == pododdzialId) // Filtrowanie po pododdziale
+                .OrderBy(h => h.Data) // Sortowanie według daty
                 .ToList();
 
             // Przekazujemy słownik do widoku,
@@ -50,6 +79,7 @@ namespace WebApplication2.Controllers
             ViewBag.ReplacedSoldiers = replacedSoldiers;
             return View(harmonogram);
         }
+
 
         // ----------------------------------
         // GET: Dodawanie Harmonogramu
@@ -94,9 +124,42 @@ namespace WebApplication2.Controllers
         // ----------------------------------
         public IActionResult Punktacja()
         {
-            var zolnierze = _context.Zolnierze.ToList();
-            return View(zolnierze);
+            // Pobieramy aktualnie zalogowanego dowódcę
+            var dowodcaId = User.Identity.Name; // Zmienna zależna od sposobu autentykacji
+
+            // Rozdzielamy login na imię i nazwisko
+            var imieNazwisko = dowodcaId.Split('.'); // Zakładamy, że login ma postać Imie.Nazwisko
+            if (imieNazwisko.Length != 2)
+            {
+                return BadRequest("Niepoprawny format loginu.");
+            }
+
+            var imie = imieNazwisko[0]; // Imię
+            var nazwisko = imieNazwisko[1]; // Nazwisko
+
+            // Znajdź żołnierza w tabeli Zolnierze, który ma przypisane imię i nazwisko
+            var zolnierz = _context.Zolnierze
+                .FirstOrDefault(z => z.Imie == imie && z.Nazwisko == nazwisko); // Porównanie z imieniem i nazwiskiem
+
+            // Sprawdzamy, czy żołnierz istnieje
+            if (zolnierz == null)
+            {
+                return NotFound("Nie znaleziono żołnierza o tym imieniu i nazwisku.");
+            }
+
+            // Pobieramy ID pododdziału przypisane temu żołnierzowi
+            var pododdzialId = zolnierz.ID_Pododdzialu;
+
+            // Pobieramy żołnierzy przypisanych do tego samego pododdziału
+            var zolnierzeWPododdziale = _context.Zolnierze
+                .Where(z => z.ID_Pododdzialu == pododdzialId) // Filtrowanie po pododdziale
+                .OrderBy(z => z.Nazwisko) // Sortowanie według nazwiska
+                .ToList();
+
+            // Przekazujemy listę żołnierzy do widoku
+            return View(zolnierzeWPododdziale);
         }
+
 
         [HttpPost]
         public IActionResult DodajPunkty(int ID_Zolnierza, int punkty)
@@ -115,13 +178,47 @@ namespace WebApplication2.Controllers
         // ----------------------------------
         public async Task<IActionResult> ListaZwolnien()
         {
+            // Pobieramy aktualnie zalogowanego dowódcę
+            var dowodcaId = User.Identity.Name; // Zmienna zależna od sposobu autentykacji
+
+            // Rozdzielamy login na imię i nazwisko
+            var imieNazwisko = dowodcaId.Split('.'); // Zakładamy, że login ma postać Imie.Nazwisko
+            if (imieNazwisko.Length != 2)
+            {
+                return BadRequest("Niepoprawny format loginu.");
+            }
+
+            var imie = imieNazwisko[0]; // Imię
+            var nazwisko = imieNazwisko[1]; // Nazwisko
+
+            // Znajdź żołnierza w tabeli Zolnierze, który ma przypisane imię i nazwisko
+            var zolnierz = await _context.Zolnierze
+                .FirstOrDefaultAsync(z => z.Imie == imie && z.Nazwisko == nazwisko);
+
+            // Sprawdzamy, czy żołnierz istnieje
+            if (zolnierz == null)
+            {
+                return NotFound("Nie znaleziono żołnierza o tym imieniu i nazwisku.");
+            }
+
+            // Pobieramy ID pododdziału przypisane temu żołnierzowi
+            var pododdzialId = zolnierz.ID_Pododdzialu;
+
+            // Pobieramy zwolnienia tylko dla żołnierzy przypisanych do tego samego pododdziału
             var zwolnienia = await _context.Zwolnienia
                 .Include(z => z.Zolnierz)
+                .Where(z => z.Zolnierz.ID_Pododdzialu == pododdzialId) // Filtrowanie po pododdziale
                 .ToListAsync();
 
-            ViewBag.Zolnierze = await _context.Zolnierze.ToListAsync();
+            // Pobieramy listę żołnierzy w tym samym pododdziale
+            ViewBag.Zolnierze = await _context.Zolnierze
+                .Where(z => z.ID_Pododdzialu == pododdzialId) // Filtrowanie po pododdziale
+                .ToListAsync();
+
+            // Zwracamy widok z danymi
             return View(zwolnienia);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -167,35 +264,87 @@ namespace WebApplication2.Controllers
             if (harmonogramItem == null)
                 return NotFound("Nie znaleziono wpisu w harmonogramie.");
 
-            // Wykluczamy obecnie przypisanego żołnierza
+            // Pobieramy aktualnie zalogowanego dowódcę
+            var dowodcaId = User.Identity.Name; // Zmienna zależna od sposobu autentykacji
+
+            // Rozdzielamy login na imię i nazwisko
+            var imieNazwisko = dowodcaId.Split('.'); // Zakładamy, że login ma postać Imie.Nazwisko
+            if (imieNazwisko.Length != 2)
+            {
+                return BadRequest("Niepoprawny format loginu.");
+            }
+
+            var imie = imieNazwisko[0]; // Imię
+            var nazwisko = imieNazwisko[1]; // Nazwisko
+
+            // Znajdź żołnierza w tabeli Zolnierze, który ma przypisane imię i nazwisko
+            var zolnierz = _context.Zolnierze
+                .FirstOrDefault(z => z.Imie == imie && z.Nazwisko == nazwisko);
+
+            // Sprawdzamy, czy żołnierz istnieje
+            if (zolnierz == null)
+            {
+                return NotFound("Nie znaleziono żołnierza o tym imieniu i nazwisku.");
+            }
+
+            // Pobieramy ID pododdziału przypisane temu żołnierzowi
+            var pododdzialId = zolnierz.ID_Pododdzialu;
+
+            // Wykluczamy obecnie przypisanego żołnierza i filtrujemy po pododdziale
             var obecnyZolnierzId = harmonogramItem.ID_Zolnierza;
             var zolnierze = _context.Zolnierze
-                .Where(z => z.ID_Zolnierza != obecnyZolnierzId)
+                .Where(z => z.ID_Zolnierza != obecnyZolnierzId && z.ID_Pododdzialu == pododdzialId) // Filtrujemy po pododdziale
                 .ToList();
 
+            // Przekazujemy dane do widoku
             ViewBag.HarmonogramItem = harmonogramItem;
             ViewBag.DostepniZolnierze = zolnierze;
 
             return View(); // przydzielzastepce.cshtml
         }
 
+
         // GET: /Dowodca/ListaPowiadomien
         // sortColumn może być np. "Zolnierz", "Tresc", "DataWyslania", "Status"
         // sortOrder "asc" lub "desc"
         public async Task<IActionResult> ListaPowiadomien(string sortColumn, string sortOrder)
         {
-            // 1) Pobieramy wszystkie powiadomienia wraz z danymi żołnierza
+            // 1) Pobieramy aktualnie zalogowanego dowódcę
+            var dowodcaId = User.Identity.Name; // Zmienna zależna od sposobu autentykacji
+
+            // Rozdzielamy login na imię i nazwisko
+            var imieNazwisko = dowodcaId.Split('.'); // Zakładamy, że login ma postać Imie.Nazwisko
+            if (imieNazwisko.Length != 2)
+            {
+                return BadRequest("Niepoprawny format loginu.");
+            }
+
+            var imie = imieNazwisko[0]; // Imię
+            var nazwisko = imieNazwisko[1]; // Nazwisko
+
+            // Znajdź żołnierza w tabeli Zolnierze, który ma przypisane imię i nazwisko
+            var zolnierz = await _context.Zolnierze
+                .FirstOrDefaultAsync(z => z.Imie == imie && z.Nazwisko == nazwisko);
+
+            if (zolnierz == null)
+            {
+                return NotFound("Nie znaleziono żołnierza o tym imieniu i nazwisku.");
+            }
+
+            // Pobieramy ID pododdziału przypisane temu żołnierzowi
+            var pododdzialId = zolnierz.ID_Pododdzialu;
+
+            // 2) Pobieramy wszystkie powiadomienia wraz z danymi żołnierza
             var query = _context.Powiadomienia
                 .Include(p => p.Zolnierz)
+                .Where(p => p.Zolnierz.ID_Pododdzialu == pododdzialId) // Filtrowanie po pododdziale
                 .AsQueryable();
 
-            // 2) Domyślne sortowanie: DataIGodzinaWyslania desc
+            // 3) Domyślne sortowanie: DataIGodzinaWyslania desc
             if (string.IsNullOrEmpty(sortColumn)) sortColumn = "Data";
             if (string.IsNullOrEmpty(sortOrder)) sortOrder = "desc";
 
-            // 3) Sortowanie wg. parametru
-            // Używamy switch, by sortować różne kolumny
-            // (lub można użyć dynamicznej biblioteki do sortowania)
+            // 4) Sortowanie wg. parametru
             query = sortColumn switch
             {
                 "Zolnierz" => (sortOrder == "asc")
@@ -217,16 +366,17 @@ namespace WebApplication2.Controllers
                 _ => query.OrderByDescending(p => p.DataIGodzinaWyslania) // domyślne
             };
 
-            // 4) Pobieramy z bazy
+            // 5) Pobieramy z bazy
             var powiadomienia = await query.ToListAsync();
 
-            // 5) Przekazujemy do widoku
+            // 6) Przekazujemy do widoku
             // By wiedzieć, jaka aktualnie kolumna i order
             ViewBag.CurrentSortColumn = sortColumn;
             ViewBag.CurrentSortOrder = sortOrder;
 
             return View(powiadomienia);
         }
+
         // POST: /Dowodca/PrzydzielZastepce
         [HttpPost]
         [ValidateAntiForgeryToken]

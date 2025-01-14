@@ -35,6 +35,8 @@ namespace WebApplication2.Controllers
                 ViewBag.Wiek = zolnierz.Wiek;
                 ViewBag.Adres = zolnierz.Adres;
                 ViewBag.ImieOjca = zolnierz.ImieOjca;
+                ViewBag.Punkty = zolnierz.Punkty;
+
 
                 return View();
             }
