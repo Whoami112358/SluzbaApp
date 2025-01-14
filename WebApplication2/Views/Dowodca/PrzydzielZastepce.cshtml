@@ -1,0 +1,174 @@
+﻿@model WebApplication2.Models.Harmonogram
+
+@{
+    ViewData["Title"] = "Przydziel Zastępcę";
+    var harmonogramItem = ViewBag.HarmonogramItem as WebApplication2.Models.Harmonogram;
+    var zolnierze = ViewBag.DostepniZolnierze as List<WebApplication2.Models.Zolnierz>;
+}
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Twoja Aplikacja</title>
+    <style>
+        /* Stylizacja podobna do poprzednich widoków */
+        /* ... */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c3e50; /* Ciemny odcień zieleni */
+            color: #ecf0f1; /* Jasny tekst */
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        header {
+            background-color: #27ae60; /* Jasny zielony */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2em;
+            text-transform: uppercase;
+        }
+
+        .content {
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 600px;
+            background-color: #34495e; /* Ciemny odcień zieleni */
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container {
+            background: #2c3e50;
+            padding: 20px;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+        }
+
+        select, button, input[type="hidden"] {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #16a085;
+            font-size: 1em;
+        }
+
+        button {
+            background-color: #1abc9c; /* Zielony */
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+            button:hover {
+                background-color: #16a085; /* Ciemniejszy zielony przy hover */
+            }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #ecf0f1;
+        }
+
+        p {
+            margin: 8px 0;
+        }
+
+        footer {
+            background-color: #34495e; /* Ciemny kolor stopki */
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 15px;
+            background-color: #d35400;
+            color: #fff;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .btn-back:hover {
+                background-color: #e67e22;
+            }
+
+        .error-message {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            padding: 10px;
+            border: 1px solid #e74c3c;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
+
+    <div class="content">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="error-message">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        <div>
+            <p><strong>ID Harmonogramu:</strong> @harmonogramItem.ID_Harmonogram</p>
+            <p><strong>Data:</strong> @harmonogramItem.Data.ToString("yyyy-MM-dd")</p>
+            <p><strong>Obecnie przypisany:</strong> @harmonogramItem.Zolnierz?.Imie @harmonogramItem.Zolnierz?.Nazwisko</p>
+            <p><strong>Służba:</strong> @harmonogramItem.Sluzba?.Rodzaj</p>
+        </div>
+
+        <hr />
+
+        <div class="form-container">
+            <form asp-controller="Dowodca"
+                  asp-action="PrzydzielZastepce"
+                  method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- Przekazanie ID harmonogramu w ukrytym polu -->
+                <input type="hidden" name="ID_Harmonogram" value="@harmonogramItem.ID_Harmonogram" />
+
+                <label for="ZastepcaId">Wybierz żołnierza zastępcę:</label>
+                <select id="ZastepcaId" name="ZastepcaId" required>
+                    <option value="">-- Wybierz zastępcę --</option>
+                    @foreach (var z in zolnierze)
+                    {
+                        <option value="@z.ID_Zolnierza">@z.Imie @z.Nazwisko</option>
+                    }
+                </select>
+
+                <button type="submit">Zapisz</button>
+            </form>
+        </div>
+
+        <!-- Przycisk powrotu do harmonogramu -->
+        <a class="btn-back" href="@Url.Action("HarmonogramKC", "Dowodca")">
+            Powrót do Harmonogramu
+        </a>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+    </footer>
+</body>
+</html>
