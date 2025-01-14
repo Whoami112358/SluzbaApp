@@ -201,6 +201,45 @@ namespace WebApplication2.Controllers
             return RedirectToAction("Punktacja");
         }
 
+        // Akcja POST do aktualizacji punktów (dodawanie/usuwanie)
+        [HttpPost]
+        public IActionResult ZaktualizujPunkty(int ID_Zolnierza, int punkty)
+        {
+            // Znajdź żołnierza w bazie danych
+            var zolnierz = _context.Zolnierze.FirstOrDefault(z => z.ID_Zolnierza == ID_Zolnierza);
+            if (zolnierz == null)
+            {
+                TempData["Error"] = "Żołnierz o podanym identyfikatorze nie został znaleziony.";
+                return RedirectToAction("Punktacja");
+            }
+
+            // Jeśli punkty są ujemne - próbujemy je odjąć
+            if (punkty < 0)
+            {
+                int punktyDoUsuniecia = Math.Abs(punkty);
+                // Sprawdź, czy żołnierz ma wystarczającą liczbę punktów
+                if (zolnierz.Punkty >= punktyDoUsuniecia)
+                {
+                    zolnierz.Punkty -= punktyDoUsuniecia;
+                }
+                else
+                {
+                    TempData["Error"] = "Nie można usunąć więcej punktów niż aktualnie posiadane.";
+                    return RedirectToAction("Punktacja");
+                }
+            }
+            else // W przeciwnym przypadku dodaj punkty
+            {
+                zolnierz.Punkty += punkty;
+            }
+
+            // Zapisz zmiany w bazie danych
+            _context.SaveChanges();
+
+            // Przekieruj z powrotem do listy żołnierzy/ekranu punktacji
+            return RedirectToAction("Punktacja");
+        }
+
         // ----------------------------------
         // Lista i Dodawanie Zwolnień
         // ----------------------------------
@@ -628,6 +667,183 @@ namespace WebApplication2.Controllers
 
             return View("WynikPowiadomien", vm);
         }
+
+
+
+
+        // GET: /Dowodca/PrzydzielAutomatycznie
+        [HttpGet]
+        public async Task<IActionResult> PrzydzielAutomatycznie()
+        {
+            // Lista kryteriów – ustawiamy statycznie
+            List<string> kryteria = new List<string> { "Punkty", "Wiek", "Stopien" };
+            ViewBag.Kryteria = new SelectList(kryteria);
+
+            // Pobieramy listę typów służb z bazy danych
+            var sluzby = await _context.Sluzby.ToListAsync();
+            ViewBag.Sluzby = new SelectList(sluzby, "ID_Sluzby", "Rodzaj");
+
+            // Ustawiamy pusty model, który zostanie powiązany z widokiem
+            return View(new PrzydzielAutomatycznieViewModel());
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PrzydzielAutomatycznie(PrzydzielAutomatycznieViewModel model, string submitAction)
+        {
+            // Ładujemy listy dla SelectList – aby w razie błędów formularz był poprawnie wypełniony
+            List<string> kryteria = new List<string> { "Punkty", "Wiek", "Stopien" };
+            ViewBag.Kryteria = new SelectList(kryteria);
+            var sluzby = await _context.Sluzby.ToListAsync();
+            ViewBag.Sluzby = new SelectList(sluzby, "ID_Sluzby", "Rodzaj");
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Parsowanie miesiąca: zakładamy format "MM-yyyy" (np. "01-2025")
+            if (!DateTime.TryParseExact($"01-{model.Miesiac}", "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime miesiacData))
+            {
+                ModelState.AddModelError("", "Podano niepoprawny format miesiąca. Użyj formatu MM-yyyy.");
+                return View(model);
+            }
+
+            // Konwersja numeru miesiąca na polską nazwę miesiąca (np. "Styczeń")
+            string monthName = System.Globalization.CultureInfo
+                .GetCultureInfo("pl-PL")
+                .DateTimeFormat.GetMonthName(miesiacData.Month);
+
+            // Upewnij się, że pierwsza litera jest wielka:
+            if (!string.IsNullOrEmpty(monthName))
+            {
+                monthName = char.ToUpper(monthName[0]) + monthName.Substring(1);
+            }
+
+            // Obsługa przycisku "wyswietl"
+            if (submitAction == "wyswietl")
+            {
+                // Pobierz harmonogram dla danego miesiąca (używając nazwy miesiąca) i wybranego typu służby
+                var harmonogram = await _context.Harmonogramy
+                    .Include(h => h.Zolnierz)
+                    .Include(h => h.Sluzba)
+                    .Where(h => h.Miesiac.ToLower() == monthName.ToLower() && h.ID_Sluzby == model.IdSluzby)
+                    .OrderBy(h => h.Data)
+                    .ToListAsync();
+
+                // Przekaż harmonogram do widoku przez ViewBag
+                ViewBag.Harmonogram = harmonogram;
+                return View(model);
+            }
+            // Obsługa przycisku "przydziel"
+            else if (submitAction == "przydziel")
+            {
+                // 1) Pobierz istniejący harmonogram dla wybranego miesiąca (przy użyciu nazwy miesiąca) i typu służby
+                var harmonogramMiesiac = await _context.Harmonogramy
+                    .Where(h => h.Miesiac.ToLower() == monthName.ToLower() && h.ID_Sluzby == model.IdSluzby)
+                    .ToListAsync();
+
+                int dniWMiesiacu = DateTime.DaysInMonth(miesiacData.Year, miesiacData.Month);
+
+                // Lista wszystkich dni miesiąca
+                List<DateTime> wszystkieDni = new List<DateTime>();
+                for (int d = 1; d <= dniWMiesiacu; d++)
+                {
+                    wszystkieDni.Add(new DateTime(miesiacData.Year, miesiacData.Month, d));
+                }
+
+                // Lista dni, dla których nie ma przypisanej służby
+                var dniBezSluzby = wszystkieDni
+                    .Where(d => !harmonogramMiesiac.Any(h => h.Data.Date == d.Date))
+                    .ToList();
+
+                // 2) Pobierz wszystkich żołnierzy uporządkowanych według wybranego kryterium
+                IQueryable<Zolnierz> query = _context.Zolnierze;
+                switch (model.WybraneKryterium)
+                {
+                    case "Punkty":
+                        query = query.OrderBy(z => z.Punkty);
+                        break;
+                    case "Wiek":
+                        query = query.OrderBy(z => z.Wiek);
+                        break;
+                    case "Stopien":
+                        query = query.OrderBy(z => z.Stopien);
+                        break;
+                    default:
+                        break;
+                }
+                var zolnierze = await query.ToListAsync();
+
+                // Słownik przechowujący liczbę przydzielonych służb dla danego żołnierza
+                Dictionary<int, int> sluzbyNaMiesiacu = new Dictionary<int, int>();
+
+                // Ładujemy również wpisy harmonogramu (dla sprawdzenia, czy w dniu poprzednim żołnierz miał służbę)
+                var harmonogramMiesiacWgZolnierzy = await _context.Harmonogramy
+                    .Where(h => h.Miesiac.ToLower() == monthName.ToLower())
+                    .ToListAsync();
+
+                bool CzyMialDzienPrzed(int idZolnierza, DateTime data)
+                {
+                    DateTime poprzedniDzien = data.AddDays(-1);
+                    return harmonogramMiesiacWgZolnierzy.Any(h => h.ID_Zolnierza == idZolnierza && h.Data.Date == poprzedniDzien.Date);
+                }
+
+                // 3) Przeprowadź automatyczny przydział dla każdego wolnego dnia
+                foreach (var dzien in dniBezSluzby)
+                {
+                    var wybranyZolnierz = zolnierze.FirstOrDefault(z =>
+                    {
+                        int iloscSluzb = sluzbyNaMiesiacu.ContainsKey(z.ID_Zolnierza)
+                            ? sluzbyNaMiesiacu[z.ID_Zolnierza]
+                            : harmonogramMiesiacWgZolnierzy.Count(h => h.ID_Zolnierza == z.ID_Zolnierza);
+
+                        if (iloscSluzb >= 5)
+                            return false;
+                        if (CzyMialDzienPrzed(z.ID_Zolnierza, dzien))
+                            return false;
+                        return true;
+                    });
+
+                    if (wybranyZolnierz != null)
+                    {
+                        string sqlQuery = "INSERT INTO SluzbaApp.Harmonogram_dane (ID_Zolnierza, ID_Sluzby, Data, Miesiac) " +
+                                          "VALUES (@ID_Zolnierza, @ID_Sluzby, @Data, @Miesiac)";
+
+                        await _context.Database.ExecuteSqlRawAsync(sqlQuery,
+                            new MySqlParameter("@ID_Zolnierza", wybranyZolnierz.ID_Zolnierza),
+                            new MySqlParameter("@ID_Sluzby", model.IdSluzby),
+                            new MySqlParameter("@Data", dzien),
+                            // Zapisujemy nazwę miesiąca (np. "Styczeń")
+                            new MySqlParameter("@Miesiac", monthName));
+
+                        if (sluzbyNaMiesiacu.ContainsKey(wybranyZolnierz.ID_Zolnierza))
+                            sluzbyNaMiesiacu[wybranyZolnierz.ID_Zolnierza]++;
+                        else
+                            sluzbyNaMiesiacu[wybranyZolnierz.ID_Zolnierza] = harmonogramMiesiacWgZolnierzy.Count(h => h.ID_Zolnierza == wybranyZolnierz.ID_Zolnierza) + 1;
+
+                        // Aktualizujemy lokalną listę harmonogramu, by dalsze sprawdzenie (np. CzyMialDzienPrzed) uwzględniało nowy wpis
+                        harmonogramMiesiacWgZolnierzy.Add(new Harmonogram
+                        {
+                            ID_Zolnierza = wybranyZolnierz.ID_Zolnierza,
+                            ID_Sluzby = model.IdSluzby,
+                            Data = dzien,
+                            Miesiac = monthName
+                        });
+                    }
+                }
+
+                // Po przydzieleniu przekierowujemy do widoku harmonogramu (np. akcji HarmonogramKC)
+                return RedirectToAction("HarmonogramKC");
+            }
+            else
+            {
+                return View(model);
+            }
+        }
+
+
     }
 
     // ========================================

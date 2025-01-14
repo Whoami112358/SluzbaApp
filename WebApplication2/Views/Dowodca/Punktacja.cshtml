@@ -119,8 +119,8 @@
                     <th>Nazwisko</th>
                     <th>Stopień</th>
                     <th>Punkty</th>
-                    <th>Dodaj Punkty</th>
-                    <th>Usuń Punkty</th>
+                    <th>Dodaj/Usuń Punkty</th>
+                    <!--<th>Usuń Punkty</th>-->
                 </tr>
             </thead>
             <tbody>
@@ -133,22 +133,22 @@
                         <td>@item.Stopien</td>
                         <td>@item.Punkty</td>
 
-                        <!-- Formularz do dodawania punktów -->
+                        <!-- Formularz do dodawania/usuwania punktów -->
                         <td>
-                            <form method="post" action="/Dyzurny/DodajPunkty">
+                            <form method="post" action="/Dowodca/ZaktualizujPunkty">
                                 <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
-                                <input type="number" name="punkty" min="0" step="1" />
-                                <button type="submit">Dodaj Punkty</button>
+                                <input type="number" name="punkty" step="1" />
+                                <button type="submit">Dodaj/Usuń Punkty</button>
                             </form>
                         </td>
-                        <!-- Formularz do usuwania punktów -->
+                        <!-- Formularz do usuwania punktów 
                         <td>
                             <form method="post" action="/Dyzurny/UsunPunkty">
                                 <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
                                 <input type="number" name="punkty" min="0" step="1" required />
                                 <button type="submit">Usuń Punkty</button>
                             </form>
-                        </td>
+                        </td>-->
                     </tr>
                 }
             </tbody>

@@ -51,6 +51,7 @@ namespace WebApplication2.Controllers
             return View(zolnierze);
         }
 
+        /*
         // Akcja POST do dodawania punktów
         [HttpPost]
         public IActionResult DodajPunkty(int ID_Zolnierza, int punkty)
@@ -70,6 +71,7 @@ namespace WebApplication2.Controllers
             return RedirectToAction("Punktacja");
         }
 
+        
         // Akcja POST do usuwania punktów
         [HttpPost]
         public IActionResult UsunPunkty(int ID_Zolnierza, int punkty)
@@ -100,7 +102,48 @@ namespace WebApplication2.Controllers
 
             // Po zaktualizowaniu danych przekieruj z powrotem do listy żołnierzy
             return RedirectToAction("Punktacja");
+        } */
+
+
+        // Akcja POST do aktualizacji punktów (dodawanie/usuwanie)
+        [HttpPost]
+        public IActionResult ZaktualizujPunkty(int ID_Zolnierza, int punkty)
+        {
+            // Znajdź żołnierza w bazie danych
+            var zolnierz = _context.Zolnierze.FirstOrDefault(z => z.ID_Zolnierza == ID_Zolnierza);
+            if (zolnierz == null)
+            {
+                TempData["Error"] = "Żołnierz o podanym identyfikatorze nie został znaleziony.";
+                return RedirectToAction("Punktacja");
+            }
+
+            // Jeśli punkty są ujemne - próbujemy je odjąć
+            if (punkty < 0)
+            {
+                int punktyDoUsuniecia = Math.Abs(punkty);
+                // Sprawdź, czy żołnierz ma wystarczającą liczbę punktów
+                if (zolnierz.Punkty >= punktyDoUsuniecia)
+                {
+                    zolnierz.Punkty -= punktyDoUsuniecia;
+                }
+                else
+                {
+                    TempData["Error"] = "Nie można usunąć więcej punktów niż aktualnie posiadane.";
+                    return RedirectToAction("Punktacja");
+                }
+            }
+            else // W przeciwnym przypadku dodaj punkty
+            {
+                zolnierz.Punkty += punkty;
+            }
+
+            // Zapisz zmiany w bazie danych
+            _context.SaveChanges();
+
+            // Przekieruj z powrotem do listy żołnierzy/ekranu punktacji
+            return RedirectToAction("Punktacja");
         }
+
 
         public IActionResult HarmonogramKC()
         {
