@@ -104,14 +104,19 @@ namespace WebApplication2.Controllers
 
         public IActionResult HarmonogramKC()
         {
-            var harmonogram = _context.Harmonogramy
-                                        .Include(h => h.Zolnierz)  // Ładowanie powiązanych danych żołnierza
-                                        .Include(h => h.Sluzba)    // Ładowanie powiązanych danych służby
-                                        .OrderBy(h => h.Data)
-                                        .ToList();
 
-            _memoryCache.Set("Harmonogram", harmonogram, TimeSpan.FromMinutes(10));
-            return View(harmonogram);  // Zwracanie widoku z danymi harmonogramu
+
+            // Pobieramy wszystkie harmonogramy wraz z żołnierzami, służbami i zastępcami
+            var harmonogram = _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                .Include(h => h.Sluzba)
+                .Include(h => h.Zastepcy) // Dodane
+                    .ThenInclude(z => z.ZolnierzZastepowanego) // Dodane
+                .OrderBy(h => h.Data)
+                .ToList();
+
+            return View(harmonogram);
+
         }
 
         // GET: /Admin/AddSchedule
@@ -270,5 +275,126 @@ namespace WebApplication2.Controllers
             return View(harmonogramy);
         }
 
+        // =========================
+        // PRZYDZIEL ZASTĘPCĘ
+        // =========================
+
+        // GET: /Dyzurny/PrzydzielZastepce?idHarmonogram=XYZ
+        [HttpGet]
+        public IActionResult PrzydzielZastepce(int idHarmonogram)
+        {
+            // Znajdź dany wpis w Harmonogramie
+            var harmonogramItem = _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                .Include(h => h.Sluzba)
+                .Include(h => h.Zastepcy) // Dodane
+                    .ThenInclude(z => z.ZolnierzZastepowanego) // Dodane
+                .FirstOrDefault(h => h.ID_Harmonogram == idHarmonogram);
+
+            if (harmonogramItem == null)
+                return NotFound("Nie znaleziono wpisu w harmonogramie.");
+
+            // Wykluczamy obecnie przypisanego żołnierza
+            var obecnyZolnierzId = harmonogramItem.ID_Zolnierza;
+            var zolnierze = _context.Zolnierze
+                .Where(z => z.ID_Zolnierza != obecnyZolnierzId)
+                .ToList();
+
+            ViewBag.HarmonogramItem = harmonogramItem;
+            ViewBag.DostepniZolnierze = zolnierze;
+
+            return View(); // przydzielzastepce.cshtml
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PrzydzielZastepce(int ID_Harmonogram, int ZastepcaId)
+        {
+            try
+            {
+                // Znajdź harmonogram wraz z zastępcami
+                var harmonogramItem = await _context.Harmonogramy
+                    .Include(h => h.Zolnierz)
+                    .Include(h => h.Sluzba)
+                    .Include(h => h.Zastepcy)
+                        .ThenInclude(z => z.ZolnierzZastepowanego)
+                    .FirstOrDefaultAsync(h => h.ID_Harmonogram == ID_Harmonogram);
+
+                if (harmonogramItem == null)
+                    return NotFound("Nie znaleziono wpisu w harmonogramie.");
+
+                // Sprawdź, czy już istnieje zastępca
+                bool hasSubstitute = harmonogramItem.Zastepcy != null && harmonogramItem.Zastepcy.Any();
+
+                if (hasSubstitute)
+                {
+                    ModelState.AddModelError("", "Zastępca już został przydzielony.");
+
+                    // Przygotuj dane do ponownego renderowania widoku z błędem
+                    var obecnyZolnierzId = harmonogramItem.ID_Zolnierza;
+                    var zolnierze = await _context.Zolnierze
+                        .Where(z => z.ID_Zolnierza != obecnyZolnierzId)
+                        .ToListAsync();
+
+                    ViewBag.HarmonogramItem = harmonogramItem;
+                    ViewBag.DostepniZolnierze = zolnierze;
+
+                    return View(); // przydzielzastepce.cshtml
+                }
+
+                // Dodaj nowego zastępcę
+                var nowyZastepca = new Zastepca
+                {
+                    ID_Harmonogram = ID_Harmonogram,
+                    ID_Zolnierza_Zastepowanego = ZastepcaId,
+                    DataPrzydzielenia = DateTime.Now
+                };
+
+                _context.Zastepcy.Add(nowyZastepca);
+                await _context.SaveChangesAsync();
+
+                // Dodaj powiadomienie do nowego zastępcy
+                var nowePowiadomienie = new Powiadomienie
+                {
+                    ID_Zolnierza = ZastepcaId,
+                    TrescPowiadomienia = $"Przydzielono Cię do służby w dniu {harmonogramItem.Data:yyyy-MM-dd}",
+                    TypPowiadomienia = "Zastępstwo",
+                    DataIGodzinaWyslania = DateTime.Now,
+                    Status = "Wysłano"
+                };
+                _context.Powiadomienia.Add(nowePowiadomienie);
+                await _context.SaveChangesAsync();
+
+                // Przekierowanie do listy harmonogramu
+                return RedirectToAction("HarmonogramKC");
+            }
+            catch (Exception ex)
+            {
+                // Logowanie błędu (konieczne jest dodanie ILogger do kontrolera)
+                // _logger.LogError(ex, "Błąd podczas przydzielania zastępcy.");
+
+                ModelState.AddModelError("", "Wystąpił błąd podczas przydzielania zastępcy.");
+
+                // Ponownie załaduj dostępnych żołnierzy do widoku
+                var harmonogramItem = await _context.Harmonogramy
+                    .Include(h => h.Zolnierz)
+                    .Include(h => h.Sluzba)
+                    .Include(h => h.Zastepcy)
+                        .ThenInclude(z => z.ZolnierzZastepowanego)
+                    .FirstOrDefaultAsync(h => h.ID_Harmonogram == ID_Harmonogram);
+
+                if (harmonogramItem == null)
+                    return NotFound("Nie znaleziono wpisu w harmonogramie.");
+
+                var obecnyZolnierzId = harmonogramItem.ID_Zolnierza;
+                var zolnierze = await _context.Zolnierze
+                    .Where(z => z.ID_Zolnierza != obecnyZolnierzId)
+                    .ToListAsync();
+
+                ViewBag.HarmonogramItem = harmonogramItem;
+                ViewBag.DostepniZolnierze = zolnierze;
+
+                return View(); // przydzielzastepce.cshtml
+            }
+        }
     }
 }
