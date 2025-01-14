@@ -1,0 +1,133 @@
+﻿@model IEnumerable<WebApplication2.Models.Powiadomienie>
+
+@{
+
+    ViewData["Title"] = "Lista Powiadomień";
+    // Wczytujemy aktualne parametry z ViewBag
+    string currentSortColumn = ViewBag.CurrentSortColumn as string ?? "Data";
+    string currentSortOrder = ViewBag.CurrentSortOrder as string ?? "desc";
+
+    // Pomocnicza funkcja do generowania linków sortowania
+    Func<string, string> sortLink = (columnName) =>
+    {
+        // Jeśli klikamy na tą samą kolumnę, odwracamy sortOrder
+        var nextOrder = (currentSortColumn == columnName && currentSortOrder == "asc") ? "desc" : "asc";
+        return Url.Action("ListaPowiadomien", "Dowodca",
+            new { sortColumn = columnName, sortOrder = nextOrder });
+    };
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background-color: #34495e;
+            padding: 20px;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+            color: #ecf0f1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #27ae60;
+        }
+
+        th {
+            background-color: #27ae60;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        tr:hover {
+            background-color: #616f39;
+        }
+
+        a.sort-link {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            a.sort-link:hover {
+                color: #1abc9c;
+            }
+
+        .status-odebrane {
+            color: #2ecc71; /* zielony */
+            font-weight: bold;
+        }
+
+        .status-wyslano {
+            color: #e74c3c; /* czerwony */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/Dowodca/DowodcaView" style="color: #1abc9c;">Wróć do Strony głównej</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h2>@ViewData["Title"]</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <!-- Każdy nagłówek linkiem do sortowania -->
+                    <th>
+                        <a href="@sortLink("Zolnierz")" class="sort-link">Żołnierz (otrzymujący powiadomienie)</a>
+                    </th>
+                    <th>
+                        <a href="@sortLink("Tresc")" class="sort-link">Treść</a>
+                    </th>
+                    <th>
+                        <a href="@sortLink("Data")" class="sort-link">Data i godzina wysłania</a>
+                    </th>
+                    <th>
+                        <a href="@sortLink("Status")" class="sort-link">Status</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>
+                            @(p.Zolnierz != null
+                                ? p.Zolnierz.Imie + " " + p.Zolnierz.Nazwisko
+                                : "Brak danych")
+                        </td>
+                        <td>@p.TrescPowiadomienia</td>
+                        <td>@(p.DataIGodzinaWyslania?.ToString("yyyy-MM-dd HH:mm") ?? "")</td>
+                        <td>
+                            @if (p.Status == "Odebrane")
+                            {
+                                <span class="status-odebrane">Odebrane</span>
+                            }
+                            else
+                            {
+                                <span class="status-wyslano">@(p.Status ?? "Wysłano")</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

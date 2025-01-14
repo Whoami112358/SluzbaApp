@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Strona główna";
+}
+
+
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="utf-8" />
@@ -128,17 +134,6 @@
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/">Strona Główna</a></li>
-                <li><a href="/Schedule">Harmonogram Służb</a></li>
-                <li><a href="/Profile">Mój Profil</a></li>
-                <li><a href="/Calendar">Kalendarz Służb</a></li>
-                <li><a href="/Account/Logout">Wyloguj się</a></li>
-            </ul>
-        </nav>
-    </header>
     <div class="content">
         <h1>Witaj, @ViewBag.Imie @ViewBag.Nazwisko!</h1>
         <p>To jest strona główna aplikacji dla zalogowanych użytkowników.</p>
