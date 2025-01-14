@@ -33,18 +33,23 @@ namespace WebApplication2.Controllers
             // Pobranie aktualnej daty
             var currentDate = DateTime.Now;
             // Obliczanie daty początkowej i końcowej bieżącego tygodnia
-            var startOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek);
-            var endOfWeek = startOfWeek.AddDays(7);
+            var startOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek + 1); // Poniedziałek
+            var endOfWeek = startOfWeek.AddDays(6); // Niedziela
 
             // Pobranie harmonogramów, które mają daty w bieżącym tygodniu
             var harmonogramy = _context.Harmonogramy
                 .Include(h => h.Zolnierz)
                 .Include(h => h.Sluzba)
-                .Where(h => h.Data >= startOfWeek && h.Data < endOfWeek) // Filtrowanie po dacie
+                .Where(h => h.Data >= startOfWeek && h.Data <= endOfWeek) // Filtrowanie po dacie
                 .ToList();
+
+            // Formatowanie zakresu dat
+            ViewBag.WeekRange = $"{startOfWeek:dd.MM.yyyy} - {endOfWeek:dd.MM.yyyy}";
 
             return View(harmonogramy);
         }
+
+
         public IActionResult Punktacja()
         {
             var zolnierze = _context.Zolnierze.ToList();
@@ -104,20 +109,34 @@ namespace WebApplication2.Controllers
 
         public IActionResult HarmonogramKC()
         {
+            // Pobranie danych dla wykresu
+            var chartData = _context.Zolnierze
+                .GroupBy(z => z.ID_Pododdzialu)
+                .Select(g => new
+                {
+                    Pododdzial = g.Key,
+                    LiczbaOsob = g.Count()
+                })
+                .ToList();
 
+            // Przygotowanie danych do wykresu
+            ViewBag.ChartData = new
+            {
+                labels = chartData.Select(d => $"Pododdział {d.Pododdzial}").ToArray(),
+                values = chartData.Select(d => d.LiczbaOsob).ToArray()
+            };
 
-            // Pobieramy wszystkie harmonogramy wraz z żołnierzami, służbami i zastępcami
             var harmonogram = _context.Harmonogramy
                 .Include(h => h.Zolnierz)
                 .Include(h => h.Sluzba)
-                .Include(h => h.Zastepcy) // Dodane
-                    .ThenInclude(z => z.ZolnierzZastepowanego) // Dodane
+                .Include(h => h.Zastepcy)
+                    .ThenInclude(z => z.ZolnierzZastepowanego)
                 .OrderBy(h => h.Data)
                 .ToList();
 
             return View(harmonogram);
-
         }
+
 
         // GET: /Admin/AddSchedule
         [HttpGet]

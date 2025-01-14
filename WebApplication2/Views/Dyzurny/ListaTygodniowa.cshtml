@@ -95,6 +95,14 @@
             a:hover {
                 color: #34495e; /* Ciemniejszy zielony przy hover */
             }
+
+        .week-range {
+            text-align: right;
+            margin-bottom: 10px;
+            color: #1abc9c;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +117,11 @@
 
     <div class="content">
         <h1>Harmonogram Służb</h1>
+
+        <!-- Wyświetlenie zakresu tygodnia -->
+        <div class="week-range">
+            Tydzień: @ViewBag.WeekRange
+        </div>
 
         <table>
             <thead>
@@ -127,8 +140,8 @@
                         <td>@item.ID_Harmonogram</td>
                         <td>@item.Data.ToString("yyyy-MM-dd")</td>
                         <td>@item.Zolnierz?.Imie</td>
-                        <td>@item.Zolnierz?.Nazwisko</td> <!-- Wyświetlenie imienia żołnierza -->
-                        <td>@item.Sluzba?.Rodzaj</td> <!-- Wyświetlenie nazwy służby -->
+                        <td>@item.Zolnierz?.Nazwisko</td>
+                        <td>@item.Sluzba?.Rodzaj</td>
                     </tr>
                 }
             </tbody>
