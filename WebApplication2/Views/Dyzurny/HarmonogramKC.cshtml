@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
-
+@{
+    ViewData["Title"] = "HARMONOGRAM SŁUŻB";
+}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -8,47 +10,35 @@
     <title>Harmonogram Służb - Dyżurny</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            box-sizing: border-box;
-            text-align: center;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
         }
 
         header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px 20px;
+            text-align: center;
+            padding: 20px 0;
+            height: 10%;
         }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 20px;
-        }
-
-            nav ul li {
-                display: inline;
-            }
-
-                nav ul li a {
-                    color: white;
-                    text-decoration: none;
-                    font-weight: bold;
-                    transition: color 0.3s ease;
-                }
-
-                    nav ul li a:hover {
-                        color: #1abc9c;
-                    }
 
         h1 {
+            font-family: 'Special Elite', cursive;
+            font-size: 48px;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            color: #ffffff;
         }
+
 
         a {
             text-decoration: none;
@@ -57,33 +47,29 @@
             transition: color 0.3s ease;
         }
 
-            a:hover {
-                color: #34495e;
-            }
 
         table {
-            width: 80%;
-            margin: 20px auto;
+            margin-right: 50px;
+            margin-left: 50px;
+            width: 100%;
             border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        th, td {
-            padding: 12px 15px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
+            table th, table td {
+                padding: 10px;
+                text-align: center;
+                border: 1px solid #ddd;
+            }
 
-        th {
-            background-color: #34495e;
-            color: white;
-        }
+            table th {
+                top: 0;
+                background-color: rgba(119, 131, 83, 1);
+                color: white;
+            }
 
-        td {
-            background-color: #f9f9f9;
-        }
-
+            table td {
+                background-color: rgba(172, 174, 165, 0.7);
+            }
         /* Styl przekreślenia starego żołnierza */
         .strikethrough {
             text-decoration: line-through;
