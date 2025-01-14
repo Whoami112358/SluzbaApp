@@ -1,0 +1,18 @@
+@model WebApplication2.Models.WniosekZmianyTerminuViewModel
+
+<<form asp-action="ZlozWniosekZmianyTerminu" method="post">
+    <div>
+        <label for="ID_Harmonogramu">ID Harmonogramu</label>
+        <input asp-for="ID_Harmonogramu" />
+    </div>
+    <div>
+        <label for="Uzasadnienie">Uzasadnienie</label>
+        <input asp-for="Uzasadnienie" />
+    </div>
+    <div>
+        <label for="ProponowanaData">Proponowana Data</label>
+        <!-- Zmiana typu input na 'date' -->
+        <input asp-for="ProponowanaData" type="date" />
+    </div>
+    <button type="submit">Złóż wniosek</button>
+</form>
