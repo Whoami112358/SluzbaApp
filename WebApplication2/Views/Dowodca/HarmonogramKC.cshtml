@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harmonogram Służb - Dyżurny</title>
+    <title>Harmonogram Służb</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -89,60 +89,25 @@
             text-decoration: line-through;
             color: red;
         }
-
-        /* Styl dla komunikatów o błędach */
-        .validation-summary-errors {
-            background-color: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            padding: 10px;
-            border: 1px solid #e74c3c;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        /* Styl dla komunikatów o sukcesie */
-        .validation-summary-success {
-            background-color: rgba(76, 175, 80, 0.1);
-            color: #4caf50;
-            padding: 10px;
-            border: 1px solid #4caf50;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
     </style>
 </head>
 <body>
     <header>
         <nav>
             <ul>
-                <li><a href="@Url.Action("DyzurnyView", "Dyzurny")" style="color: #1abc9c;">Wróć do Strony głównej</a></li>
-                <li><a href="@Url.Action("DodajHarmonogramKC", "Dyzurny")">Dodaj Harmonogram</a></li>
+                <li><a href="@Url.Action("DowodcaView", "Dowodca")" style="color: #1abc9c;">Wróć do Strony głównej</a></li>
+                <li><a href="@Url.Action("DodajHarmonogramKC", "Dowodca")">Dodaj Harmonogram</a></li>
+                <li><a href="@Url.Action("ZarzadzajPriorytetami", "Dowodca")">Zarządzaj priorytetami</a></li>
             </ul>
         </nav>
     </header>
 
     <h1>Harmonogram Służb</h1>
 
-    <!-- Przykładowy link do pobrania pliku -->
-    <a href="@Url.Action("Download", "Dyzurny")" class="harm-downloadButt">
+    <!-- Przykładowy link do pobrania pliku (jeśli istnieje w kontrolerze) -->
+    <a href="@Url.Action("Download", "Dowodca")" class="harm-downloadButt">
         Pobierz harmonogram
     </a>
-
-    @* Wyświetlanie komunikatów o błędach *@
-    @if (TempData["Error"] != null)
-    {
-        <div class="validation-summary-errors">
-            <p>@TempData["Error"]</p>
-        </div>
-    }
-
-    @* Wyświetlanie komunikatów o sukcesie *@
-    @if (TempData["Success"] != null)
-    {
-        <div class="validation-summary-success">
-            <p>@TempData["Success"]</p>
-        </div>
-    }
 
     <table>
         <thead>
@@ -191,7 +156,7 @@
                     <td>
                         @if (canAssignSubstitute)
                         {
-                            <a href="@Url.Action("PrzydzielZastepce", "Dyzurny", new { idHarmonogram = item.ID_Harmonogram })"
+                            <a href="@Url.Action("PrzydzielZastepce", "Dowodca", new { idHarmonogram = item.ID_Harmonogram })"
                                style="color: #e74c3c; font-weight: bold; text-decoration: none;">
                                 Przydziel zastępcę
                             </a>
@@ -205,5 +170,12 @@
             }
         </tbody>
     </table>
+
+    <style>
+        .strikethrough {
+            text-decoration: line-through;
+            color: red;
+        }
+    </style>
 </body>
 </html>

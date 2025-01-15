@@ -12,7 +12,7 @@
     {
         // Jeśli klikamy na tą samą kolumnę, odwracamy sortOrder
         var nextOrder = (currentSortColumn == columnName && currentSortOrder == "asc") ? "desc" : "asc";
-        return Url.Action("ListaPowiadomien", "Dowodca",
+        return Url.Action("ListaPowiadomien", "Dyzurny",
             new { sortColumn = columnName, sortOrder = nextOrder });
     };
 }
@@ -78,7 +78,7 @@
     <header>
         <nav>
             <ul>
-                <li><a href="/Dowodca/DowodcaView" style="color: #1abc9c;">Wróć do Strony głównej</a></li>
+                <li><a href="/Dyzurny/DyzurnyView" style="color: #1abc9c;">Wróć do Strony głównej</a></li>
             </ul>
         </nav>
     </header>
