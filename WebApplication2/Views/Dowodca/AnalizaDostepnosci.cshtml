@@ -1,0 +1,345 @@
+﻿@{
+    ViewData["Title"] = "Analiza dostępności";
+}
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+
+    <style>
+        /* Style dla body z drugiego widoku */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            font-family: Arial, sans-serif;
+            text-align: center; /* Dodane dla spójności z pierwszym widokiem */
+        }
+
+        /* Style dla kontenera z drugiego widoku */
+        .container {
+            max-width: 1000px;
+            margin: 80px auto 20px auto; /* Dodano margines górny, aby nie nachodził na header */
+            background-color: #34495e;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        /* Style nagłówka z drugiego widoku */
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ecf0f1; /* Dostosowany kolor tekstu */
+        }
+
+        /* Style formularza */
+        form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        select {
+            margin-right: 15px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #888;
+        }
+
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: #1abc9c;
+            color: #fff;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #16a085;
+            }
+
+        /* Style kalendarza */
+        #calendar {
+            background: #ffffff;
+            color: #000000; /* Tekst w kalendarzu ciemny na jasnym tle */
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* Ukrywanie toolbarów FullCalendar */
+        .fc-header-toolbar,
+        .fc-footer-toolbar {
+            display: none !important;
+        }
+
+        /* Zablokowanie interakcji z nagłówków dni */
+        .fc-dayGridMonth-view .fc-daygrid-day-top a {
+            pointer-events: none;
+        }
+
+        /* Style dla modala */
+        .modal-overlay {
+            display: none; /* Domyślnie ukryty */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center; /* Centrowanie modala */
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            color: #000;
+            border-radius: 6px;
+            padding: 20px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+            .close-btn:hover {
+                color: red;
+            }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        /* Lista żołnierzy w modalce */
+        #listDostepni, #listNiedostepni {
+            margin: 0;
+            padding: 0;
+            list-style-type: square;
+            text-align: left; /* Ustawienie tekstu na lewą stronę */
+        }
+
+            #listDostepni li, #listNiedostepni li {
+                margin-left: 18px;
+                margin-bottom: 5px;
+            }
+
+        /* Style dla headera z pierwszego widoku */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            position: fixed; /* Ustawienie headera na stałe u góry */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000; /* Zapewnienie, że header będzie nad innymi elementami */
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 20px;
+            justify-content: center; /* Centrowanie elementów nawigacji */
+        }
+
+            nav ul li {
+                display: inline;
+            }
+
+                nav ul li a {
+                    color: #1abc9c;
+                    text-decoration: none;
+                    font-weight: bold;
+                    transition: color 0.3s ease;
+                }
+
+                    nav ul li a:hover {
+                        color: #16a085; /* Zmiana koloru przy hoverze */
+                    }
+
+        /* Dostosowanie kontenera, aby nie nachodził na header */
+        .container {
+            margin-top: 60px; /* Wysokość headera plus trochę odstępu */
+        }
+
+        /* Dodatkowe style, jeśli potrzebne */
+    </style>
+</head>
+<body>
+    <!-- Dodany Header -->
+    <header>
+        <nav>
+            <ul>
+                <li><a href="@Url.Action("DowodcaView", "Dowodca")">Wróć do Strony głównej</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+
+        <!-- Sekcja błędów ModelState -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div style="color: red;">
+                <ul>
+                    @foreach (var state in ViewData.ModelState)
+                    {
+                        foreach (var err in state.Value.Errors)
+                        {
+                            <li>@err.ErrorMessage</li>
+                        }
+                    }
+                </ul>
+            </div>
+        }
+
+        <!-- Form do wyboru miesiąca/roku -->
+        <form asp-action="AnalizaDostepnosci" method="post">
+            @Html.AntiForgeryToken()
+            <label>Miesiąc:</label>
+            <select name="month">
+                @foreach (var m in ViewBag.Months as List<int>)
+                {
+                    bool selected = (m == (ViewBag.CurrentMonth ?? 0));
+                    <option value="@m" selected="@(selected)">@m</option>
+                }
+            </select>
+
+            <label>Rok:</label>
+            <select name="year">
+                @foreach (var y in ViewBag.Years as List<int>)
+                {
+                    bool selected = (y == (ViewBag.CurrentYear ?? 0));
+                    <option value="@y" selected="@(selected)">@y</option>
+                }
+            </select>
+
+            <button type="submit">Pokaż</button>
+        </form>
+
+        <!-- Kalendarz, tylko jeśli mamy eventy w ViewBag.EventsJson -->
+        @if (ViewBag.EventsJson != null)
+        {
+            <div id="calendar"></div>
+        }
+    </div>
+
+    <!-- Modal z listą dostępnych / niedostępnych -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2>Detale dnia</h2>
+            <p><strong>Dostępni żołnierze:</strong></p>
+            <ul id="listDostepni"></ul>
+            <p><strong>Niedostępni żołnierze:</strong></p>
+            <ul id="listNiedostepni"></ul>
+        </div>
+    </div>
+
+    @if (ViewBag.EventsJson != null)
+    {
+        <!-- Ładujemy skrypt FullCalendar TYLKO gdy mamy events -->
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var calendarEl = document.getElementById('calendar');
+
+                var calendarEvents = @Html.Raw(ViewBag.EventsJson);
+                var dayInfo = @Html.Raw(ViewBag.DayInfoJson);
+
+                // Składamy datę: YYYY-MM-01
+                var initDate = '@(ViewBag.CurrentYear + "-" + (ViewBag.CurrentMonth.ToString("D2")) + "-01")';
+
+                // Zakres dozwolony, by uniemożliwić przejście do innego miesiąca
+                // Załóżmy, że w 'CurrentMonth' +1 jest koniec widocznego okresu
+                var startRange = initDate; // np. 2025-02-01
+                var endRange = '@(ViewBag.CurrentYear + "-" + ((ViewBag.CurrentMonth < 12 ? ViewBag.CurrentMonth + 1 : 1).ToString("D2")) + "-01")';
+
+                // Tworzymy kalendarz
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    // Zamiast headerToolbar – nasz styling w CSS .fc-header-toolbar { display:none }
+                    headerToolbar: false,
+                    // Wypełniamy eventy
+                    events: calendarEvents,
+                    // Ustawiamy datę startową, np. 2025-02-01
+                    initialDate: initDate,
+                    // Zablokuj nawigację na inny miesiąc
+                    validRange: {
+                        start: startRange,  // włącznie
+                        end: endRange       // niewłącznie, jeśli chcemy zablokować przejście
+                    },
+                    // Po kliknięciu eventu – pokaż modal
+                    eventClick: function(info) {
+                        var dateObj = info.event.start;
+                        var yyyy = dateObj.getFullYear();
+                        var mm = String(dateObj.getMonth()+1).padStart(2, '0');
+                        var dd = String(dateObj.getDate()).padStart(2, '0');
+                        var dateKey = yyyy + "-" + mm + "-" + dd;
+                        if (dayInfo[dateKey]) {
+                            showModal(dayInfo[dateKey].Dostepni, dayInfo[dateKey].Niedostepni);
+                        }
+                    },
+                });
+
+                calendar.render();
+
+                // Obsługa modala
+                var overlay = document.getElementById('modalOverlay');
+                var closeBtn = document.getElementById('closeModal');
+
+                closeBtn.addEventListener('click', function() {
+                    overlay.style.display = 'none';
+                });
+
+                function showModal(dostepni, niedostepni) {
+                    var listD = document.getElementById('listDostepni');
+                    var listN = document.getElementById('listNiedostepni');
+                    listD.innerHTML = "";
+                    listN.innerHTML = "";
+
+                    // Wypełniamy listy w modalce
+                    if (dostepni) {
+                        dostepni.forEach(function(z) {
+                            var li = document.createElement('li');
+                            li.textContent = z;
+                            listD.appendChild(li);
+                        });
+                    }
+                    if (niedostepni) {
+                        niedostepni.forEach(function(z) {
+                            var li = document.createElement('li');
+                            li.textContent = z;
+                            listN.appendChild(li);
+                        });
+                    }
+                    overlay.style.display = 'flex'; // Pokaż modal
+                }
+            });
+        </script>
+    }
+</body>
+</html>

@@ -17,6 +17,7 @@ namespace WebApplication2.Controllers
             _context = context;
         }
 
+
         // GET: /Account/Login
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
