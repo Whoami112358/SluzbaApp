@@ -1,0 +1,135 @@
+﻿@model WebApplication2.Models.FeedbackViewModel
+@{
+    ViewData["Title"] = "Zgłoś feedback";
+}
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Style podobne do tych z Twojego Index.cshtml */
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #34495e;
+            padding: 20px;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+            color: #ecf0f1;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #27ae60;
+            border-radius: 4px;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #27ae60;
+            color: #ecf0f1;
+        }
+
+            .btn-primary:hover {
+                background-color: #1e8449;
+            }
+
+        .btn-warning {
+            background-color: #e67e22;
+            color: #ecf0f1;
+        }
+
+            .btn-warning:hover {
+                background-color: #d35400;
+            }
+
+        .message-box {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Feedback dotyczący przydziału służb</h2>
+        <p>Proszę wpisz swój feedback lub sugestię.</p>
+
+        <!-- Formularz wysyłający feedback do kontrolera -->
+        <form id="feedbackForm" asp-action="ZglosFeedback" method="post">
+            @Html.AntiForgeryToken()
+            <!-- Jeśli chcesz wiązać feedback z konkretnym harmonogramem, możesz dodać ukryte pole -->
+            @* <input type="hidden" asp-for="ID_Harmonogramu" /> *@
+
+            <label for="Tresc">Treść feedbacku:</label>
+            <textarea id="Tresc" name="Tresc" placeholder="Np. Proponuję zmniejszyć liczbę żołnierzy na nocnych służbach, aby zoptymalizować zasoby." required></textarea>
+
+            <button type="submit" class="btn btn-primary">Wyślij</button>
+            <button type="button" class="btn btn-warning" onclick="goBack()">Wróć</button>
+        </form>
+
+        <!-- Miejsce na wyświetlenie komunikatu po wysłaniu -->
+        <div id="messageBox" class="message-box" style="display: none;">
+            Feedback został zapisany. Dziękujemy za Twoje sugestie.
+            <br />
+            <a href="@Url.Action("Index", "Schedule")" class="btn btn-primary" style="margin-top: 10px;">Powrót do harmonogramu</a>
+        </div>
+    </div>
+
+    <script>
+        // Funkcja przechwytująca wysyłanie formularza
+        document.getElementById("feedbackForm").onsubmit = function (event) {
+            event.preventDefault(); // zapobiegamy domyślnej akcji formularza
+
+            // Tworzymy obiekt FormData, który pobiera dane z formularza
+            var formData = new FormData(this);
+
+            // Wysyłamy dane metodą fetch do akcji ZglosFeedback w ScheduleController
+            fetch('@Url.Action("ZglosFeedback", "Schedule")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Po poprawnym wysłaniu ukrywamy formularz i pokazujemy komunikat
+                    document.getElementById("feedbackForm").style.display = "none";
+                    document.getElementById("messageBox").style.display = "block";
+                } else {
+                    alert('Wystąpił błąd przy wysyłaniu feedbacku.');
+                }
+            })
+            .catch(error => {
+                alert('Wystąpił błąd.');
+                console.error(error);
+            });
+        };
+
+        // Funkcja „Wróć” – przekierowuje z powrotem do strony harmonogramu
+        function goBack() {
+            window.location.href = "@Url.Action("Index", "Schedule")";
+        }
+    </script>
+</body>
+</html>

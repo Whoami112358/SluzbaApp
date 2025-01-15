@@ -60,7 +60,6 @@
             .btn-primary:hover {
                 background-color: #1e8449;
             }
-
         /* Modal styl */
         .modal {
             display: none;
@@ -96,8 +95,10 @@
                 font-weight: bold;
             }
 
-            .modal-content textarea,
-            .modal-content input {
+            .modal-content input[type="range"],
+            .modal-content input[type="date"],
+            .modal-content input[type="time"],
+            .modal-content select {
                 width: 100%;
                 padding: 8px;
                 margin-top: 5px;
@@ -143,11 +144,44 @@
             .return-button:hover {
                 background-color: #1e8449;
             }
+        /* Styl układu dla modalu priorytetu – dwie kolumny z pionową kreską */
+        .priorytet-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .priorytet-col {
+            flex: 1;
+            padding: 5px;
+        }
+
+        .separator {
+            width: 1px;
+            background-color: #ecf0f1;
+            height: 40px;
+            margin: 0 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2 style="color: #27ae60;">Twój Harmonogram Służb</h2>
+
+        <!-- Przyciski otwierające modale: Feedback, Konflikt, Priorytet -->
+        <div style="text-align: right; margin-bottom: 20px;">
+            <button class="btn btn-warning" onclick="openFeedbackModal()">
+                Zgłoś sugestię odnośnie przydzielania służb
+            </button>
+            &nbsp;
+            <button class="btn btn-warning" onclick="openConflictModal()">
+                Zgłoś konflikt służbowy
+            </button>
+            &nbsp;
+            <button class="btn btn-warning" onclick="openPriorytetModal()">
+                Priorytet służby
+            </button>
+        </div>
 
         <table>
             <thead>
@@ -165,13 +199,14 @@
                         <td>@item.Data.ToShortDateString()</td>
                         <td>@(item.Sluzba != null ? item.Sluzba.Rodzaj : "Brak")</td>
                         <td>
-                            <a href="@Url.Action("AddReminder", "Schedule", new { idHarmonogram = item.ID_Harmonogram })"
-                               class="btn btn-primary">
+                            <a href="@Url.Action("AddReminder", "Schedule", new { idHarmonogram = item.ID_Harmonogram })" class="btn btn-primary">
                                 Dodaj przypomnienie
                             </a>
                         </td>
                         <td>
-                            <button class="btn btn-warning" onclick="openModal(@item.ID_Harmonogram)">Złóż wniosek o zmianę terminu</button>
+                            <button class="btn btn-warning" onclick="openModal(@item.ID_Harmonogram)">
+                                Złóż wniosek o zmianę terminu
+                            </button>
                         </td>
                     </tr>
                 }
@@ -179,7 +214,7 @@
         </table>
     </div>
 
-    <!-- Modal do składania wniosku -->
+    <!-- Modal do składania wniosku o zmianę terminu -->
     <div id="changeRequestModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -189,36 +224,132 @@
                 <input type="hidden" id="harmonogramId" name="ID_Harmonogramu" />
                 <label for="uzasadnienie">Uzasadnienie wniosku:</label>
                 <textarea id="uzasadnienie" name="Uzasadnienie" required></textarea>
-
                 <label for="proponowanaData">Proponowana data:</label>
                 <input type="date" id="proponowanaData" name="ProponowanaData" required />
-
                 <button type="submit" class="btn btn-primary">Wyślij wniosek</button>
             </form>
             <div id="messageBox" class="message-box" style="display: none;">
-                Twój wniosek został wysłany!
-                <br />
+                Twój wniosek został wysłany!<br />
                 <a href="@Url.Action("Index", "Schedule")" class="return-button">Powrót do harmonogramu</a>
             </div>
         </div>
     </div>
 
+    <!-- Modal do zgłaszania feedbacku -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFeedbackModal()">&times;</span>
+            <h2>Feedback dotyczący przydziału służb</h2>
+            <p>Proszę wpisz swój feedback lub sugestię.</p>
+            <form id="feedbackForm" method="post">
+                @Html.AntiForgeryToken()
+                <label for="TrescFeedback">Treść feedbacku:</label>
+                <textarea id="TrescFeedback" name="Tresc" placeholder="Np. Proponuję zmniejszyć liczbę żołnierzy na nocnych służbach, aby zoptymalizować zasoby." required></textarea>
+                <button type="submit" class="btn btn-primary">Wyślij</button>
+                <button type="button" class="btn btn-warning" onclick="closeFeedbackModal()">Wróć</button>
+            </form>
+            <div id="feedbackMessage" class="message-box" style="display: none;">
+                Feedback został zapisany. Dziękujemy za Twoje sugestie.<br />
+                <a href="#" onclick="closeFeedbackModal()" class="return-button">Powrót do harmonogramu</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do zgłaszania konfliktu służbowego -->
+    <div id="conflictModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeConflictModal()">&times;</span>
+            <h2>Zgłoś konflikt służbowy</h2>
+            <p>Wybierz dzień, którego dotyczy oraz przedział godzin oraz wpisz powód konfliktu.</p>
+            <form id="conflictForm" method="post">
+                @Html.AntiForgeryToken()
+                <label for="konfliktDzien">Wybierz dzień:</label>
+                <input type="date" id="konfliktDzien" name="Dzien" required />
+                <label for="odGodziny">Od godziny:</label>
+                <input type="time" id="odGodziny" name="OdGodziny" required />
+                <label for="doGodziny">Do godziny:</label>
+                <input type="time" id="doGodziny" name="DoGodziny" required />
+                <label for="powodKonfliktu">Powód konfliktu:</label>
+                <textarea id="powodKonfliktu" name="PowodKonfliktu" placeholder="Np. Konflikt związany z organizacją służby..." required></textarea>
+                <button type="submit" class="btn btn-primary">Wyślij</button>
+                <button type="button" class="btn btn-warning" onclick="closeConflictModal()">Wróć</button>
+            </form>
+            <div id="conflictMessage" class="message-box" style="display: none;">
+                Konflikt został zgłoszony. Powiadomienie zostało wysłane w odpowiednie miejsce.<br />
+                <a href="#" onclick="closeConflictModal()" class="return-button">Powrót do harmonogramu</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do ustawiania priorytetu służby (2 kolumny, 3 wiersze) -->
+    <div id="priorytetModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePriorytetModal()">&times;</span>
+            <h2>Ustaw Priorytet Służby</h2>
+            <p>Wybierz priorytet dla poszczególnych rodzajów służby.</p>
+            <!-- Formularz priorytetu -->
+            <form id="priorytetForm" method="post">
+                @Html.AntiForgeryToken()
+                <!-- Wiersz dla Warty -->
+                <div class="priorytet-row">
+                    <div class="priorytet-col">
+                        <strong>Warta</strong>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="priorytet-col">
+                        <label for="priorytetWarta">Priorytet (1-5):</label>
+                        <input type="range" id="priorytetWarta" name="PriorytetWarta" min="1" max="5" value="3" oninput="document.getElementById('wartaValue').innerText = this.value" required />
+                        <span id="wartaValue">3</span>
+                    </div>
+                </div>
+                <!-- Wiersz dla Patrolu -->
+                <div class="priorytet-row">
+                    <div class="priorytet-col">
+                        <strong>Patrol</strong>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="priorytet-col">
+                        <label for="priorytetPatrol">Priorytet (1-5):</label>
+                        <input type="range" id="priorytetPatrol" name="PriorytetPatrol" min="1" max="5" value="3" oninput="document.getElementById('patrolValue').innerText = this.value" required />
+                        <span id="patrolValue">3</span>
+                    </div>
+                </div>
+                <!-- Wiersz dla Pododdzialu -->
+                <div class="priorytet-row">
+                    <div class="priorytet-col">
+                        <strong>Pododdział</strong>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="priorytet-col">
+                        <label for="priorytetPododdzial">Priorytet (1-5):</label>
+                        <input type="range" id="priorytetPododdzial" name="PriorytetPododdzial" min="1" max="5" value="3" oninput="document.getElementById('pododdzialValue').innerText = this.value" required />
+                        <span id="pododdzialValue">3</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Wyślij</button>
+                <button type="button" class="btn btn-warning" onclick="closePriorytetModal()">Wróć</button>
+            </form>
+            <div id="priorytetMessage" class="message-box" style="display: none;">
+                Priorytet służby został zapisany.<br />
+                <a href="#" onclick="closePriorytetModal()" class="return-button">Powrót do harmonogramu</a>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // --- Funkcje dla modalu wniosku o zmianę terminu ---
         function openModal(id) {
             document.getElementById("harmonogramId").value = id;
             document.getElementById("changeRequestModal").style.display = "block";
         }
-
         function closeModal() {
             document.getElementById("changeRequestModal").style.display = "none";
             document.getElementById("messageBox").style.display = "none";
             document.getElementById("changeRequestForm").style.display = "block";
         }
-
         document.getElementById("changeRequestForm").onsubmit = function (event) {
             event.preventDefault();
             var formData = new FormData(this);
-
             fetch('@Url.Action("ZlozWniosekZmianyTerminu", "Schedule")', {
                 method: 'POST',
                 body: formData
@@ -229,6 +360,96 @@
                     document.getElementById("changeRequestForm").style.display = "none";
                 } else {
                     alert('Wystąpił błąd przy wysyłaniu wniosku.');
+                }
+            })
+            .catch(error => {
+                alert('Wystąpił błąd.');
+                console.error(error);
+            });
+        };
+
+        // --- Funkcje dla modalu feedbacku ---
+        function openFeedbackModal() {
+            document.getElementById("feedbackModal").style.display = "block";
+        }
+        function closeFeedbackModal() {
+            document.getElementById("feedbackModal").style.display = "none";
+            document.getElementById("feedbackMessage").style.display = "none";
+            document.getElementById("feedbackForm").style.display = "block";
+        }
+        document.getElementById("feedbackForm").onsubmit = function (event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('@Url.Action("ZglosFeedback", "Schedule")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("feedbackMessage").style.display = "block";
+                    document.getElementById("feedbackForm").style.display = "none";
+                } else {
+                    alert('Wystąpił błąd przy wysyłaniu feedbacku.');
+                }
+            })
+            .catch(error => {
+                alert('Wystąpił błąd.');
+                console.error(error);
+            });
+        };
+
+        // --- Funkcje dla modalu konfliktu służbowego ---
+        function openConflictModal() {
+            document.getElementById("conflictModal").style.display = "block";
+        }
+        function closeConflictModal() {
+            document.getElementById("conflictModal").style.display = "none";
+            document.getElementById("conflictMessage").style.display = "none";
+            document.getElementById("conflictForm").style.display = "block";
+        }
+        document.getElementById("conflictForm").onsubmit = function (event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('@Url.Action("ZglosKonflikt", "Schedule")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("conflictMessage").style.display = "block";
+                    document.getElementById("conflictForm").style.display = "none";
+                } else {
+                    alert('Wystąpił błąd przy zgłaszaniu konfliktu.');
+                }
+            })
+            .catch(error => {
+                alert('Wystąpił błąd.');
+                console.error(error);
+            });
+        };
+
+        // --- Funkcje dla modalu priorytetu służby ---
+        function openPriorytetModal() {
+            document.getElementById("priorytetModal").style.display = "block";
+        }
+        function closePriorytetModal() {
+            document.getElementById("priorytetModal").style.display = "none";
+            document.getElementById("priorytetMessage").style.display = "none";
+            document.getElementById("priorytetForm").style.display = "block";
+        }
+        document.getElementById("priorytetForm").onsubmit = function (event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('@Url.Action("ZglosPriorytet", "Schedule")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("priorytetMessage").style.display = "block";
+                    document.getElementById("priorytetForm").style.display = "none";
+                } else {
+                    alert('Wystąpił błąd przy ustawianiu priorytetu.');
                 }
             })
             .catch(error => {

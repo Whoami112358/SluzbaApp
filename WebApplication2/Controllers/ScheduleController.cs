@@ -40,7 +40,7 @@ namespace WebApplication2.Controllers
                 .Include(h => h.Sluzba)
                 .ToListAsync();
 
-            // Jeśli brak, zainicjuj pustą listę
+            // Jeśli brak, inicjuj pustą listę
             if (harmonogramy == null)
             {
                 harmonogramy = new List<Harmonogram>();
@@ -49,7 +49,6 @@ namespace WebApplication2.Controllers
             return View(harmonogramy);
         }
 
-        // POST: /Schedule/ZlozWniosekZmianyTerminu
         // POST: /Schedule/ZlozWniosekZmianyTerminu
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -134,6 +133,198 @@ VALUES (@ID_Zolnierza, @Tresc, @Typ, @DataIGodzina, @Status)";
             return RedirectToAction("Index");
         }
 
+        // ------------------------------------------------------------------
+        // POST: /Schedule/ZglosFeedback
+        // Metoda przetwarzająca zgłoszenie feedbacku/sugestii od żołnierza.
+        // Wzorowana jest na rozwiązaniu dla wniosku o zmianę terminu służby.
+        // ------------------------------------------------------------------
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ZglosFeedback(FeedbackViewModel model)
+        {
+            // Sprawdzenie walidacji modelu
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Pobranie ID zalogowanego żołnierza z claimów
+            var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
+            if (idZolnierzaClaim == null)
+            {
+                return NotFound("Nie znaleziono żołnierza.");
+            }
+            var idZolnierza = int.Parse(idZolnierzaClaim);
+
+            // Pobranie danych żołnierza (np. imie, nazwisko, stopień, ID_Pododdzialu)
+            var zolnierz = await _context.Zolnierze
+                .Where(z => z.ID_Zolnierza == idZolnierza)
+                .Select(z => new { z.Imie, z.Nazwisko, z.Stopien, z.ID_Pododdzialu })
+                .FirstOrDefaultAsync();
+
+            if (zolnierz == null)
+            {
+                ModelState.AddModelError("", "Nie znaleziono danych żołnierza.");
+                return RedirectToAction("Index");
+            }
+
+            // Wyszukanie dowódcy w tym samym pododdziale (przyjmujemy, że stopień dowódcy to "kpt")
+            var dowodca = await _context.Zolnierze
+                .Where(z => z.ID_Pododdzialu == zolnierz.ID_Pododdzialu && z.Stopien == "kpt")
+                .FirstOrDefaultAsync();
+
+            if (dowodca == null)
+            {
+                ModelState.AddModelError("", "Nie znaleziono dowódcy o stopniu kpt.");
+                return RedirectToAction("Index");
+            }
+
+            int IDdowodca = dowodca.ID_Zolnierza;
+
+            // Utworzenie treści powiadomienia z feedbackiem
+            string tresc = $"Feedback od {zolnierz.Stopien} {zolnierz.Imie} {zolnierz.Nazwisko}: {model.Tresc}";
+
+            // Przygotowanie zapytania SQL do wstawienia powiadomienia
+            string sqlQuery = @"INSERT INTO SluzbaApp.Powiadomienia_dane 
+(ID_Zolnierza, Tresc_powiadomienia, Typ_powiadomienia, Data_i_godzina_wyslania, Status)
+VALUES (@ID_Zolnierza, @Tresc, @Typ, @DataIGodzina, @Status)";
+
+            // Wstawienie powiadomienia dla dowódcy
+            await _context.Database.ExecuteSqlRawAsync(sqlQuery,
+                new MySqlParameter("@ID_Zolnierza", IDdowodca),
+                new MySqlParameter("@Tresc", tresc),
+                new MySqlParameter("@Typ", "Feedback"),
+                new MySqlParameter("@DataIGodzina", DateTime.Now),
+                new MySqlParameter("@Status", "Wysłano"));
+
+         
+            // Ustawienie komunikatu potwierdzającego (opcjonalnie możesz użyć TempData aby wyświetlić komunikat po przekierowaniu)
+            TempData["FeedbackMessage"] = "Feedback został zapisany. Dziękujemy za Twoje sugestie.";
+
+            return RedirectToAction("Index");
+        }
+
+        // ------------------------------------------------------------------
+        // POST: /Schedule/ZglosKonflikt
+        // Przetwarza zgłoszenie konfliktu służbowego.
+        // ------------------------------------------------------------------
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ZglosKonflikt(KonfliktViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Pobranie ID zalogowanego żołnierza
+            var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
+            if (idZolnierzaClaim == null)
+            {
+                return NotFound("Nie znaleziono żołnierza.");
+            }
+            var idZolnierza = int.Parse(idZolnierzaClaim);
+
+            // Pobranie danych żołnierza
+            var zolnierz = await _context.Zolnierze
+                .Where(z => z.ID_Zolnierza == idZolnierza)
+                .Select(z => new { z.Imie, z.Nazwisko, z.Stopien, z.ID_Pododdzialu })
+                .FirstOrDefaultAsync();
+            if (zolnierz == null)
+            {
+                ModelState.AddModelError("", "Nie znaleziono danych żołnierza.");
+                return RedirectToAction("Index");
+            }
+
+            // Wyszukanie dowódcy (stopień "kpt") w tym samym pododdziale
+            var dowodca = await _context.Zolnierze
+                .Where(z => z.ID_Pododdzialu == zolnierz.ID_Pododdzialu && z.Stopien == "kpt")
+                .FirstOrDefaultAsync();
+            if (dowodca == null)
+            {
+                ModelState.AddModelError("", "Nie znaleziono dowódcy o stopniu kpt.");
+                return RedirectToAction("Index");
+            }
+
+            // (Opcjonalnie:) Możesz wyszukać też oficera dyżurnego, jeśli wiadomo gdzie kierować takie zgłoszenie.
+
+            // Utworzenie treści powiadomienia z konfliktem – format przykładowy
+            string tresc = $"Konflikt służbowy zgłoszony przez {zolnierz.Stopien} {zolnierz.Imie} {zolnierz.Nazwisko}:" +
+                           $" Dzień: {model.Dzien.ToString("yyyy-MM-dd")}, " +
+                           $"Od: {model.OdGodziny}, Do: {model.DoGodziny}. " +
+                           $"Powód: {model.PowodKonfliktu}";
+
+            // Przygotowanie zapytania SQL do zapisania powiadomienia
+            string sqlQuery = @"INSERT INTO SluzbaApp.Powiadomienia_dane 
+(ID_Zolnierza, Tresc_powiadomienia, Typ_powiadomienia, Data_i_godzina_wyslania, Status)
+VALUES (@ID_Zolnierza, @Tresc, @Typ, @DataIGodzina, @Status)";
+
+            // Wstawienie powiadomienia dla dowódcy
+            await _context.Database.ExecuteSqlRawAsync(sqlQuery,
+                new MySqlParameter("@ID_Zolnierza", dowodca.ID_Zolnierza),
+                new MySqlParameter("@Tresc", tresc),
+                new MySqlParameter("@Typ", "Konflikt"),
+                new MySqlParameter("@DataIGodzina", DateTime.Now),
+                new MySqlParameter("@Status", "Wysłano"));
+
+            // (Opcjonalnie:) Wstawienie powiadomienia dla innych, np. oficera dyżurnego
+
+            TempData["FeedbackMessage"] = "Konflikt został zgłoszony. Powiadomienie zostało wysłane w odpowiednie miejsce.";
+            return RedirectToAction("Index");
+        }
+
+
+        // ------------------------------------------------------------------
+        // POST: /Schedule/ZglosPriorytet
+        // Przetwarza ustawienie priorytetu dla trzech rodzajów służby jednocześnie.
+        // Jeśli rekord już istnieje (dla danego ID_Zolnierza i ID_Sluzby), zostanie nadpisany.
+        // ------------------------------------------------------------------
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ZglosPriorytet(PriorytetMultipleViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Pobranie ID zalogowanego żołnierza
+            var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
+            if (idZolnierzaClaim == null)
+            {
+                return NotFound("Nie znaleziono żołnierza.");
+            }
+            var idZolnierza = int.Parse(idZolnierzaClaim);
+
+            // Instrukcja INSERT ... ON DUPLICATE KEY UPDATE – dla nadpisania rekordu, jeżeli kombinacja (ID_Zolnierza, ID_Sluzby) już istnieje.
+            string sqlQuery = @"
+        INSERT INTO SluzbaApp.Priorytety_dane (ID_Zolnierza, ID_Sluzby, Priorytet)
+        VALUES (@ID_Zolnierza, @ID_Sluzby, @Priorytet)
+        ON DUPLICATE KEY UPDATE Priorytet = VALUES(Priorytet)";
+
+            // Dla Warty (przyjmujemy, że ID_Sluzby = 1)
+            await _context.Database.ExecuteSqlRawAsync(sqlQuery,
+                new MySqlParameter("@ID_Zolnierza", idZolnierza),
+                new MySqlParameter("@ID_Sluzby", 1),
+                new MySqlParameter("@Priorytet", model.PriorytetWarta));
+
+            // Dla Patrolu (przyjmujemy, że ID_Sluzby = 2)
+            await _context.Database.ExecuteSqlRawAsync(sqlQuery,
+                new MySqlParameter("@ID_Zolnierza", idZolnierza),
+                new MySqlParameter("@ID_Sluzby", 2),
+                new MySqlParameter("@Priorytet", model.PriorytetPatrol));
+
+            // Dla Pododdziału (przyjmujemy, że ID_Sluzby = 3)
+            await _context.Database.ExecuteSqlRawAsync(sqlQuery,
+                new MySqlParameter("@ID_Zolnierza", idZolnierza),
+                new MySqlParameter("@ID_Sluzby", 3),
+                new MySqlParameter("@Priorytet", model.PriorytetPododdzial));
+
+            TempData["FeedbackMessage"] = "Priorytet służby został zapisany.";
+            return RedirectToAction("Index");
+        }
+
+
 
 
 
@@ -206,8 +397,7 @@ VALUES (@ID_Zolnierza, @Tresc, @Typ, @DataIGodzina, @Status)";
             DateTime endDateTime = startDateTime.AddHours(8);
 
             // Format do Google Calendar: 
-            // "YYYYMMDDTHHMMSSZ" (UTC) lub bez 'Z' jeśli local time
-            // Prostota: localtime "YYYYMMDDTHHMMSS"
+            // "YYYYMMDDTHHMMSS" (local time)
             string startStr = startDateTime.ToString("yyyyMMddTHHmmss");
             string endStr = endDateTime.ToString("yyyyMMddTHHmmss");
 
@@ -215,16 +405,12 @@ VALUES (@ID_Zolnierza, @Tresc, @Typ, @DataIGodzina, @Status)";
             string title = model.Tytul ?? $"Służba {harmItem.ID_Harmonogram}";
             string details = model.Notatki ?? "";
 
-            // Można dodać offset np. w parametrach notatek ("Przypomnienie 1h przed") 
-            // Google Calendar link (bez 'Z' - localtime):
-            // https://calendar.google.com/calendar/render?action=TEMPLATE&text=TITLE&dates=20230901T080000/20230901T160000&details=NOTES
+            // Google Calendar link (localtime):
+            // https://calendar.google.com/calendar/render?action=TEMPLATE&text=TITLE&dates=YYYYMMDDTHHMMSS/YYYYMMDDTHHMMSS&details=NOTES
             string googleCalendarUrl = $"https://calendar.google.com/calendar/render?action=TEMPLATE" +
                 $"&text={Uri.EscapeDataString(title)}" +
                 $"&dates={startStr}/{endStr}" +
                 $"&details={Uri.EscapeDataString(details)}";
-
-            // W docelowym scenariuszu można generować ICS lub link do Outlook
-            // Tutaj zwracamy link do Google
 
             // Przekazujemy link do widoku potwierdzającego
             ViewBag.GoogleLink = googleCalendarUrl;
@@ -235,7 +421,7 @@ VALUES (@ID_Zolnierza, @Tresc, @Typ, @DataIGodzina, @Status)";
     }
 
     // =================================================
-    //   ViewModel do formularza
+    //   ViewModel do formularza przypomnienia
     // =================================================
     public class AddReminderViewModel
     {
