@@ -50,5 +50,7 @@ namespace WebApplication2.Models
         public virtual ICollection<Przewinienie> Przewinienia { get; set; }
         public virtual ICollection<Powiadomienie> Powiadomienia { get; set; }
         public virtual ICollection<Priorytet> Priorytety { get; set; }
+        public virtual ICollection<Urlop> Urlopy { get; set; }
+
     }
 }

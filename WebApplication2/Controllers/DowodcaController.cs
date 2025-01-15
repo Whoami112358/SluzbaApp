@@ -1115,6 +1115,217 @@ namespace WebApplication2.Controllers
             return RedirectToAction("HarmonogramKC", "Dowodca");
         }
 
+        [HttpGet]
+        public IActionResult AnalizaDostepnosci()
+        {
+            // 1) Generujemy listę miesięcy i lat do wyboru (np. bieżący rok i kolejny?)
+            var months = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            var years = new List<int> { DateTime.Now.Year, DateTime.Now.Year + 1 };
+
+            ViewBag.Months = months; // do <select>
+            ViewBag.Years = years;
+
+            // 2) Możemy ustawić domyślny wybór: aktualny miesiąc/rok
+            ViewBag.SelectedMonth = DateTime.Now.Month;
+            ViewBag.SelectedYear = DateTime.Now.Year;
+
+            // Na razie brak eventów w widoku → user wybierze i wciśnie "Pokaż"
+            return View(); // AnalizaDostepnosci.cshtml (formularz i/lub kalendarz)
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AnalizaDostepnosci(int month, int year)
+        {
+            // 1) Znajdź dowódcę
+            var login = User.Identity.Name; // np. "Jan.Kowalski"
+            var parts = login.Split('.');
+            if (parts.Length != 2)
+            {
+                ModelState.AddModelError("", "Niepoprawny format loginu.");
+                return View(); // Wróci do formularza
+            }
+            string imie = parts[0];
+            string nazwisko = parts[1];
+
+            var dowodca = await _context.Zolnierze
+                .FirstOrDefaultAsync(z => z.Imie == imie && z.Nazwisko == nazwisko);
+
+            if (dowodca == null)
+            {
+                ModelState.AddModelError("", "Nie znaleziono dowódcy w bazie.");
+                return View();
+            }
+
+            // 2) Wyznacz zakres (pierwszy i ostatni dzień wybranego miesiąca)
+            // Sprawdzamy poprawność month/year w razie czego
+            if (month < 1 || month > 12 || year < 2000 || year > 2100)
+            {
+                ModelState.AddModelError("", "Niepoprawny zakres miesiąca/roku.");
+                return View();
+            }
+
+            var firstDay = new DateTime(year, month, 1);
+            var lastDay = firstDay.AddMonths(1).AddDays(-1);
+
+            // 3) Pobieramy wszystkich żołnierzy z pododdziału dowódcy
+            var zolnierzePododdzial = await _context.Zolnierze
+                .Where(z => z.ID_Pododdzialu == dowodca.ID_Pododdzialu)
+                .ToListAsync();
+
+            // 4) Pobieramy Harmonogram w tym miesiącu
+            var harmonogramOkres = await _context.Harmonogramy
+                .Where(h => h.Data >= firstDay && h.Data <= lastDay)
+                .ToListAsync();
+
+            // 5) Pobieramy Urlopy i Zwolnienia
+            var urlopyOkres = await _context.Urlopy
+                .Where(u => u.DataRozpoczecia <= lastDay && u.DataZakonczenia >= firstDay)
+                .ToListAsync();
+            var zwolnieniaOkres = await _context.Zwolnienia
+                .Where(z => z.DataRozpoczeciaZwolnienia <= lastDay
+                         && z.DataZakonczeniaZwolnienia >= firstDay)
+                .ToListAsync();
+
+            // 6) Budujemy dayMap [yyyy-MM-dd -> DayDetails]
+            int totalDays = (lastDay - firstDay).Days + 1;
+            var dayMap = new Dictionary<string, DayDetails>();
+            for (int i = 0; i < totalDays; i++)
+            {
+                var d = firstDay.AddDays(i);
+                string key = d.ToString("yyyy-MM-dd");
+                dayMap[key] = new DayDetails
+                {
+                    Dostepni = new List<string>(),
+                    Niedostepni = new List<string>()
+                };
+            }
+
+            // ...
+            // 7) Dla każdej doby i każdego żołnierza → sprawdzamy dostępność
+            for (int i = 0; i < totalDays; i++)
+            {
+                var d = firstDay.AddDays(i);
+                string dateKey = d.ToString("yyyy-MM-dd");
+
+                foreach (var z in zolnierzePododdzial)
+                {
+                    string powod = SprawdzNiedostepnosc(z.ID_Zolnierza, d,
+                        harmonogramOkres, urlopyOkres, zwolnieniaOkres);
+
+                    // Budujemy zapis w formacie: "Stopien Imie Nazwisko"
+                    var opisZolnierza = $"{z.Stopien} {z.Imie} {z.Nazwisko}";
+
+                    if (powod == null)
+                    {
+                        // Żołnierz dostępny
+                        dayMap[dateKey].Dostepni.Add(opisZolnierza);
+                    }
+                    else
+                    {
+                        // Żołnierz niedostępny + powód
+                        dayMap[dateKey].Niedostepni.Add($"{opisZolnierza} ({powod})");
+                    }
+                }
+            }
+
+
+            // 8) Budujemy eventy (po jednym na każdy dzień)
+            var events = new List<object>();
+            for (int i = 0; i < totalDays; i++)
+            {
+                var d = firstDay.AddDays(i);
+                string dateKey = d.ToString("yyyy-MM-dd");
+                var details = dayMap[dateKey];
+                int countDost = details.Dostepni.Count;
+                int countNied = details.Niedostepni.Count;
+
+                string title = $"Dost. {countDost}, Nied. {countNied}";
+                // Kolory – ciemna czcionka, by lepiej widać
+                string bgColor = "#f9c74f";  // np. żółtawy
+                string txtColor = "#000000"; // czarny
+
+                events.Add(new
+                {
+                    title = title,
+                    start = dateKey,
+                    allDay = true,
+                    color = bgColor,
+                    textColor = txtColor
+                });
+            }
+
+            // Konwersja do JSON
+            ViewBag.EventsJson = System.Text.Json.JsonSerializer.Serialize(events);
+
+            // Szczegóły do modala
+            var dayInfo = dayMap.ToDictionary(
+                x => x.Key,
+                x => new {
+                    Dostepni = x.Value.Dostepni,
+                    Niedostepni = x.Value.Niedostepni
+                }
+            );
+            ViewBag.DayInfoJson = System.Text.Json.JsonSerializer.Serialize(dayInfo);
+
+            // 9) Zapisujemy do ViewBag, by widok wiedział, jaki to miesiąc
+            ViewBag.CurrentMonth = month;
+            ViewBag.CurrentYear = year;
+
+            // Ponownie listy do <select>, by mogły się wyświetlić
+            var months = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            var years = new List<int> { DateTime.Now.Year, DateTime.Now.Year + 1 };
+            ViewBag.Months = months;
+            ViewBag.Years = years;
+
+            // Zwracamy ten sam widok AnalizaDostepnosci.cshtml
+            return View();
+        }
+
+        // Pomocnicza metoda do sprawdzenia powodu niedostępności
+        private string SprawdzNiedostepnosc(int idZolnierza, DateTime dzien,
+            List<Harmonogram> harmList,
+            List<Urlop> urlopList,
+            List<Zwolnienie> zwolList)
+        {
+            // 1) W służbie tego dnia?
+            bool wSluzbie = harmList.Any(h => h.ID_Zolnierza == idZolnierza
+                                           && h.Data.Date == dzien.Date);
+            if (wSluzbie)
+                return "służba";
+
+            // 2) Dzień po służbie => odpoczynek
+            var wczoraj = dzien.AddDays(-1);
+            bool wczorajSluzba = harmList.Any(h => h.ID_Zolnierza == idZolnierza
+                                                && h.Data.Date == wczoraj.Date);
+            if (wczorajSluzba)
+                return "odpoczynek";
+
+            // 3) Urlop?
+            bool wUrlopie = urlopList.Any(u => u.ID_Zolnierza == idZolnierza
+                && u.DataRozpoczecia <= dzien && u.DataZakonczenia >= dzien);
+            if (wUrlopie)
+                return "urlop";
+
+            // 4) Zwolnienie?
+            bool wZwolnieniu = zwolList.Any(z => z.ID_Zolnierza == idZolnierza
+                && z.DataRozpoczeciaZwolnienia <= dzien
+                && z.DataZakonczeniaZwolnienia >= dzien);
+            if (wZwolnieniu)
+                return "zwolnienie";
+
+            // Jeśli nic – jest dostępny
+            return null;
+        }
+
+        // Pomocnicza klasa do przechowywania listy dostępnych/niedostępnych
+        private class DayDetails
+        {
+            public List<string> Dostepni { get; set; }
+            public List<string> Niedostepni { get; set; }
+        }
+
+
     }
 
     // ========================================
