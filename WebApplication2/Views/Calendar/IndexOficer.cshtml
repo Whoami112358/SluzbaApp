@@ -6,6 +6,16 @@
 
 <h1>Kalendarz Oficera Dyżurnego</h1>
 
+
+
+<!-- TEMPORARNY FORMULARZ PRZYZNAWANIA PUNKTÓW -->
+<form method="post" asp-controller="DyzurnyCalendarController" asp-action="PrzyznajPunkty">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-primary">*** Przyznaj punkty (test) ***</button>
+</form>
+
+
+
 <div id="calendar"></div>
 
 <!-- FullCalendar -->

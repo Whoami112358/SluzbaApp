@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Models;
+using WebApplication2.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Jedrych tu byl
 // Pobierz connection string z appsettings.json
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -14,6 +14,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Dodaj us³ugê kontrolerów z widokami
 builder.Services.AddControllersWithViews();
+
+// Ta us³uga bêdzie wywo³ywana automatycznie (np. codziennie o 9:00), aby przyznawaæ punkty
+builder.Services.AddHostedService<AutomatycznaPunktacja>();
 
 // Konfiguracja uwierzytelniania z dwoma schematami
 builder.Services.AddAuthentication(options =>
