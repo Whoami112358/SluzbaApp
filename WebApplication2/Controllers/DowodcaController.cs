@@ -33,13 +33,121 @@ namespace WebApplication2.Controllers
             _memoryCache = memoryCache;
         }
 
+
+
+
         // ----------------------------------
-        // Panel główny Dowódcy
+        // Panel główny Dowódcy   + WYSYŁANIE POWIADOMIEŃ DOTYCZĄCYCH SŁUŻB NA DZIEŃ DZISIEJSZY I NASTĘPNY
         // ----------------------------------
-        public IActionResult DowodcaView()
+        public async Task<IActionResult> DowodcaView()
         {
+            // Pobranie dzisiejszej daty
+            var dzisiaj = DateTime.Today;
+            var jutro = dzisiaj.AddDays(1);
+
+            // Pobranie ID aktualnie zalogowanego dowódcy
+            var dowodcaLogin = User.Identity.Name; // Zależne od implementacji autoryzacji
+            var dowodca = await _context.Zolnierze
+                .Include(z => z.Pododdzial) // Ładowanie powiązanego pododdziału
+                .FirstOrDefaultAsync(z => z.LoginData.LoginName == dowodcaLogin);
+
+            if (dowodca == null)
+            {
+                return Unauthorized("Nie znaleziono dowódcy.");
+            }
+
+            // Pobranie służb na dzisiaj i jutro
+            var sluzbyDzisiaj = await _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                    .ThenInclude(z => z.Pododdzial) // Ładowanie pododdziału żołnierzy
+                .Include(h => h.Sluzba)
+                .Where(h => h.Data.Date == dzisiaj)
+                .ToListAsync();
+
+            var sluzbyJutro = await _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                    .ThenInclude(z => z.Pododdzial) // Ładowanie pododdziału żołnierzy
+                .Include(h => h.Sluzba)
+                .Where(h => h.Data.Date == jutro)
+                .ToListAsync();
+
+            // Tworzenie powiadomień
+            var powiadomienia = new List<Powiadomienie>();
+
+            if (sluzbyDzisiaj.Any())
+            {
+                var istniejePowiadomienieDzisiaj = await _context.Powiadomienia
+                    .AnyAsync(p => p.ID_Zolnierza == dowodca.ID_Zolnierza &&
+                                   p.TypPowiadomienia == "Informacja o służbach (dziś)");
+
+                if (!istniejePowiadomienieDzisiaj)
+                {
+                    var trescDzisiaj = "Służby na dzisiaj:\n" +
+                        string.Join("\n", sluzbyDzisiaj.Select(s =>
+                            $"{s.Data:yyyy-MM-dd} - {s.Zolnierz.Imie} {s.Zolnierz.Nazwisko} ({s.Sluzba.Rodzaj}) -  {s.Zolnierz.Pododdzial?.Nazwa}"));
+
+                    powiadomienia.Add(new Powiadomienie
+                    {
+                        ID_Zolnierza = dowodca.ID_Zolnierza,
+                        TrescPowiadomienia = trescDzisiaj,
+                        TypPowiadomienia = "Informacja o służbach (dziś)",
+                        DataIGodzinaWyslania = DateTime.Now,
+                        Status = "Wysłano"
+                    });
+                }
+            }
+
+            if (sluzbyJutro.Any())
+            {
+                var istniejePowiadomienieJutro = await _context.Powiadomienia
+                    .AnyAsync(p => p.ID_Zolnierza == dowodca.ID_Zolnierza &&
+                                   p.TypPowiadomienia == "Informacja o służbach (jutro)");
+
+                if (!istniejePowiadomienieJutro)
+                {
+                    var trescJutro = "Służby na jutro:\n" +
+                        string.Join("\n", sluzbyJutro.Select(s =>
+                            $"{s.Data:yyyy-MM-dd} - {s.Zolnierz.Imie} {s.Zolnierz.Nazwisko} ({s.Sluzba.Rodzaj}) -  {s.Zolnierz.Pododdzial?.Nazwa}"));
+
+                    powiadomienia.Add(new Powiadomienie
+                    {
+                        ID_Zolnierza = dowodca.ID_Zolnierza,
+                        TrescPowiadomienia = trescJutro,
+                        TypPowiadomienia = "Informacja o służbach (jutro)",
+                        DataIGodzinaWyslania = DateTime.Now,
+                        Status = "Wysłano"
+                    });
+                }
+            }
+
+            // Zapisanie powiadomień w bazie danych
+            if (powiadomienia.Any())
+            {
+                _context.Powiadomienia.AddRange(powiadomienia);
+                await _context.SaveChangesAsync();
+            }
+
             return View();
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // ----------------------------------
         // Lista Harmonogramów
@@ -233,9 +341,18 @@ namespace WebApplication2.Controllers
             {
                 zolnierz.Punkty += punkty;
             }
-
-            // Zapisz zmiany w bazie danych
+            var powiadomienie = new Powiadomienie
+            {
+                ID_Zolnierza = ID_Zolnierza,
+                TrescPowiadomienia = $"Twoja punktacja została zmieniona o {punkty}. Aktualna liczba punktów: {zolnierz.Punkty}.",
+                TypPowiadomienia = "Zmiana punktacji",
+                DataIGodzinaWyslania = DateTime.Now,
+                Status = "Wysłano"
+            };
+            _context.Powiadomienia.Add(powiadomienie);
             _context.SaveChanges();
+            // Zapisz zmiany w bazie danych
+           
 
             // Przekieruj z powrotem do listy żołnierzy/ekranu punktacji
             return RedirectToAction("Punktacja");
@@ -376,13 +493,10 @@ namespace WebApplication2.Controllers
                 return NotFound("Nie znaleziono żołnierza o tym imieniu i nazwisku.");
             }
 
-            // Pobieramy ID pododdziału przypisane temu żołnierzowi
-            var pododdzialId = zolnierz.ID_Pododdzialu;
-
-            // 2) Pobieramy wszystkie powiadomienia wraz z danymi żołnierza
+            // 2) Pobieramy wszystkie powiadomienia przypisane wyłącznie do dowódcy
             var query = _context.Powiadomienia
                 .Include(p => p.Zolnierz)
-                .Where(p => p.Zolnierz.ID_Pododdzialu == pododdzialId) // Filtrowanie po pododdziale
+                .Where(p => p.ID_Zolnierza == zolnierz.ID_Zolnierza) // Filtrowanie tylko powiadomień dowódcy
                 .AsQueryable();
 
             // 3) Domyślne sortowanie: DataIGodzinaWyslania desc

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Models;
+using WebApplication2.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,7 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 // Dodaj us³ugê DbContext z MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 
 // Dodaj us³ugê kontrolerów z widokami
 builder.Services.AddControllersWithViews();
@@ -40,6 +43,9 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+// To ten od powiadomieñ od czasu coœ takiego. 
+builder.Services.AddHostedService<NotificationService>();
 
 // Dodaj Swagger (do testów API)
 builder.Services.AddSwaggerGen(c =>
