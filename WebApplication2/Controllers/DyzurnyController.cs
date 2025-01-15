@@ -136,6 +136,16 @@ namespace WebApplication2.Controllers
             {
                 zolnierz.Punkty += punkty;
             }
+            var powiadomienie = new Powiadomienie
+            {
+                ID_Zolnierza = ID_Zolnierza,
+                TrescPowiadomienia = $"Twoja punktacja została zmieniona o {punkty}. Aktualna liczba punktów: {zolnierz.Punkty}.",
+                TypPowiadomienia = "Zmiana punktacji",
+                DataIGodzinaWyslania = DateTime.Now,
+                Status = "Wysłano"
+            };
+            _context.Powiadomienia.Add(powiadomienie);
+            _context.SaveChanges();
 
             // Zapisz zmiany w bazie danych
             _context.SaveChanges();
