@@ -1,67 +1,61 @@
 ﻿@model IEnumerable<WebApplication2.Models.Zwolnienie>
 
 @{
-    ViewData["Title"] = "Lista Zwolnień";
+    ViewData["Title"] = "LISTA ZWOLNIEŃ";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
 
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - Twoja Aplikacja</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #ecf0f1; /* Jasny tekst */
-            box-sizing: border-box;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../listabg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         header {
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: white;
-            padding: 10px 20px;
+            text-align: center;
+            padding: 20px 0;
         }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 20px;
-        }
-
-            nav ul li {
-                display: inline;
-            }
-
-                nav ul li a {
-                    color: white;
-                    text-decoration: none;
-                    font-weight: bold;
-                    transition: color 0.3s ease;
-                }
-
-                    nav ul li a:hover {
-                        color: #1abc9c; /* Jasny zielony przy hover */
-                    }
 
         h1 {
-            color: #27ae60; /* Jasny zielony */
-            text-align: center;
-            font-family: 'Impact', sans-serif;
-            text-shadow: 2px 2px #000;
-            margin-top: 20px;
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            margin: 25px 0;
+            color: #ffffff;
         }
 
-        /* Tabela */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow: auto;
+            padding: 20px;
+        }
+
         table {
-            width: 100%;
+            width: 90%;
+            max-width: 800px;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: 20px auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: rgba(172, 174, 165, 0.7);
+            border-radius: 8px;
         }
 
             table th, table td {
@@ -71,42 +65,44 @@
             }
 
             table th {
-                background-color: #27ae60; /* Jasny zielony */
+                background-color: rgba(119, 131, 83, 1);
                 color: white;
             }
 
             table td {
-                background-color: #34495e; /* Ciemniejszy zielony */
-                color: #ecf0f1;
+                background-color: rgba(172, 174, 165, 0.7);
             }
 
-        /* Formularz */
         .form-container {
-            background-color: #34495e; /* Ciemny zielony */
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
             padding: 20px;
             border-radius: 10px;
-            border: 2px solid #3e5057;
-            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: rgba(172, 174, 165, 0.7);
         }
 
             .form-container label {
-                color: #27ae60; /* Jasny zielony dla etykiet */
+                display: block;
+                margin-bottom: 10px;
                 font-weight: bold;
+                color: #ffffff;
             }
 
             .form-container select,
-            .form-container input {
-                background-color: #2c3e50; /* Ciemny odcień zieleni */
-                color: #ecf0f1;
-                padding: 10px;
+            .form-container input[type="date"] {
                 width: 100%;
-                border: 1px solid #34495e;
-                margin: 10px 0;
+                padding: 10px;
+                margin-bottom: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
                 border-radius: 5px;
+                background-color: rgba(119, 131, 83, 1);
+                color: white;
             }
 
             .form-container button {
-                background-color: #1abc9c; /* Jasny zielony */
+                background-color: rgba(119, 131, 83, 1);
                 color: white;
                 padding: 12px 20px;
                 border: none;
@@ -117,64 +113,68 @@
             }
 
                 .form-container button:hover {
-                    background-color: #16a085; /* Ciemniejszy zielony przy hover */
+                    background-color: rgba(0, 0, 0, 0.2);
                 }
 
-        /* Styl linków */
-        a {
-            color: #1abc9c; /* Jasny zielony */
-            text-decoration: none;
-            font-weight: bold;
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
         }
 
-            a:hover {
-                color: #16a085; /* Ciemniejszy zielony przy hover */
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
             }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
     </style>
 </head>
 <body>
-
     <header>
-        <nav>
-            <ul>
-                <li><a href="/Dowodca/DowodcaView">Wróć do Strony głównej</a></li>
-            </ul>
-        </nav>
+        <h1>@ViewData["Title"]</h1>
     </header>
-
-    <h1>@ViewData["Title"]</h1>
-
-    <!-- Tabela z listą zwolnień -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Żołnierz</th>
-                <th>Data Rozpoczęcia</th>
-                <th>Data Zakończenia</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var zwolnienie in Model)
-            {
+    <div class="content">
+        <!-- Tabela z listą zwolnień -->
+        <table>
+            <thead>
                 <tr>
-                    <td>@zwolnienie.Zolnierz.Imie @zwolnienie.Zolnierz.Nazwisko</td>
-                    <td>@zwolnienie.DataRozpoczeciaZwolnienia.ToString("yyyy-MM-dd")</td>
-                    <td>@zwolnienie.DataZakonczeniaZwolnienia.ToString("yyyy-MM-dd")</td>
+                    <th>Żołnierz</th>
+                    <th>Data Rozpoczęcia</th>
+                    <th>Data Zakończenia</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var zwolnienie in Model)
+                {
+                    <tr>
+                        <td>@zwolnienie.Zolnierz.Imie @zwolnienie.Zolnierz.Nazwisko</td>
+                        <td>@zwolnienie.DataRozpoczeciaZwolnienia.ToString("yyyy-MM-dd")</td>
+                        <td>@zwolnienie.DataZakonczeniaZwolnienia.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
-    <hr />
+        <!-- Formularz dodania zwolnienia -->
+        <div class="form-container">
+            <h3>Dodaj Nowe Zwolnienie</h3>
+            <form method="post" asp-action="DodajZwolnienie">
+                @Html.AntiForgeryToken()
 
-    <!-- Formularz do dodania nowego zwolnienia -->
-    <div class="form-container">
-        <h3>Dodaj Nowe Zwolnienie</h3>
-
-        <form method="post" asp-action="DodajZwolnienie">
-            @Html.AntiForgeryToken()
-
-            <div>
                 <label for="ID_Zolnierza">Żołnierz:</label>
                 <select id="ID_Zolnierza" name="ID_Zolnierza" required>
                     @foreach (var zolnierz in ViewBag.Zolnierze)
@@ -182,21 +182,23 @@
                         <option value="@zolnierz.ID_Zolnierza">@zolnierz.Imie @zolnierz.Nazwisko</option>
                     }
                 </select>
-            </div>
 
-            <div class="form-group">
-                <label for="DataRozpoczeciaZwolnienia">Data Rozpoczęcia Zwolnienia</label>
-                <input type="date" class="form-control" id="DataRozpoczeciaZwolnienia" name="DataRozpoczeciaZwolnienia" required />
-            </div>
+                <label for="DataRozpoczeciaZwolnienia">Data Rozpoczęcia Zwolnienia:</label>
+                <input type="date" id="DataRozpoczeciaZwolnienia" name="DataRozpoczeciaZwolnienia" required />
 
-            <div class="form-group">
-                <label for="DataZakonczeniaZwolnienia">Data Zakończenia Zwolnienia</label>
-                <input type="date" class="form-control" id="DataZakonczeniaZwolnienia" name="DataZakonczeniaZwolnienia" required />
-            </div>
+                <label for="DataZakonczeniaZwolnienia">Data Zakończenia Zwolnienia:</label>
+                <input type="date" id="DataZakonczeniaZwolnienia" name="DataZakonczeniaZwolnienia" required />
 
-            <button type="submit">Dodaj Zwolnienie</button>
-        </form>
+                <button type="submit">Dodaj Zwolnienie</button>
+            </form>
+        </div>
     </div>
 
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("DowodcaView", "Dowodca")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
 </body>
 </html>

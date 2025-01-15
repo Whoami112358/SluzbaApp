@@ -1,5 +1,6 @@
 ﻿@{
-    ViewData["Title"] = "Analiza dostępności";
+    ViewData["Title"] = "ANALIZA DOSTĘPNOŚCI";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
 
 <!DOCTYPE html>
@@ -12,100 +13,135 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 
     <style>
-        /* Style dla body z drugiego widoku */
         body {
             margin: 0;
             padding: 0;
-            background-color: #2c3e50;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             color: #ecf0f1;
-            font-family: Arial, sans-serif;
-            text-align: center; /* Dodane dla spójności z pierwszym widokiem */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: auto; /* Usunięcie białego paska */
         }
 
-        /* Style dla kontenera z drugiego widoku */
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
+          
+        }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            margin: 25px 0;
+            color: #ffffff;
+        }
+
         .container {
-            max-width: 1000px;
-            margin: 80px auto 20px auto; /* Dodano margines górny, aby nie nachodził na header */
-            background-color: #34495e;
-            border-radius: 8px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
             padding: 20px;
         }
 
-        /* Style nagłówka z drugiego widoku */
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #ecf0f1; /* Dostosowany kolor tekstu */
-        }
-
-        /* Style formularza */
         form {
-            margin-bottom: 20px;
-            text-align: center;
+            background-color: rgba(172, 174, 165, 0.7);
+            padding: 20px;
+            max-width: 600px;
+            width: 90%;
+            margin: 20px auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         label {
             font-weight: bold;
-            margin-right: 5px;
+            display: block;
+            margin-bottom: 5px;
+            color: #ffffff;
         }
 
         select {
-            margin-right: 15px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            border: 1px solid #888;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+            font-size: 14px;
         }
 
         button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            background-color: #1abc9c;
-            color: #fff;
             cursor: pointer;
+            background-color: rgba(119, 131, 83, 1);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
 
             button:hover {
-                background-color: #16a085;
+                background-color: rgba(0, 0, 0, 0.2);
             }
 
-        /* Style kalendarza */
         #calendar {
-            background: #ffffff;
-            color: #000000; /* Tekst w kalendarzu ciemny na jasnym tle */
-            padding: 10px;
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
             border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Ukrywanie toolbarów FullCalendar */
-        .fc-header-toolbar,
-        .fc-footer-toolbar {
-            display: none !important;
-        }
-
-        /* Zablokowanie interakcji z nagłówków dni */
-        .fc-dayGridMonth-view .fc-daygrid-day-top a {
-            pointer-events: none;
-        }
-
-        /* Style dla modala */
         .modal-overlay {
-            display: none; /* Domyślnie ukryty */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 9999;
-            justify-content: center; /* Centrowanie modala */
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
             align-items: center;
+            z-index: 1000;
         }
 
         .modal-content {
-            background-color: #fff;
+            background-color: #ffffff;
             color: #000;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 20px;
             max-width: 600px;
             width: 90%;
@@ -130,75 +166,25 @@
             color: #333;
         }
 
-        /* Lista żołnierzy w modalce */
         #listDostepni, #listNiedostepni {
             margin: 0;
             padding: 0;
             list-style-type: square;
-            text-align: left; /* Ustawienie tekstu na lewą stronę */
+            text-align: left;
         }
 
             #listDostepni li, #listNiedostepni li {
                 margin-left: 18px;
                 margin-bottom: 5px;
             }
-
-        /* Style dla headera z pierwszego widoku */
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px 20px;
-            position: fixed; /* Ustawienie headera na stałe u góry */
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000; /* Zapewnienie, że header będzie nad innymi elementami */
-        }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 20px;
-            justify-content: center; /* Centrowanie elementów nawigacji */
-        }
-
-            nav ul li {
-                display: inline;
-            }
-
-                nav ul li a {
-                    color: #1abc9c;
-                    text-decoration: none;
-                    font-weight: bold;
-                    transition: color 0.3s ease;
-                }
-
-                    nav ul li a:hover {
-                        color: #16a085; /* Zmiana koloru przy hoverze */
-                    }
-
-        /* Dostosowanie kontenera, aby nie nachodził na header */
-        .container {
-            margin-top: 60px; /* Wysokość headera plus trochę odstępu */
-        }
-
-        /* Dodatkowe style, jeśli potrzebne */
     </style>
 </head>
 <body>
-    <!-- Dodany Header -->
     <header>
-        <nav>
-            <ul>
-                <li><a href="@Url.Action("DowodcaView", "Dowodca")">Wróć do Strony głównej</a></li>
-            </ul>
-        </nav>
+        <h1>@ViewData["Title"]</h1>
     </header>
 
     <div class="container">
-        <h1>@ViewData["Title"]</h1>
 
         <!-- Sekcja błędów ModelState -->
         @if (!ViewData.ModelState.IsValid)
@@ -258,6 +244,13 @@
             <ul id="listNiedostepni"></ul>
         </div>
     </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("DowodcaView", "Dowodca")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
 
     @if (ViewBag.EventsJson != null)
     {
