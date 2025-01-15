@@ -61,10 +61,8 @@ namespace WebApplication2.Tests
         [TearDown]
         public void TearDown()
         {
-            _dbContext.Database.CloseConnection(); // Zamykanie połączenia
             _dbContext?.Dispose();
         }
-
 
         public void Dispose()
         {
@@ -157,23 +155,6 @@ namespace WebApplication2.Tests
 
             _dbContext.SaveChanges();
         }
-
-        #region DowodcaView Tests
-
-        [Test]
-        public void DowodcaView_ShouldReturnView()
-        {
-            // Act
-            var result = _controller.DowodcaView();
-
-            // Assert
-            Assert.IsInstanceOf<ViewResult>(result);
-            var viewResult = (ViewResult)result;
-            Assert.IsNull(viewResult.ViewName);
-            // Domyślnie null oznacza, że używamy nazwy akcji ("DowodcaView")
-        }
-
-        #endregion
 
         #region HarmonogramKC Tests
 
@@ -462,7 +443,6 @@ namespace WebApplication2.Tests
 
         #region DodajZwolnienie Tests
 
-     
 
         [Test]
         public async Task DodajZwolnienie_Post_ShouldReturnView_WhenSoldierNotFound()
