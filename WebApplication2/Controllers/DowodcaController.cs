@@ -16,6 +16,7 @@ using iText.Layout.Element;
 using iText.Layout.Properties;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics;
 
 namespace WebApplication2.Controllers
 {
@@ -841,8 +842,164 @@ namespace WebApplication2.Controllers
             {
                 return View(model);
             }
+
         }
 
+        // =======================================
+        // GET: /Dowodca/ZarzadzajPriorytetami
+        // =======================================
+        [HttpGet]
+        public async Task<IActionResult> ZarzadzajPriorytetami()
+        {
+            // 1. Pobierz dane zalogowanego dowódcy (login w formacie Imie.Nazwisko)
+            var dowodcaLogin = User.Identity.Name;
+            if (string.IsNullOrEmpty(dowodcaLogin))
+            {
+                return Unauthorized("Brak zalogowanego dowódcy.");
+            }
+
+            var imieNazwisko = dowodcaLogin.Split('.');
+            if (imieNazwisko.Length != 2)
+            {
+                return BadRequest("Niepoprawny format loginu (oczekiwano Imie.Nazwisko).");
+            }
+
+            var imie = imieNazwisko[0];
+            var nazwisko = imieNazwisko[1];
+
+            // 2. Znajdź dowódcę w tabeli Zolnierze
+            var dowodca = await _context.Zolnierze
+                .FirstOrDefaultAsync(z => z.Imie == imie && z.Nazwisko == nazwisko);
+
+            if (dowodca == null)
+            {
+                return NotFound("Nie znaleziono dowódcy o podanym loginie.");
+            }
+
+            // 3. Pobierz wszystkie służby (Sluzba_dane)
+            var wszystkieSluzby = await _context.Sluzby.ToListAsync();
+
+            // 4. Pobierz wszystkie priorytety dla aktualnego dowódcy
+            var priorytetyDlaDowodcy = await _context.Priorytety
+                .Where(p => p.ID_Zolnierza == dowodca.ID_Zolnierza)
+                .ToListAsync();
+
+            // 5. Jeśli dla którejś służby nie ma ustawionego priorytetu, dodaj go z domyślną wartością 1
+            bool isNewRecordAdded = false;
+            foreach (var sluzba in wszystkieSluzby)
+            {
+                if (!priorytetyDlaDowodcy.Any(p => p.ID_Sluzby == sluzba.ID_Sluzby))
+                {
+                    var nowyPriorytet = new Priorytet
+                    {
+                        ID_Zolnierza = dowodca.ID_Zolnierza,
+                        ID_Sluzby = sluzba.ID_Sluzby,
+                        PriorytetValue = 1 // domyślny priorytet
+                    };
+                    _context.Priorytety.Add(nowyPriorytet);
+                    priorytetyDlaDowodcy.Add(nowyPriorytet);
+                    isNewRecordAdded = true;
+                }
+            }
+
+            if (isNewRecordAdded)
+            {
+                // Zapisujemy do bazy dopiero po dodaniu wszystkich brakujących rekordów
+                await _context.SaveChangesAsync();
+            }
+
+            // 6. Ponownie pobierz priorytety, ale już z danymi o służbie
+            var priorytetyZSluzbami = await _context.Priorytety
+                .Where(p => p.ID_Zolnierza == dowodca.ID_Zolnierza)
+                .Include(p => p.Sluzba)
+                .ToListAsync();
+
+            // 7. Zwróć widok z listą priorytetów
+            return View(priorytetyZSluzbami);
+        }
+
+        // =======================================
+        // POST: /Dowodca/ZarzadzajPriorytetami
+        // =======================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ZarzadzajPriorytetami(List<Priorytet> priorytety)
+        {
+            // 1. Ponownie pobierz dane zalogowanego dowódcy
+            var dowodcaLogin = User.Identity.Name;
+            if (string.IsNullOrEmpty(dowodcaLogin))
+            {
+                return Unauthorized("Brak zalogowanego dowódcy.");
+            }
+
+            var imieNazwisko = dowodcaLogin.Split('.');
+            if (imieNazwisko.Length != 2)
+            {
+                return BadRequest("Niepoprawny format loginu (oczekiwano Imie.Nazwisko).");
+            }
+
+            var imie = imieNazwisko[0];
+            var nazwisko = imieNazwisko[1];
+
+            var dowodca = await _context.Zolnierze
+                .FirstOrDefaultAsync(z => z.Imie == imie && z.Nazwisko == nazwisko);
+
+            if (dowodca == null)
+            {
+                return NotFound("Nie znaleziono dowódcy o podanym loginie.");
+            }
+
+            // 2. Walidacja podstawowa
+            if (!ModelState.IsValid)
+            {
+                // Jeśli jest błąd walidacji, zwracamy widok z błędami
+                return View(priorytety);
+            }
+
+            // 3. Przetwarzanie priorytetów
+            foreach (var priorytet in priorytety)
+            {
+                // Upewniamy się, że priorytet należy do aktualnie zalogowanego dowódcy
+                if (priorytet.ID_Zolnierza != dowodca.ID_Zolnierza)
+                {
+                    // Ewentualnie można zignorować, a można też zgłosić błąd
+                    ModelState.AddModelError("", "Nieautoryzowana zmiana priorytetu.");
+                    continue;
+                }
+
+                // Znajdź istniejący rekord w bazie
+                var existingPriorytet = await _context.Priorytety
+                    .FirstOrDefaultAsync(p => p.ID_Priorytetu == priorytet.ID_Priorytetu &&
+                                              p.ID_Zolnierza == dowodca.ID_Zolnierza);
+
+                if (existingPriorytet != null)
+                {
+                    // Zaktualizuj wartość priorytetu
+                    existingPriorytet.PriorytetValue = priorytet.PriorytetValue;
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(priorytety);
+            }
+
+            // 4. Zapisanie zmian w bazie i przekierowanie do HarmonogramKC
+            try
+            {
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Priorytety zostały zaktualizowane.";
+            }
+            catch (Exception ex)
+            {
+                // Obsługa ewentualnych błędów DB
+                ModelState.AddModelError("", "Wystąpił błąd podczas aktualizacji priorytetów: " + ex.Message);
+                return View(priorytety);
+            }
+
+            // 5. Po zapisaniu: redirect do HarmonogramKC
+            return RedirectToAction("HarmonogramKC", "Dowodca");
+        }
 
     }
 
