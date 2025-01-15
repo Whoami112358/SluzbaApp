@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace WebApplication2.Models
 {
@@ -21,10 +22,12 @@ namespace WebApplication2.Models
 
         // Nawigacja do Zolnierz
         [ForeignKey("ID_Zolnierza")]
+        [ValidateNever] // Dodane, aby model binder nie próbował mapować tej właściwości
         public virtual Zolnierz Zolnierz { get; set; }
 
         // Nawigacja do Sluzba
         [ForeignKey("ID_Sluzby")]
+        [ValidateNever] // Dodane, aby model binder nie próbował mapować tej właściwości
         public virtual Sluzba Sluzba { get; set; }
     }
 }

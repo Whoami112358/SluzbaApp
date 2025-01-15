@@ -1,0 +1,231 @@
+﻿@model List<WebApplication2.Models.Priorytet>
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Zarządzanie Priorytetami Służb</title>
+    <style>
+        /* Style CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+            nav ul li {
+                display: inline;
+            }
+
+                nav ul li a {
+                    color: white;
+                    text-decoration: none;
+                    font-weight: bold;
+                    transition: color 0.3s ease;
+                }
+
+                    nav ul li a:hover {
+                        color: #1abc9c;
+                    }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        .slider {
+            width: 80%;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            margin: 20px 10px 0 10px;
+        }
+
+            button:hover {
+                background-color: #2ecc71;
+            }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #2980b9;
+            color: white;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .btn-back:hover {
+                background-color: #3498db;
+            }
+
+        .alert-success {
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            width: 80%;
+            margin: 20px auto;
+            text-align: left;
+        }
+
+        .alert-danger {
+            background-color: #f2dede;
+            color: #a94442;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            width: 80%;
+            margin: 20px auto;
+            text-align: left;
+        }
+    </style>
+    <script>
+        // Skrypt do aktualizacji etykiety wartości suwaka
+        function updateSliderValue(slider, spanId) {
+            const labels = ["Bardzo Niski", "Niski", "Średni", "Wysoki", "Bardzo Wysoki"];
+            const value = parseInt(slider.value, 10);
+            document.getElementById(spanId).innerText = labels[value - 1] || "Nieokreślony";
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Zarządzanie Priorytetami Służb</h1>
+
+    @* Komunikat sukcesu *@
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @* Komunikaty o błędach z ModelState *@
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert-danger">
+            <ul>
+                @foreach (var state in ViewData.ModelState)
+                {
+                    foreach (var error in state.Value.Errors)
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+
+    @* Formularz *@
+    <form asp-action="ZarzadzajPriorytetami" method="post">
+        @Html.AntiForgeryToken()
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Rodzaj Służby</th>
+                    <th>Priorytet (1-5)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var item = Model[i];
+                    // Tekstowa reprezentacja priorytetu
+                    string priorityLabel = item.PriorytetValue switch
+                    {
+                        1 => "Bardzo Niski",
+                        2 => "Niski",
+                        3 => "Średni",
+                        4 => "Wysoki",
+                        5 => "Bardzo Wysoki",
+                        _ => "Nieokreślony"
+                    };
+
+                    <tr>
+                        <td>
+                            @* Nazwa służby *@
+                            @(item.Sluzba?.Rodzaj ?? "Brak")
+
+                            @* Ukryte pola *@
+                            <input type="hidden" name="[@i].ID_Priorytetu" value="@item.ID_Priorytetu" />
+                            <input type="hidden" name="[@i].ID_Zolnierza" value="@item.ID_Zolnierza" />
+                            <input type="hidden" name="[@i].ID_Sluzby" value="@item.ID_Sluzby" />
+                        </td>
+                        <td>
+                            <input type="range"
+                                   name="[@i].PriorytetValue"
+                                   min="1"
+                                   max="5"
+                                   value="@item.PriorytetValue"
+                                   class="slider"
+                                   id="slider_@i"
+                                   oninput="updateSliderValue(this, 'value_@i')" />
+                            <span id="value_@i">@priorityLabel</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="submit">Zapisz</button>
+        <a class="btn-back" href="@Url.Action("HarmonogramKC", "Dowodca")">Powrót</a>
+    </form>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+    </footer>
+</body>
+</html>
