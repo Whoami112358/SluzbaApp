@@ -144,29 +144,6 @@
 
     <h1>@ViewData["Title"]</h1>
 
-    <!-- Tabela z listą zwolnień -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Żołnierz</th>
-                <th>Data Rozpoczęcia</th>
-                <th>Data Zakończenia</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var zwolnienie in Model)
-            {
-                <tr>
-                    <td>@zwolnienie.Zolnierz.Imie @zwolnienie.Zolnierz.Nazwisko</td>
-                    <td>@zwolnienie.DataRozpoczeciaZwolnienia.ToString("yyyy-MM-dd")</td>
-                    <td>@zwolnienie.DataZakonczeniaZwolnienia.ToString("yyyy-MM-dd")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <hr />
-
     <!-- Formularz do dodania nowego zwolnienia -->
     <div class="form-container">
         <h3>Dodaj Nowe Zwolnienie</h3>
@@ -197,6 +174,27 @@
             <button type="submit">Dodaj Zwolnienie</button>
         </form>
     </div>
+
+    <!-- Tabela z listą zwolnień -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Żołnierz</th>
+                <th>Data Rozpoczęcia</th>
+                <th>Data Zakończenia</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var zwolnienie in Model)
+            {
+                <tr>
+                    <td>@zwolnienie.Zolnierz.Imie @zwolnienie.Zolnierz.Nazwisko</td>
+                    <td>@zwolnienie.DataRozpoczeciaZwolnienia.ToString("yyyy-MM-dd")</td>
+                    <td>@zwolnienie.DataZakonczeniaZwolnienia.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
 </body>
 </html>

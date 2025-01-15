@@ -9,6 +9,12 @@ using System.Collections.Generic;
 using WebApplication2.Models;
 using System.ComponentModel.DataAnnotations;
 using MySqlConnector;
+using iText.IO.Font.Constants;
+using iText.Kernel.Colors;
+using iText.Kernel.Font;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
+using iText.Layout.Properties;
 
 namespace WebApplication2.Controllers
 {
@@ -232,6 +238,75 @@ VALUES (@ID_Zolnierza, @Tresc, @Typ, @DataIGodzina, @Status)";
 
             return View("AddReminderResult");
         }
+
+        public IActionResult DownloadReport()
+        {
+            try
+            {
+                // Pobranie ID żołnierza z sesji (np. z claimów)
+                var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
+                if (idZolnierzaClaim == null)
+                {
+                    return NotFound("Nie znaleziono żołnierza.");
+                }
+
+                var idZolnierza = int.Parse(idZolnierzaClaim);
+
+                // Pobranie harmonogramu dla ostatnich 6 miesięcy
+                DateTime sixMonthsAgo = DateTime.Now.AddMonths(-6);
+                var harmonogram = _context.Harmonogramy
+                    .Where(h => h.ID_Zolnierza == idZolnierza && h.Data >= sixMonthsAgo)
+                    .Include(h => h.Sluzba)
+                    .OrderBy(h => h.Data)
+                    .ToList();
+
+                if (harmonogram == null || harmonogram.Count == 0)
+                {
+                    return NotFound("Brak danych do wygenerowania raportu.");
+                }
+
+                // Generowanie pliku PDF
+                using (var memoryStream = new MemoryStream())
+                {
+                    PdfWriter writer = new PdfWriter(memoryStream);
+                    PdfDocument pdf = new PdfDocument(writer);
+                    iText.Layout.Document document = new iText.Layout.Document(pdf);
+
+                    // Tytuł dokumentu
+                    document.Add(new Paragraph("Raport Sluzb - Ostatnie 6 miesiecy")
+                        .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD))
+                        .SetFontSize(16)
+                        .SetTextAlignment(TextAlignment.CENTER)
+                        .SetMarginBottom(20));
+
+                    // Tworzenie tabeli
+                    Table table = new Table(3).UseAllAvailableWidth();
+                    table.AddHeaderCell("Data").SetBackgroundColor(ColorConstants.LIGHT_GRAY);
+                    table.AddHeaderCell("Rodzaj Sluzby").SetBackgroundColor(ColorConstants.LIGHT_GRAY);
+                    table.AddHeaderCell("Miejsce").SetBackgroundColor(ColorConstants.LIGHT_GRAY);
+
+                    // Wypełnianie danych w tabeli
+                    foreach (var item in harmonogram)
+                    {
+                        table.AddCell(item.Data.ToString("yyyy-MM-dd"));
+                        table.AddCell(item.Sluzba?.Rodzaj ?? "Brak");
+                        table.AddCell(item.Sluzba?.MiejscePelnieniaSluzby ?? "Brak");
+                    }
+
+                    document.Add(table);
+                    document.Close();
+
+                    // Zwracanie pliku PDF
+                    return File(memoryStream.ToArray(), "application/pdf", "Raport_Sluzb.pdf");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Wystąpił błąd podczas generowania raportu: {ex.Message}");
+            }
+        }
+
+
     }
 
     // =================================================
