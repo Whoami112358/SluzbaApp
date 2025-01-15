@@ -33,13 +33,121 @@ namespace WebApplication2.Controllers
             _memoryCache = memoryCache;
         }
 
+
+
+
         // ----------------------------------
-        // Panel główny Dowódcy
+        // Panel główny Dowódcy   + WYSYŁANIE POWIADOMIEŃ DOTYCZĄCYCH SŁUŻB NA DZIEŃ DZISIEJSZY I NASTĘPNY
         // ----------------------------------
-        public IActionResult DowodcaView()
+        public async Task<IActionResult> DowodcaView()
         {
+            // Pobranie dzisiejszej daty
+            var dzisiaj = DateTime.Today;
+            var jutro = dzisiaj.AddDays(1);
+
+            // Pobranie ID aktualnie zalogowanego dowódcy
+            var dowodcaLogin = User.Identity.Name; // Zależne od implementacji autoryzacji
+            var dowodca = await _context.Zolnierze
+                .Include(z => z.Pododdzial) // Ładowanie powiązanego pododdziału
+                .FirstOrDefaultAsync(z => z.LoginData.LoginName == dowodcaLogin);
+
+            if (dowodca == null)
+            {
+                return Unauthorized("Nie znaleziono dowódcy.");
+            }
+
+            // Pobranie służb na dzisiaj i jutro
+            var sluzbyDzisiaj = await _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                    .ThenInclude(z => z.Pododdzial) // Ładowanie pododdziału żołnierzy
+                .Include(h => h.Sluzba)
+                .Where(h => h.Data.Date == dzisiaj)
+                .ToListAsync();
+
+            var sluzbyJutro = await _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                    .ThenInclude(z => z.Pododdzial) // Ładowanie pododdziału żołnierzy
+                .Include(h => h.Sluzba)
+                .Where(h => h.Data.Date == jutro)
+                .ToListAsync();
+
+            // Tworzenie powiadomień
+            var powiadomienia = new List<Powiadomienie>();
+
+            if (sluzbyDzisiaj.Any())
+            {
+                var istniejePowiadomienieDzisiaj = await _context.Powiadomienia
+                    .AnyAsync(p => p.ID_Zolnierza == dowodca.ID_Zolnierza &&
+                                   p.TypPowiadomienia == "Informacja o służbach (dziś)");
+
+                if (!istniejePowiadomienieDzisiaj)
+                {
+                    var trescDzisiaj = "Służby na dzisiaj:\n" +
+                        string.Join("\n", sluzbyDzisiaj.Select(s =>
+                            $"{s.Data:yyyy-MM-dd} - {s.Zolnierz.Imie} {s.Zolnierz.Nazwisko} ({s.Sluzba.Rodzaj}) -  {s.Zolnierz.Pododdzial?.Nazwa}"));
+
+                    powiadomienia.Add(new Powiadomienie
+                    {
+                        ID_Zolnierza = dowodca.ID_Zolnierza,
+                        TrescPowiadomienia = trescDzisiaj,
+                        TypPowiadomienia = "Informacja o służbach (dziś)",
+                        DataIGodzinaWyslania = DateTime.Now,
+                        Status = "Wysłano"
+                    });
+                }
+            }
+
+            if (sluzbyJutro.Any())
+            {
+                var istniejePowiadomienieJutro = await _context.Powiadomienia
+                    .AnyAsync(p => p.ID_Zolnierza == dowodca.ID_Zolnierza &&
+                                   p.TypPowiadomienia == "Informacja o służbach (jutro)");
+
+                if (!istniejePowiadomienieJutro)
+                {
+                    var trescJutro = "Służby na jutro:\n" +
+                        string.Join("\n", sluzbyJutro.Select(s =>
+                            $"{s.Data:yyyy-MM-dd} - {s.Zolnierz.Imie} {s.Zolnierz.Nazwisko} ({s.Sluzba.Rodzaj}) -  {s.Zolnierz.Pododdzial?.Nazwa}"));
+
+                    powiadomienia.Add(new Powiadomienie
+                    {
+                        ID_Zolnierza = dowodca.ID_Zolnierza,
+                        TrescPowiadomienia = trescJutro,
+                        TypPowiadomienia = "Informacja o służbach (jutro)",
+                        DataIGodzinaWyslania = DateTime.Now,
+                        Status = "Wysłano"
+                    });
+                }
+            }
+
+            // Zapisanie powiadomień w bazie danych
+            if (powiadomienia.Any())
+            {
+                _context.Powiadomienia.AddRange(powiadomienia);
+                await _context.SaveChangesAsync();
+            }
+
             return View();
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // ----------------------------------
         // Lista Harmonogramów
@@ -233,9 +341,18 @@ namespace WebApplication2.Controllers
             {
                 zolnierz.Punkty += punkty;
             }
-
-            // Zapisz zmiany w bazie danych
+            var powiadomienie = new Powiadomienie
+            {
+                ID_Zolnierza = ID_Zolnierza,
+                TrescPowiadomienia = $"Twoja punktacja została zmieniona o {punkty}. Aktualna liczba punktów: {zolnierz.Punkty}.",
+                TypPowiadomienia = "Zmiana punktacji",
+                DataIGodzinaWyslania = DateTime.Now,
+                Status = "Wysłano"
+            };
+            _context.Powiadomienia.Add(powiadomienie);
             _context.SaveChanges();
+            // Zapisz zmiany w bazie danych
+           
 
             // Przekieruj z powrotem do listy żołnierzy/ekranu punktacji
             return RedirectToAction("Punktacja");
@@ -344,6 +461,79 @@ namespace WebApplication2.Controllers
             ViewBag.DostepniZolnierze = zolnierze;
 
             return View(); // przydzielzastepce.cshtml
+        }
+
+
+
+
+        // GET: /Dowodca/ListaPowiadomien
+        // sortColumn może być np. "Zolnierz", "Tresc", "DataWyslania", "Status"
+        // sortOrder "asc" lub "desc"
+        public async Task<IActionResult> ListaPowiadomien(string sortColumn, string sortOrder)
+        {
+            // 1) Pobieramy aktualnie zalogowanego dowódcę
+            var dowodcaId = User.Identity.Name; // Zmienna zależna od sposobu autentykacji
+
+            // Rozdzielamy login na imię i nazwisko
+            var imieNazwisko = dowodcaId.Split('.'); // Zakładamy, że login ma postać Imie.Nazwisko
+            if (imieNazwisko.Length != 2)
+            {
+                return BadRequest("Niepoprawny format loginu.");
+            }
+
+            var imie = imieNazwisko[0]; // Imię
+            var nazwisko = imieNazwisko[1]; // Nazwisko
+
+            // Znajdź żołnierza w tabeli Zolnierze, który ma przypisane imię i nazwisko
+            var zolnierz = await _context.Zolnierze
+                .FirstOrDefaultAsync(z => z.Imie == imie && z.Nazwisko == nazwisko);
+
+            if (zolnierz == null)
+            {
+                return NotFound("Nie znaleziono żołnierza o tym imieniu i nazwisku.");
+            }
+
+            // 2) Pobieramy wszystkie powiadomienia przypisane wyłącznie do dowódcy
+            var query = _context.Powiadomienia
+                .Include(p => p.Zolnierz)
+                .Where(p => p.ID_Zolnierza == zolnierz.ID_Zolnierza) // Filtrowanie tylko powiadomień dowódcy
+                .AsQueryable();
+
+            // 3) Domyślne sortowanie: DataIGodzinaWyslania desc
+            if (string.IsNullOrEmpty(sortColumn)) sortColumn = "Data";
+            if (string.IsNullOrEmpty(sortOrder)) sortOrder = "desc";
+
+            // 4) Sortowanie wg. parametru
+            query = sortColumn switch
+            {
+                "Zolnierz" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.Zolnierz.Nazwisko)
+                    : query.OrderByDescending(p => p.Zolnierz.Nazwisko),
+
+                "Tresc" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.TrescPowiadomienia)
+                    : query.OrderByDescending(p => p.TrescPowiadomienia),
+
+                "Status" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.Status)
+                    : query.OrderByDescending(p => p.Status),
+
+                "Data" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.DataIGodzinaWyslania)
+                    : query.OrderByDescending(p => p.DataIGodzinaWyslania),
+
+                _ => query.OrderByDescending(p => p.DataIGodzinaWyslania) // domyślne
+            };
+
+            // 5) Pobieramy z bazy
+            var powiadomienia = await query.ToListAsync();
+
+            // 6) Przekazujemy do widoku
+            // By wiedzieć, jaka aktualnie kolumna i order
+            ViewBag.CurrentSortColumn = sortColumn;
+            ViewBag.CurrentSortOrder = sortOrder;
+
+            return View(powiadomienia);
         }
 
 
