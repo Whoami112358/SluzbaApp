@@ -39,7 +39,7 @@
         }
 
         .card {
-            background-color: rgba(119, 131, 83, 0.7);
+            background-color: rgba(119, 131, 83, 0.6);
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 1);
             text-align: center;
@@ -65,30 +65,30 @@
 
 </head>
 <body>
-    <button onclick="location.href='@Url.Action("Index", "Home")'"
+    <button onclick="location.href='/Account/Logout'"
             style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; top: 10px; right: 10px;">
         <img src="../Wyloguj.png" style="width: 28px; height: 32px;" alt="Wyloguj" />
     </button>
     <button onclick="location.href='@Url.Action("Index", "Profile")'"
             style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; top: 10px; right: 110px;">
-        <img src="../avatar.png" style="width: 28px; height: 32px;" alt="Wyloguj" />
+        <img src="../avatar.png" style="width: 28px; height: 32px;" alt="Profil" />
     </button>
     <button onclick="location.href='@Url.Action("Index", "Powiadomienia")'"
             style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; top: 10px; right: 60px;">
-        <img src="../powiadomienia.png" style="width:28px; height: 32px;" alt="Wyloguj" />
+        <img src="../powiadomienia.png" style="width:28px; height: 32px;" alt="Powiadomienia" />
     </button>
 
     <div class="content">
         <div class="card">
             <button onclick="location.href='@Url.Action("Index", "Schedule")'" style="border: none; background: none; padding: 0; cursor: pointer;">
                 <img src="../harmonogram.png" alt="Harmonogram" style="width: 108px; height: 124px;" />
-                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Kalendarz służb żołnierzy</span>
+                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Harmonogram służb</span>
             </button>
         </div>
         <div class="card">
             <button onclick="location.href='@Url.Action("Index", "Calendar")'" style="border: none; background: none; padding: 0; cursor: pointer;">
                 <img src="../kalendarz.png" alt="Kalendarz" style="width: 108px; height: 124px;" />
-                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Kalendarz służb żołnierzy</span>
+                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Kalendarz służb</span>
             </button>
         </div>
     </div>

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "KALENDARZ SŁUŻB";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
 <!DOCTYPE html>
 <html lang="pl">
@@ -13,7 +14,8 @@
     <style>
         body {
             font-family: 'Poppins', Arial, sans-serif;
-            margin: 0;
+            margin-left: auto;
+            margin-right: auto;
             padding: 0;
             background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../kalendarzbg.png');
             background-size: cover;
@@ -25,19 +27,26 @@
         }
 
         h1 {
-            font-family: 'Special Elite', cursive;
+            font-family: 'Korolev Military Stencil W00 Rg';
             text-align: center;
             font-size: 48px;
             color: #ffffff;
             margin-top: 20px;
-            margin-bottom: 10px;
+            margin-bottom: 40px;
+
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
         }
 
         #calendar {
             max-width: 100%;
             position: center;
-            margin-left: 1000px;
-            background-color: rgba(15, 24, 16, 0.6);
+            background-color: rgba(119, 131, 83, 0.6);
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -95,7 +104,8 @@
     </style>
 </head>
 <body>
-    <h1>Kalendarz Służb</h1>
+    <div id=".content">
+    <h1>@ViewData["Title"]</h1>
     <div id="calendar"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
@@ -130,6 +140,14 @@
             calendar.render();
         });
     </script>
+    </div>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+    </footer>
+    <button onclick="location.href='@Url.Action("Index", "Home")'"
+            style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; bottom: 35px; left: 10px;">
+        <img src="../back.png" style="width: 25px; height: 24px;" />
+    </button>
 </body>
 
 </html>

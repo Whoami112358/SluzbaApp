@@ -1,8 +1,8 @@
 @model IEnumerable<WebApplication2.Models.Harmonogram>
 
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Harmonogram Służb";
+    ViewData["Title"] = "HARMONOGRAM SŁUŻB";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
 
 
@@ -13,96 +13,76 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="/css/site.css" />
     <style>
-        /* Ogólne style dla strony */
         body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #ffffff; /* Biały tekst */
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
         }
 
         header {
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            padding: 15px;
             text-align: center;
-            border-bottom: 2px solid #ffffff;
+            padding: 20px 0;
+            height: 10%;
         }
 
-            header nav ul {
-                list-style-type: none;
-                padding: 0;
-                margin: 0;
-            }
-
-                header nav ul li {
-                    display: inline;
-                    margin-right: 20px;
-                }
-
-                    header nav ul li a {
-                        color: #ffffff;
-                        text-decoration: none;
-                        font-size: 1.2em;
-                    }
-
-                        header nav ul li a:hover {
-                            color: #1abc9c; /* Jasny zielony przy hover */
-                        }
-
-        .content {
-            margin: 30px auto;
-            padding: 20px;
-            width: 800px;
-            background-color: #34495e; /* Ciemny odcień zieleni */
-            border: 2px solid #27ae60; /* Jasny zielony */
-            border-radius: 8px;
-        }
-
-            .content h1 {
-                color: #27ae60; /* Jasny zielony */
-                font-size: 2.5em;
-                text-align: center;
-            }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #27ae60; /* Jasny zielony */
-        }
-
-        th {
-            background-color: #27ae60; /* Zielony wojskowy nagłówek */
-            color: #fff;
-        }
-
-        td {
-            background-color: #5a5a5a; /* Subtelnie ciemniejsze tło komórek */
-            color: #fff;
-        }
-
-        tr:hover {
-            background-color: #616f39; /* Jaśniejszy odcień zieleni przy najechaniu */
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            text-align: center;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            color: #ffffff;
         }
 
         footer {
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #ffffff;
             text-align: center;
             padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            color: #ffffff;
+            font-size: 14px;
         }
 
-            footer p {
-                margin: 0;
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 90%;
+            width: 100%;
+            overflow: auto;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+
+        table {
+            margin-right: 50px;
+            margin-left: 50px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            table th, table td {
+                padding: 10px;
+                text-align: center;
+                border: 1px solid #ddd;
+            }
+
+            table th {
+                top: 0;
+                background-color: rgba(119, 131, 83, 1);
+                color: white;
+            }
+
+            table td {
+                background-color: rgba(172, 174, 165, 0.7);
             }
 
         /* Styl dla wiadomości o błędach */
@@ -117,7 +97,7 @@
 
         /* Styl linku w kolumnie Przypomnienie */
         .reminder-link {
-            color: #1abc9c;
+            color: rgba(119, 131, 83, 1);
             text-decoration: none;
             font-weight: bold;
         }
@@ -128,9 +108,12 @@
     </style>
 </head>
 <body>
+    <button onclick="location.href='@Url.Action("Index", "Home")'"
+            style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; bottom: 35px; left: 10px;">
+        <img src="../back.png" style="width: 25px; height: 24px;" />
+    </button>
+    <h1>@ViewData["Title"]</h1>
     <div class="content">
-        <h1>Twój Harmonogram Służb</h1>
-
         <table>
             <thead>
                 <tr>
@@ -146,10 +129,17 @@
                         <td>@item.Data.ToShortDateString()</td>
                         <td>@(item.Sluzba != null ? item.Sluzba.Rodzaj : "Brak")</td>
                         <td>
-                            <a href="@Url.Action("AddReminder", "Schedule", new { idHarmonogram = item.ID_Harmonogram })"
-                               class="reminder-link">
-                                Dodaj przypomnienie
-                            </a>
+                            <button onclick="location.href='@Url.Action("AddReminder", "Schedule", new { idHarmonogram = item.ID_Harmonogram })'"
+                                    style="font-family: 'Poppins', Arial, sans-serif;
+                                    font-size: 18px;
+                                    font-weight: bold;
+                                    cursor: pointer;
+                                    color: white;
+                                    background-color: rgba(119, 131, 83, 1);
+                                    border: none;
+                                    border-radius: 30px;
+                                    padding: 10px 20px;"> Dodaj przypomnienie
+                            </button>
                         </td>
 
                     </tr>
@@ -159,7 +149,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2024 Twoja Aplikacja</p>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
     </footer>
 
     <script src="/_framework/aspnetcore-browser-refresh.js"></script>

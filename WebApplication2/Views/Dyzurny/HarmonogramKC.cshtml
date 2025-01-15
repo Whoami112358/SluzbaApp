@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
 @{
     ViewData["Title"] = "HARMONOGRAM SŁUŻB";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+
 }
 <!DOCTYPE html>
 <html lang="pl">
@@ -31,7 +33,7 @@
         }
 
         h1 {
-            font-family: 'Special Elite', cursive;
+            font-family: 'Korolev Military Stencil W00 Rg';
             font-size: 48px;
             text-align: center;
             margin-top: 25px;
@@ -169,12 +171,12 @@
             </tbody>
         </table>
     </div>
-    <footer>
-        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
-    </footer>
     <button onclick="location.href='@Url.Action("DyzurnyView", "Dyzurny")'"
             style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; bottom: 35px; left: 10px;">
         <img src="../back.png" style="width: 25px; height: 24px;" />
     </button>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+    </footer>
 </body>
 </html>

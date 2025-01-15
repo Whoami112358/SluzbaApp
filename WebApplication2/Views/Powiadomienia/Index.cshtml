@@ -1,8 +1,9 @@
 ﻿@model IEnumerable<WebApplication2.Models.Powiadomienie>
 
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Moje Powiadomienia";
+    ViewData["Title"] = "POWIADOMIENIA";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+
 }
 
 <!DOCTYPE html>
@@ -11,59 +12,83 @@
     <meta charset="utf-8" />
     <title>@ViewData["Title"]</title>
     <style>
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            background-color: #34495e;
-            padding: 20px;
-            border: 2px solid #27ae60;
-            border-radius: 8px;
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+
+            margin-left: auto;
+            margin-right: auto;
+
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../kalendarzbg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            width: 100vh;
             color: #ecf0f1;
         }
 
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            text-align: center;
+            font-size: 48px;
+            color: #ffffff;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            margin-top: 55%;
+        }
+
+        .content {
+            flex: 1;
+            overflow: auto;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+
         table {
+            margin-right: 50px;
+            margin-left: 50px;
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #27ae60;
-        }
+            table th, table td {
+                padding: 10px;
+                text-align: center;
+                border: 1px solid #ddd;
+            }
 
-        th {
-            background-color: #27ae60;
-            color: #fff;
-        }
+            table th {
+                top: 0;
+                background-color: rgba(119, 131, 83, 1);
+                color: white;
+            }
 
-        tr:hover {
-            background-color: #616f39;
-        }
-
-        a.button-link {
-            text-decoration: none;
-            color: #1abc9c;
-            font-weight: bold;
-        }
-
-            a.button-link:hover {
-                color: #34495e;
+            table td {
+                background-color: rgba(172, 174, 165, 0.7);
             }
 
         .status-odebrane {
-            color: #2ecc71; /* zielony */
+            color: #2ecc71;
             font-weight: bold;
         }
 
         .status-wyslano {
-            color: #e74c3c; /* czerwony */
+            color: #e74c3c;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>@ViewData["Title"]</h2>
+        <h1>@ViewData["Title"]</h1>
 
         @if (Model == null || !Model.Any())
         {
@@ -105,8 +130,9 @@
                                 {
                                     <!-- ZAMIENIAMY tag helper na bezpośrednie href -->
                                     <a href="/Powiadomienia/Odbierz?idPowiadomienia=@p.ID_Powiadomienia"
-                                       class="button-link">
-                                        Odbierz
+                                       class="button-link"
+                                       style="color: #2ecc71;">
+                                        Potwierdź
                                     </a>
                                 }
                             </td>
@@ -116,5 +142,12 @@
             </table>
         }
     </div>
+    <button onclick="location.href='@Url.Action("Index", "Home")'"
+            style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; bottom: 35px; left: 10px;">
+        <img src="../back.png" style="width: 25px; height: 24px;" />
+    </button>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+    </footer>
 </body>
 </html>
