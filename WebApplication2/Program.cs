@@ -3,19 +3,21 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication2.Models;
 using WebApplication2.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Pobierz connection string z appsettings.json
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Dodaj us³ugê DbContext z MySQL
+// Dodaj usÂ³ugÃª DbContext z MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Dodaj us³ugê kontrolerów z widokami
+
+// Dodaj usÂ³ugÃª kontrolerÃ³w z widokami
 builder.Services.AddControllersWithViews();
 
-// Ta us³uga bêdzie wywo³ywana automatycznie (np. codziennie o 9:00), aby przyznawaæ punkty
+// Ta usÂ³uga bÃªdzie wywoÂ³ywana automatycznie (np. codziennie o 9:00), aby przyznawaÃ¦ punkty
 builder.Services.AddHostedService<AutomatycznaPunktacja>();
 
 // Konfiguracja uwierzytelniania z dwoma schematami
@@ -27,24 +29,27 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
-    options.LoginPath = "/Account/Login";    // Œcie¿ka do logowania u¿ytkowników
-    options.LogoutPath = "/Account/Logout";  // Œcie¿ka do wylogowania u¿ytkowników
+    options.LoginPath = "/Account/Login";    // Å’cieÂ¿ka do logowania uÂ¿ytkownikÃ³w
+    options.LogoutPath = "/Account/Logout";  // Å’cieÂ¿ka do wylogowania uÂ¿ytkownikÃ³w
 })
 .AddCookie("AdminScheme", options =>
 {
-    options.LoginPath = "/AdminLogin/Login";    // Œcie¿ka do logowania administratorów
-    options.LogoutPath = "/AdminLogout/Logout";  // Œcie¿ka do wylogowania administratorów
+    options.LoginPath = "/AdminLogin/Login";    // Å’cieÂ¿ka do logowania administratorÃ³w
+    options.LogoutPath = "/AdminLogout/Logout";  // Å’cieÂ¿ka do wylogowania administratorÃ³w
 });
 
-// Dodaj us³ugê sesji
+// Dodaj usÂ³ugÃª sesji
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Czas wygaœniêcia sesji
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Czas wygaÅ“niÃªcia sesji
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-// Dodaj Swagger (do testów API)
+// To ten od powiadomieÃ± od czasu coÅ“ takiego. 
+builder.Services.AddHostedService<NotificationService>();
+
+// Dodaj Swagger (do testÃ³w API)
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "v1" });

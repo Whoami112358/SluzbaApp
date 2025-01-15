@@ -24,10 +24,150 @@ namespace WebApplication2.Controllers
             _hostEnvironment = hostEnvironment;
             _memoryCache = memoryCache;
         }
-        public IActionResult DyzurnyView()
+        public async Task<IActionResult> DyzurnyView()
         {
+            // Pobranie dzisiejszej daty
+            var dzisiaj = DateTime.Today;
+            var jutro = dzisiaj.AddDays(1);
+
+            // Pobranie ID aktualnie zalogowanego oficera dyżurnego
+            var dyzurnyLogin = User.Identity.Name; // Zależne od implementacji autoryzacji
+            var dyzurny = await _context.Zolnierze
+                .FirstOrDefaultAsync(z => z.LoginData.LoginName == dyzurnyLogin);
+
+            if (dyzurny == null)
+            {
+                return Unauthorized("Nie znaleziono oficera dyżurnego.");
+            }
+
+            // Pobranie służb na dzisiaj i jutro
+            var sluzbyDzisiaj = await _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                .Include(h => h.Sluzba)
+                .Where(h => h.Data.Date == dzisiaj)
+                .ToListAsync();
+
+            var sluzbyJutro = await _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                .Include(h => h.Sluzba)
+                .Where(h => h.Data.Date == jutro)
+                .ToListAsync();
+
+            // Tworzenie powiadomień
+            var powiadomienia = new List<Powiadomienie>();
+
+            if (sluzbyDzisiaj.Any())
+            {
+                var istniejePowiadomienieDzisiaj = await _context.Powiadomienia
+                    .AnyAsync(p => p.ID_Zolnierza == dyzurny.ID_Zolnierza &&
+                                   p.TypPowiadomienia == "Informacja o służbach (dziś)");
+
+                if (!istniejePowiadomienieDzisiaj)
+                {
+                    var trescDzisiaj = "Służby na dzisiaj:\n" +
+                        string.Join("\n", sluzbyDzisiaj.Select(s =>
+                            $"{s.Data:yyyy-MM-dd} - {s.Zolnierz.Imie} {s.Zolnierz.Nazwisko} ({s.Sluzba.Rodzaj})"));
+
+                    powiadomienia.Add(new Powiadomienie
+                    {
+                        ID_Zolnierza = dyzurny.ID_Zolnierza,
+                        TrescPowiadomienia = trescDzisiaj,
+                        TypPowiadomienia = "Informacja o służbach (dziś)",
+                        DataIGodzinaWyslania = DateTime.Now,
+                        Status = "Wysłano"
+                    });
+                }
+            }
+
+            if (sluzbyJutro.Any())
+            {
+                var istniejePowiadomienieJutro = await _context.Powiadomienia
+                    .AnyAsync(p => p.ID_Zolnierza == dyzurny.ID_Zolnierza &&
+                                   p.TypPowiadomienia == "Informacja o służbach (jutro)");
+
+                if (!istniejePowiadomienieJutro)
+                {
+                    var trescJutro = "Służby na jutro:\n" +
+                        string.Join("\n", sluzbyJutro.Select(s =>
+                            $"{s.Data:yyyy-MM-dd} - {s.Zolnierz.Imie} {s.Zolnierz.Nazwisko} ({s.Sluzba.Rodzaj})"));
+
+                    powiadomienia.Add(new Powiadomienie
+                    {
+                        ID_Zolnierza = dyzurny.ID_Zolnierza,
+                        TrescPowiadomienia = trescJutro,
+                        TypPowiadomienia = "Informacja o służbach (jutro)",
+                        DataIGodzinaWyslania = DateTime.Now,
+                        Status = "Wysłano"
+                    });
+                }
+            }
+
+            // Zapisanie powiadomień w bazie danych
+            if (powiadomienia.Any())
+            {
+                _context.Powiadomienia.AddRange(powiadomienia);
+                await _context.SaveChangesAsync();
+            }
+
             return View();
         }
+
+
+
+
+        // GET: /Dyzurny/ListaPowiadomien
+        // sortColumn może być np. "Zolnierz", "Tresc", "DataWyslania", "Status"
+        // sortOrder "asc" lub "desc"
+        public async Task<IActionResult> ListaPowiadomien(string sortColumn, string sortOrder)
+        {
+            // 1) Ustawienie ID Oficera Dyżurnego na sztywno
+            const int dyzurnyId = 26;
+
+            // 2) Pobieramy powiadomienia przypisane tylko do Oficera Dyżurnego (ID_Zolnierza = 0)
+            var query = _context.Powiadomienia
+                .Include(p => p.Zolnierz) // Dołączenie informacji o żołnierzu
+                .Where(p => p.ID_Zolnierza == dyzurnyId) // Filtracja dla Oficera Dyżurnego
+                .AsQueryable();
+
+            // 3) Domyślne sortowanie: DataIGodzinaWyslania desc
+            if (string.IsNullOrEmpty(sortColumn)) sortColumn = "Data";
+            if (string.IsNullOrEmpty(sortOrder)) sortOrder = "desc";
+
+            // 4) Sortowanie wg. parametru
+            query = sortColumn switch
+            {
+                "Zolnierz" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.Zolnierz.Nazwisko)
+                    : query.OrderByDescending(p => p.Zolnierz.Nazwisko),
+
+                "Tresc" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.TrescPowiadomienia)
+                    : query.OrderByDescending(p => p.TrescPowiadomienia),
+
+                "Status" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.Status)
+                    : query.OrderByDescending(p => p.Status),
+
+                "Data" => (sortOrder == "asc")
+                    ? query.OrderBy(p => p.DataIGodzinaWyslania)
+                    : query.OrderByDescending(p => p.DataIGodzinaWyslania),
+
+                _ => query.OrderByDescending(p => p.DataIGodzinaWyslania) // domyślne
+            };
+
+            // 5) Pobieramy z bazy
+            var powiadomienia = await query.ToListAsync();
+
+            // 6) Przekazujemy do widoku
+            // Informacje o aktualnie sortowanej kolumnie i porządku
+            ViewBag.CurrentSortColumn = sortColumn;
+            ViewBag.CurrentSortOrder = sortOrder;
+
+            return View(powiadomienia);
+        }
+
+
+
         public IActionResult ListaTygodniowa()
         {
             // Pobranie aktualnej daty
@@ -51,6 +191,7 @@ namespace WebApplication2.Controllers
             return View(zolnierze);
         }
 
+        /*
         // Akcja POST do dodawania punktów
         [HttpPost]
         public IActionResult DodajPunkty(int ID_Zolnierza, int punkty)
@@ -70,6 +211,7 @@ namespace WebApplication2.Controllers
             return RedirectToAction("Punktacja");
         }
 
+        
         // Akcja POST do usuwania punktów
         [HttpPost]
         public IActionResult UsunPunkty(int ID_Zolnierza, int punkty)
@@ -100,7 +242,58 @@ namespace WebApplication2.Controllers
 
             // Po zaktualizowaniu danych przekieruj z powrotem do listy żołnierzy
             return RedirectToAction("Punktacja");
+        } */
+
+
+        // Akcja POST do aktualizacji punktów (dodawanie/usuwanie)
+        [HttpPost]
+        public IActionResult ZaktualizujPunkty(int ID_Zolnierza, int punkty)
+        {
+            // Znajdź żołnierza w bazie danych
+            var zolnierz = _context.Zolnierze.FirstOrDefault(z => z.ID_Zolnierza == ID_Zolnierza);
+            if (zolnierz == null)
+            {
+                TempData["Error"] = "Żołnierz o podanym identyfikatorze nie został znaleziony.";
+                return RedirectToAction("Punktacja");
+            }
+
+            // Jeśli punkty są ujemne - próbujemy je odjąć
+            if (punkty < 0)
+            {
+                int punktyDoUsuniecia = Math.Abs(punkty);
+                // Sprawdź, czy żołnierz ma wystarczającą liczbę punktów
+                if (zolnierz.Punkty >= punktyDoUsuniecia)
+                {
+                    zolnierz.Punkty -= punktyDoUsuniecia;
+                }
+                else
+                {
+                    TempData["Error"] = "Nie można usunąć więcej punktów niż aktualnie posiadane.";
+                    return RedirectToAction("Punktacja");
+                }
+            }
+            else // W przeciwnym przypadku dodaj punkty
+            {
+                zolnierz.Punkty += punkty;
+            }
+            var powiadomienie = new Powiadomienie
+            {
+                ID_Zolnierza = ID_Zolnierza,
+                TrescPowiadomienia = $"Twoja punktacja została zmieniona o {punkty}. Aktualna liczba punktów: {zolnierz.Punkty}.",
+                TypPowiadomienia = "Zmiana punktacji",
+                DataIGodzinaWyslania = DateTime.Now,
+                Status = "Wysłano"
+            };
+            _context.Powiadomienia.Add(powiadomienie);
+            _context.SaveChanges();
+
+            // Zapisz zmiany w bazie danych
+            _context.SaveChanges();
+
+            // Przekieruj z powrotem do listy żołnierzy/ekranu punktacji
+            return RedirectToAction("Punktacja");
         }
+
 
         public IActionResult HarmonogramKC()
         {
