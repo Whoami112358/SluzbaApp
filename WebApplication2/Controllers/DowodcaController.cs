@@ -492,13 +492,10 @@ namespace WebApplication2.Controllers
                 return NotFound("Nie znaleziono żołnierza o tym imieniu i nazwisku.");
             }
 
-            // Pobieramy ID pododdziału przypisane temu żołnierzowi
-            var pododdzialId = zolnierz.ID_Pododdzialu;
-
-            // 2) Pobieramy wszystkie powiadomienia wraz z danymi żołnierza
+            // 2) Pobieramy wszystkie powiadomienia przypisane wyłącznie do dowódcy
             var query = _context.Powiadomienia
                 .Include(p => p.Zolnierz)
-                .Where(p => p.Zolnierz.ID_Pododdzialu == pododdzialId) // Filtrowanie po pododdziale
+                .Where(p => p.ID_Zolnierza == zolnierz.ID_Zolnierza) // Filtrowanie tylko powiadomień dowódcy
                 .AsQueryable();
 
             // 3) Domyślne sortowanie: DataIGodzinaWyslania desc
