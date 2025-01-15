@@ -1,69 +1,18 @@
-@model IEnumerable<WebApplication2.Models.Harmonogram>
-
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Harmonogram Służb";
-}
-
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="/css/site.css" />
     <style>
-        /* Ogólne style dla strony */
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #ffffff; /* Biały tekst */
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            padding: 15px;
-            text-align: center;
-            border-bottom: 2px solid #ffffff;
-        }
-
-            header nav ul {
-                list-style-type: none;
-                padding: 0;
-                margin: 0;
-            }
-
-                header nav ul li {
-                    display: inline;
-                    margin-right: 20px;
-                }
-
-                    header nav ul li a {
-                        color: #ffffff;
-                        text-decoration: none;
-                        font-size: 1.2em;
-                    }
-
-                        header nav ul li a:hover {
-                            color: #1abc9c; /* Jasny zielony przy hover */
-                        }
-
-        .content {
-            margin: 30px auto;
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #34495e;
             padding: 20px;
-            width: 800px;
-            background-color: #34495e; /* Ciemny odcień zieleni */
-            border: 2px solid #27ae60; /* Jasny zielony */
+            border: 2px solid #27ae60;
             border-radius: 8px;
+            color: #ecf0f1;
         }
-
-            .content h1 {
-                color: #27ae60; /* Jasny zielony */
-                font-size: 2.5em;
-                text-align: center;
-            }
 
         table {
             width: 100%;
@@ -73,63 +22,132 @@
 
         th, td {
             padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #27ae60; /* Jasny zielony */
+            border-bottom: 1px solid #27ae60;
         }
 
         th {
-            background-color: #27ae60; /* Zielony wojskowy nagłówek */
-            color: #fff;
-        }
-
-        td {
-            background-color: #5a5a5a; /* Subtelnie ciemniejsze tło komórek */
+            background-color: #27ae60;
             color: #fff;
         }
 
         tr:hover {
-            background-color: #616f39; /* Jaśniejszy odcień zieleni przy najechaniu */
+            background-color: #616f39;
         }
 
-        footer {
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #ffffff;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-            footer p {
-                margin: 0;
-            }
-
-        /* Styl dla wiadomości o błędach */
-        .error-message {
-            background-color: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            padding: 10px;
-            border: 1px solid #e74c3c;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        /* Styl linku w kolumnie Przypomnienie */
-        .reminder-link {
-            color: #1abc9c;
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
             text-decoration: none;
             font-weight: bold;
         }
 
-            .reminder-link:hover {
-                color: #34495e;
+        .btn-warning {
+            background-color: #e67e22;
+            color: #ecf0f1;
+        }
+
+            .btn-warning:hover {
+                background-color: #d35400;
+            }
+
+        .btn-primary {
+            background-color: #27ae60;
+            color: #ecf0f1;
+        }
+
+            .btn-primary:hover {
+                background-color: #1e8449;
+            }
+
+        /* Modal styl */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: auto;
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #34495e;
+            margin: 5% auto;
+            padding: 20px;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+            width: 50%;
+            color: #ecf0f1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+            .modal-content h2 {
+                color: #27ae60;
+            }
+
+            .modal-content label {
+                display: block;
+                margin-top: 10px;
+                font-weight: bold;
+            }
+
+            .modal-content textarea,
+            .modal-content input {
+                width: 100%;
+                padding: 8px;
+                margin-top: 5px;
+                margin-bottom: 15px;
+                border: 1px solid #27ae60;
+                border-radius: 4px;
+                background-color: #ecf0f1;
+                color: #2c3e50;
+            }
+
+        .close {
+            color: #ecf0f1;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close:hover,
+            .close:focus {
+                color: #d35400;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+        .message-box {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .return-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: #ecf0f1;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+            .return-button:hover {
+                background-color: #1e8449;
             }
     </style>
 </head>
 <body>
-    <div class="content">
-        <h1>Twój Harmonogram Służb</h1>
+    <div class="container">
+        <h2 style="color: #27ae60;">Twój Harmonogram Służb</h2>
 
         <table>
             <thead>
@@ -137,6 +155,7 @@
                     <th>Data</th>
                     <th>Służba</th>
                     <th>Przypomnienie</th>
+                    <th>Wniosek o zmianę terminu</th>
                 </tr>
             </thead>
             <tbody>
@@ -147,21 +166,76 @@
                         <td>@(item.Sluzba != null ? item.Sluzba.Rodzaj : "Brak")</td>
                         <td>
                             <a href="@Url.Action("AddReminder", "Schedule", new { idHarmonogram = item.ID_Harmonogram })"
-                               class="reminder-link">
+                               class="btn btn-primary">
                                 Dodaj przypomnienie
                             </a>
                         </td>
-
+                        <td>
+                            <button class="btn btn-warning" onclick="openModal(@item.ID_Harmonogram)">Złóż wniosek o zmianę terminu</button>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 
-    <footer>
-        <p>&copy; 2024 Twoja Aplikacja</p>
-    </footer>
+    <!-- Modal do składania wniosku -->
+    <div id="changeRequestModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Wniosek o zmianę terminu służby</h2>
+            <form id="changeRequestForm" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="harmonogramId" name="ID_Harmonogramu" />
+                <label for="uzasadnienie">Uzasadnienie wniosku:</label>
+                <textarea id="uzasadnienie" name="Uzasadnienie" required></textarea>
 
-    <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+                <label for="proponowanaData">Proponowana data:</label>
+                <input type="date" id="proponowanaData" name="ProponowanaData" required />
+
+                <button type="submit" class="btn btn-primary">Wyślij wniosek</button>
+            </form>
+            <div id="messageBox" class="message-box" style="display: none;">
+                Twój wniosek został wysłany!
+                <br />
+                <a href="@Url.Action("Index", "Schedule")" class="return-button">Powrót do harmonogramu</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById("harmonogramId").value = id;
+            document.getElementById("changeRequestModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("changeRequestModal").style.display = "none";
+            document.getElementById("messageBox").style.display = "none";
+            document.getElementById("changeRequestForm").style.display = "block";
+        }
+
+        document.getElementById("changeRequestForm").onsubmit = function (event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+
+            fetch('@Url.Action("ZlozWniosekZmianyTerminu", "Schedule")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("messageBox").style.display = "block";
+                    document.getElementById("changeRequestForm").style.display = "none";
+                } else {
+                    alert('Wystąpił błąd przy wysyłaniu wniosku.');
+                }
+            })
+            .catch(error => {
+                alert('Wystąpił błąd.');
+                console.error(error);
+            });
+        };
+    </script>
 </body>
 </html>

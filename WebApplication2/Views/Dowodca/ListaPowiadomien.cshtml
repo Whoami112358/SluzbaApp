@@ -75,6 +75,13 @@
     </style>
 </head>
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/Dowodca/DowodcaView" style="color: #1abc9c;">Wróć do Strony głównej</a></li>
+            </ul>
+        </nav>
+    </header>
     <div class="container">
         <h2>@ViewData["Title"]</h2>
 
@@ -83,7 +90,7 @@
                 <tr>
                     <!-- Każdy nagłówek linkiem do sortowania -->
                     <th>
-                        <a href="@sortLink("Zolnierz")" class="sort-link">Żołnierz</a>
+                        <a href="@sortLink("Zolnierz")" class="sort-link">Żołnierz (otrzymujący powiadomienie)</a>
                     </th>
                     <th>
                         <a href="@sortLink("Tresc")" class="sort-link">Treść</a>
