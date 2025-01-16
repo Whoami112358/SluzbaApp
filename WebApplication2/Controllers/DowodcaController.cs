@@ -138,17 +138,6 @@ namespace WebApplication2.Controllers
 
 
 
-
-
-
-
-
-
-
-
-
-
-
         // ----------------------------------
         // Lista Harmonogramów
         // ----------------------------------

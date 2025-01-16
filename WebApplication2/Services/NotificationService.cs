@@ -42,7 +42,7 @@ namespace WebApplication2.Services
             }
         }
 
-        private async Task SendNotificationsAsync()
+        public async Task SendNotificationsAsync()
         {
             using (var scope = _serviceProvider.CreateScope())
             {

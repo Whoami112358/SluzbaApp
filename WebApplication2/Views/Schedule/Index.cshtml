@@ -285,18 +285,49 @@
             <tbody>
                 @foreach (var item in Model)
                 {
+                    // Przyjmijmy stałe wartości:
+                    // - start służby: item.Data, godzina 09:00
+                    // - koniec służby: 8 godzin później, tj. 17:00
+
+                    // Data w formacie "yyyyMMdd" + "T090000"
+                    var startStr = item.Data.ToString("yyyyMMdd") + "T090000";
+                    var endStr = item.Data.ToString("yyyyMMdd") + "T330000";
+
+                    // Tytuł = "Służba: <rodzaj>"
+                    var nazwaSluzby = (item.Sluzba != null)
+                    ? item.Sluzba.Rodzaj
+                    : "Służba";
+                    var title = $"Służba: {nazwaSluzby}";
+
+                    // Szczegóły/Opis (opcjonalnie)
+                    var details = $"Szczegóły służby: {nazwaSluzby}";
+
+                    // Konstruujemy URL do Google Kalendarza
+                    // UWAGA:
+                    //  - Używamy Uri.EscapeDataString(...) do kodowania
+                    //  - Konstruujemy parametry: action=TEMPLATE, text=..., dates=..., details=...
+                    var googleCalendarUrl = "https://calendar.google.com/calendar/render?" +
+                    "action=TEMPLATE" +
+                    "&text=" + Uri.EscapeDataString(title) +
+                    "&dates=" + startStr + "/" + endStr +
+                    "&details=" + Uri.EscapeDataString(details);
+
                     <tr>
                         <td>@item.Data.ToShortDateString()</td>
-                        <td>@(item.Sluzba != null ? item.Sluzba.Rodzaj : "Brak")</td>
+                        <td>@nazwaSluzby</td>
                         <td>
-                            <a href="@Url.Action("AddReminder", "Schedule", new { idHarmonogram = item.ID_Harmonogram })" class="btn btn-primary">
-                                dodaj <i class="fa fa-calendar-plus text-white"></i>
+                            <!-- Bezpośredni link do Google Kalendarza -->
+                            <a href="@googleCalendarUrl"
+                               class="btn btn-primary"
+                               target="_blank">
+                                Dodaj przypomnienie
                             </a>
 
                         </td>
                         <td>
-                            <button class="btn btn-primary" onclick="openModal(@item.ID_Harmonogram)">
-                                złóż wniosek <i class="fa fa-envelope text-white"></i>
+                            <button class="btn btn-warning"
+                                    onclick="openModal(@item.ID_Harmonogram)">
+                                Złóż wniosek o zmianę terminu
                             </button>
                         </td>
 
