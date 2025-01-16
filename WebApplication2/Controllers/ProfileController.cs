@@ -70,44 +70,81 @@ namespace WebApplication2.Controllers
             return View(zolnierz);
         }
 
+
         // POST: /Profile/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Zolnierz zolnierz)
+        public async Task<IActionResult> Edit(string Stopien, int Wiek, string Adres)
         {
-            if (ModelState.IsValid)
+            var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
+
+            if (idZolnierzaClaim == null)
             {
-                var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
-
-                if (idZolnierzaClaim == null)
-                {
-                    return NotFound("Nie znaleziono żołnierza.");
-                }
-
-                var idZolnierza = int.Parse(idZolnierzaClaim);
-
-                var zolnierzDb = await _context.Zolnierze
-                    .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
-
-                if (zolnierzDb == null)
-                {
-                    return NotFound("Nie znaleziono żołnierza.");
-                }
-
-                // Aktualizacja właściwości
-                zolnierzDb.Imie = zolnierz.Imie;
-                zolnierzDb.Nazwisko = zolnierz.Nazwisko;
-                zolnierzDb.Stopien = zolnierz.Stopien;
-                zolnierzDb.Wiek = zolnierz.Wiek;
-                zolnierzDb.Adres = zolnierz.Adres;
-                zolnierzDb.ImieOjca = zolnierz.ImieOjca;
-
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("Index", "Profile");
+                return NotFound("Nie znaleziono żołnierza.");
             }
 
-            return View(zolnierz);
+            if (string.IsNullOrWhiteSpace(Stopien))
+            {
+                ModelState.AddModelError("Stopien", "Stopień jest wymagany.");
+            }
+
+            if (Wiek < 18 || Wiek > 100)
+            {
+                ModelState.AddModelError("Wiek", "Wiek musi być w zakresie od 18 do 100.");
+            }
+
+            if (string.IsNullOrWhiteSpace(Adres))
+            {
+                ModelState.AddModelError("Adres", "Adres jest wymagany.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // Pobierz pełne dane żołnierza, aby wyświetlić w widoku
+                var idZolnierza = int.Parse(idZolnierzaClaim);
+                var zolnierzDbFull = await _context.Zolnierze
+                    .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
+
+                if (zolnierzDbFull == null)
+                {
+                    return NotFound("Nie znaleziono żołnierza.");
+                }
+
+                // Aktualizuj tylko edytowane pola w obiekcie modelu
+                zolnierzDbFull.Stopien = Stopien;
+                zolnierzDbFull.Wiek = Wiek;
+                zolnierzDbFull.Adres = Adres;
+
+                return View(zolnierzDbFull);
+            }
+
+            // Aktualizacja danych w bazie
+            var id = int.Parse(idZolnierzaClaim);
+            var zolnierzToUpdate = await _context.Zolnierze.FindAsync(id);
+
+            if (zolnierzToUpdate == null)
+            {
+                return NotFound("Nie znaleziono żołnierza.");
+            }
+
+            zolnierzToUpdate.Stopien = Stopien;
+            zolnierzToUpdate.Wiek = Wiek;
+            zolnierzToUpdate.Adres = Adres;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                ModelState.AddModelError("", "Nie udało się zapisać zmian: " + ex.Message);
+                return View(zolnierzToUpdate);
+            }
+
+            return RedirectToAction("Index", "Profile");
         }
+
+
+
     }
 }

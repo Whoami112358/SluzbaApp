@@ -134,19 +134,35 @@
     <div class="content">
         <h1>Edytuj Mój Profil</h1>
 
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="error-message">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
         <form method="post" asp-action="Edit">
             @Html.AntiForgeryToken()
 
-            <div>
-                <label for="Imie">Imię:</label>
-                <input type="text" id="Imie" name="Imie" value="@Model.Imie" required />
-            </div>
+            <!-- Ukryte pola dla wymaganych właściwości -->
+            <input type="hidden" name="ID_Zolnierza" value="@Model.ID_Zolnierza" />
+            <input type="hidden" name="Imie" value="@Model.Imie" />
+            <input type="hidden" name="Nazwisko" value="@Model.Nazwisko" />
+            <input type="hidden" name="Pesel" value="@Model.Pesel" />
+            <input type="hidden" name="ImieOjca" value="@Model.ImieOjca" />
+            <input type="hidden" name="Pododdzial" value="@Model.Pododdzial?.ID_Pododdzialu" />
+            <input type="hidden" name="LoginData" value="@Model.LoginData?.LoginName" />
+            <input type="hidden" name="Urlopy" value="@Model.Urlopy?.Count()" />
+            <input type="hidden" name="Zwolnienia" value="@Model.Zwolnienia?.Count()" />
+            <input type="hidden" name="Harmonogramy" value="@Model.Harmonogramy?.Count()" />
+            <input type="hidden" name="Przewinienia" value="@Model.Przewinienia?.Count()" />
+            <input type="hidden" name="Powiadomienia" value="@Model.Powiadomienia?.Count()" />
+            <input type="hidden" name="Priorytety" value="@Model.Priorytety?.Count()" />
 
-            <div>
-                <label for="Nazwisko">Nazwisko:</label>
-                <input type="text" id="Nazwisko" name="Nazwisko" value="@Model.Nazwisko" required />
-            </div>
-
+            <!-- Edytowane pola -->
             <div>
                 <label for="Stopien">Stopień:</label>
                 <input type="text" id="Stopien" name="Stopien" value="@Model.Stopien" required />
@@ -154,7 +170,7 @@
 
             <div>
                 <label for="Wiek">Wiek:</label>
-                <input type="number" id="Wiek" name="Wiek" value="@Model.Wiek" required />
+                <input type="number" id="Wiek" name="Wiek" value="@Model.Wiek" required min="18" max="100" />
             </div>
 
             <div>
@@ -162,12 +178,10 @@
                 <input type="text" id="Adres" name="Adres" value="@Model.Adres" required />
             </div>
 
-            <div>
-                <label for="ImieOjca">Imię Ojca:</label>
-                <input type="text" id="ImieOjca" name="ImieOjca" value="@Model.ImieOjca" required />
+            <div style="display: flex; justify-content: space-between;">
+                <button type="submit">Zapisz zmiany</button>
+                <button type="button" onclick="window.location.href='@Url.Action("Index", "Profile")'">Anuluj</button>
             </div>
-
-            <button type="submit">Zapisz zmiany</button>
         </form>
     </div>
     <footer>
