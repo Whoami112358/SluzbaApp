@@ -90,7 +90,7 @@
             font-size: 1em;
         }
 
-        button {
+        .zapisz-butt {
             background-color: rgba(119, 131, 83, 1);
             color: #fff;
             cursor: pointer;
@@ -98,7 +98,7 @@
             font-weight: bold;
         }
 
-            button:hover {
+            .zapisz-butt:hover {
                 background-color: rgba(0, 0, 0, 0.2);
             }
 
@@ -132,6 +132,15 @@
             border-radius: 5px;
             margin-bottom: 15px;
         }
+
+        .goback-butt {
+            position: fixed;
+            bottom: 0px;
+            left: 10px;
+            z-index: 1;
+        }
+
+
     </style>
 </head>
 <body>
@@ -153,7 +162,7 @@
         <div>
             @if (harmonogramItem != null)
             {
-                <p><strong>ID Harmonogramu:</strong> @harmonogramItem.ID_Harmonogram</p>
+                <!--<p><strong>ID Harmonogramu:</strong> @harmonogramItem.ID_Harmonogram</p>-->
                 <p><strong>Data:</strong> @harmonogramItem.Data.ToString("yyyy-MM-dd")</p>
                 <p><strong>Obecnie przypisany:</strong> @harmonogramItem.Zolnierz?.Imie @harmonogramItem.Zolnierz?.Nazwisko</p>
                 <p><strong>Służba:</strong> @harmonogramItem.Sluzba?.Rodzaj</p>
@@ -190,14 +199,14 @@
                     }
                 </select>
 
-                <button type="submit">Zapisz</button>
+                <button class="zapisz-butt" type="submit">Zapisz</button>
             </form>
         </div>
     </div>
 
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
-        <button onclick="location.href='@Url.Action("DyzurnyView", "Dyzurny")'">
+        <button class="goback-butt" onclick="location.href='@Url.Action("DyzurnyView", "Dyzurny")'">
             <img src="../back.png" alt="Powrót" />
         </button>
     </footer>

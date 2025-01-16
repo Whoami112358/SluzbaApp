@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "HARMONOGRAM SŁUŻB";
     <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
-
+    <link href='https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap' rel="stylesheet">
 }
 <!DOCTYPE html>
 <html lang="pl">
@@ -12,7 +12,7 @@
     <title>Harmonogram</title>
     <style>
         body {
-            font-family: 'Poppins', Arial, sans-serif;
+            font-family: Poppins;
             margin: 0;
             padding: 0;
             background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
@@ -23,22 +23,15 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 100vh;
-        }
-
-        header {
-            text-align: center;
-            padding: 20px 0;
-            height: 10%;
+            height: 100%;
+            width: 100%;
         }
 
         h1 {
             font-family: 'Korolev Military Stencil W00 Rg';
             font-size: 48px;
-            text-align: center;
-            margin-top: 25px;
-            margin-bottom: 25px;
             color: #ffffff;
+            margin-bottom: 0px;
         }
 
         footer {
@@ -105,6 +98,32 @@
             text-decoration: line-through;
             color: red;
         }
+
+        .zastepca-butt {
+            font-family: Poppins;
+            font-size: 18px;
+            cursor: pointer;
+            color: white;
+            background-color: rgba(119, 131, 83, 1);
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Add smooth transition */
+        }
+
+            .zastepca-butt:hover {
+                background-color: rgba(0, 0, 0, 0.2); /* Change background color on hover */
+                transform: scale(1.05); /* Optional: Slightly enlarge the button on hover */
+            }
+
+        .head-content{
+            margin-left: 50px;
+        }
+
+        .download-butt:hover{
+            filter: hue-rotate(90deg) brightness(0.7);
+            scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -114,21 +133,21 @@
         // Ewentualnie pełna lista żołnierzy do odnalezienia starego soldiera
         var zolnierzeDb = ViewBag.ZolnierzeDb as List<WebApplication2.Models.Zolnierz>;
     }
-    <header>
+    <div class="head-content">
         <h1>@ViewData["Title"]</h1>
-    </header>
-    <button onclick="location.href='@Url.Action("Download")'"
-            style="border: none; background: none; padding: 0; cursor: pointer; margin-bottom: 20px; ">
-        <span style="font-family: 'Poppins', Arial, sans-serif; font-size: 24px; color: #ffffff;">
+    <button class="download-butt" onclick="location.href='@Url.Action("Download")'"
+                style="border: none; background: none; padding: 0; cursor: pointer; margin-bottom: 20px; transition: filter 0.3s ease, transform 0.3s ease;">
+        <span style="font-family: Poppins; font-size: 24px; color: #ffffff;">
             Pobierz plik
         </span>
-        <img src="../download.png" style="width: 25px; height: 24px;" />
+        <img src="../download2.png" />
     </button>
+    </div>
     <div class="content">
         <table>
             <thead>
                 <tr>
-                    <th>ID Harmonogramu</th>
+                    <!--<th>ID Harmonogramu</th>-->
                     <th>Data</th>
                     <th>Żołnierz</th>
                     <th>Służba</th>
@@ -143,7 +162,7 @@
                     int? oldZolnierzId = isReplaced ? replacedSoldiers[item.ID_Harmonogram] : (int?)null;
 
                     <tr>
-                        <td>@item.ID_Harmonogram</td>
+                        <!--<td>@item.ID_Harmonogram</td>-->
                         <td>@item.Data.ToString("yyyy-MM-dd")</td>
                         <td>
                             @if (isReplaced && oldZolnierzId.HasValue)
@@ -172,16 +191,7 @@
 
                         <!-- Dodajemy kolumnę z przyciskiem "Przydziel zastępcę" -->
                         <td>
-                            <button onclick="location.href='@Url.Action("PrzydzielZastepce", "Dyzurny", new { idHarmonogram = item.ID_Harmonogram })'"
-                                    style="font-family: 'Poppins', Arial, sans-serif;
-                                    font-size: 18px;
-                                    font-weight: bold;
-                                    cursor: pointer;
-                                    color: white;
-                                    background-color: rgba(119, 131, 83, 1);
-                                    border: none;
-                                    border-radius: 30px;
-                                    padding: 10px 20px;">
+                            <button onclick="location.href='@Url.Action("PrzydzielZastepce", "Dyzurny", new { idHarmonogram = item.ID_Harmonogram })'" class="zastepca-butt">
                                 Przydziel zastępcę
                             </button>
                         </td>
