@@ -1,7 +1,8 @@
 ﻿@model WebApplication2.Models.Harmonogram
 
 @{
-    ViewData["Title"] = "Dodaj Harmonogram";
+    ViewData["Title"] = "DODAJ HARMONOGRAM";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
 
 <!DOCTYPE html>
@@ -12,24 +13,112 @@
     <title>@ViewData["Title"] - Twoja Aplikacja</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            box-sizing: border-box;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
         }
 
         header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px 20px;
+            text-align: center;
+            padding: 20px 0;
         }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            margin: 25px 0;
+            color: #ffffff;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        form {
+            background-color: rgba(172, 174, 165, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #ffffff;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .action-button {
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            background-color: rgba(119, 131, 83, 1);
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+            button:hover {
+                background-color: rgba(0, 0, 0, 0.2);
+            }
 
         nav ul {
             list-style: none;
-            margin: 0;
             padding: 0;
             display: flex;
+            justify-content: center;
             gap: 20px;
         }
 
@@ -38,94 +127,29 @@
             }
 
                 nav ul li a {
-                    color: white;
+                    color: #1abc9c;
                     text-decoration: none;
                     font-weight: bold;
                     transition: color 0.3s ease;
                 }
 
                     nav ul li a:hover {
-                        color: #1abc9c;
+                        color: #ffffff;
                     }
-
-        .content {
-            padding: 20px;
-            margin: 30px auto;
-            max-width: 900px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        label {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #333;
-        }
-
-        input, select {
-            padding: 10px;
-            font-size: 1em;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-
-        button {
-            padding: 12px;
-            font-size: 1.1em;
-            background-color: #2c3e50; /* Ciemnoniebieski przycisk */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-            button:hover {
-                background-color: #1abc9c; /* Zielony przycisk przy hover */
-            }
-
-        a {
-            display: inline-block;
-            margin-bottom: 20px;
-            font-size: 1em;
-            color: #333;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-
-            a:hover {
-                color: #1abc9c;
-            }
     </style>
 </head>
 <body>
-
     <header>
+        <h1>@ViewData["Title"]</h1>
         <nav>
             <ul>
-                <li><a href="/Dowodca/HarmonogramKC">Wróć do Harmonogram</a></li>
-                <li><a href="@Url.Action("PrzydzielAutomatycznie", "Dowodca")">Przydziel automatycznie</a></li>
+                <li><a href="/Dowodca/HarmonogramKC" class="action-button" >Wróć do Harmonogram</a></li>
+                <li><a href="@Url.Action("PrzydzielAutomatycznie", "Dowodca" ) " class="action-button" >Przydziel Automatycznie</a></li>
             </ul>
         </nav>
     </header>
 
     <div class="content">
-        <h1>@ViewData["Title"]</h1>
-
         <form method="post" asp-action="DodajHarmonogramKC">
             @Html.AntiForgeryToken()
 
@@ -162,6 +186,8 @@
             <button type="submit">Zapisz Harmonogram</button>
         </form>
     </div>
-
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+    </footer>
 </body>
 </html>

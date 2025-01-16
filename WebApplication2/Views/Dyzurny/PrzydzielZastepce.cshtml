@@ -1,7 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Przydziel Zastępcę";
+    ViewData["Title"] = "PRZYDZIEL ZASTĘPCĘ";
     var harmonogramItem = ViewBag.HarmonogramItem as WebApplication2.Models.Harmonogram;
     var zolnierze = ViewBag.DostepniZolnierze as List<WebApplication2.Models.Zolnierz>;
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
 
 <!DOCTYPE html>
@@ -12,37 +13,73 @@
     <style>
         /* Stylizacja podobna do poprzednich widoków */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #ecf0f1; /* Jasny tekst */
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
         }
 
         header {
-            background-color: #27ae60; /* Jasny zielony */
-            color: white;
-            padding: 20px;
             text-align: center;
-            font-size: 2em;
-            text-transform: uppercase;
+            padding: 20px 0;
+            height: 10%;
         }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            text-align: center;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            color: #ffffff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
+        }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
 
         .content {
             padding: 30px;
             margin: 40px auto;
             max-width: 600px;
-            background-color: #34495e; /* Ciemny odcień zieleni */
-            border-radius: 8px;
+            background-color: rgba(172, 174, 165, 0.7);
+            border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .form-container {
-            background: #2c3e50;
+            background: rgba(172, 174, 165, 0,5);
             padding: 20px;
-            border: 2px solid #27ae60;
-            border-radius: 8px;
+            border-radius: 15px;
         }
 
         select, button, input[type="hidden"] {
@@ -50,12 +87,11 @@
             margin: 10px 0;
             padding: 10px;
             border-radius: 4px;
-            border: 1px solid #16a085;
             font-size: 1em;
         }
 
         button {
-            background-color: #1abc9c; /* Zielony */
+            background-color: rgba(119, 131, 83, 1);
             color: #fff;
             cursor: pointer;
             transition: background-color 0.3s ease;
@@ -63,7 +99,7 @@
         }
 
             button:hover {
-                background-color: #16a085; /* Ciemniejszy zielony przy hover */
+                background-color: rgba(0, 0, 0, 0.2);
             }
 
         label {
@@ -72,24 +108,11 @@
             color: #ecf0f1;
         }
 
-        p {
-            margin: 8px 0;
-        }
-
-        footer {
-            background-color: #34495e; /* Ciemny kolor stopki */
-            color: white;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
 
         .btn-back {
             display: inline-block;
             margin-top: 15px;
-            background-color: #d35400;
+            background-color: rgba(119, 131, 83, 1);
             color: #fff;
             padding: 8px 15px;
             text-decoration: none;
@@ -170,15 +193,14 @@
                 <button type="submit">Zapisz</button>
             </form>
         </div>
-
-        <!-- Przycisk powrotu do harmonogramu -->
-        <a class="btn-back" href="@Url.Action("HarmonogramKC", "Dyzurny")">
-            Powrót do Harmonogramu
-        </a>
     </div>
 
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("DyzurnyView", "Dyzurny")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
     </footer>
+
 </body>
 </html>

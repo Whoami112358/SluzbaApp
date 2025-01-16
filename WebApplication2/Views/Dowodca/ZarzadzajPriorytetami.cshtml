@@ -1,138 +1,145 @@
 ﻿@model List<WebApplication2.Models.Priorytet>
 
+@{
+    ViewData["Title"] = "ZARZĄDZANIE PRIORYTETAMI SŁUŻB";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+}
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Zarządzanie Priorytetami Służb</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
     <style>
-        /* Style CSS */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            box-sizing: border-box;
-            text-align: center;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px 20px;
+            text-align: center;
+            padding: 20px 0;
         }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-
-            nav ul li {
-                display: inline;
-            }
-
-                nav ul li a {
-                    color: white;
-                    text-decoration: none;
-                    font-weight: bold;
-                    transition: color 0.3s ease;
-                }
-
-                    nav ul li a:hover {
-                        color: #1abc9c;
-                    }
 
         h1 {
-            text-align: center;
-            margin-top: 20px;
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            margin: 25px 0;
+            color: #ffffff;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow: auto;
         }
 
         table {
-            width: 80%;
-            margin: 20px auto;
+            width: 90%;
+            max-width: 800px;
             border-collapse: collapse;
-            background-color: white;
+            margin: 20px auto;
+            background-color: rgba(172, 174, 165, 0.7);
+            border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         th, td {
-            padding: 12px 15px;
+            padding: 15px;
             text-align: center;
-            border: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
         }
 
         th {
-            background-color: #34495e;
+            background-color: rgba(119, 131, 83, 1);
             color: white;
         }
 
         td {
-            background-color: #f9f9f9;
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .slider {
-            width: 80%;
+            width: 90%;
         }
 
         button {
-            padding: 10px 20px;
-            background-color: #27ae60;
+            display: block; /* Ustaw blokowy model, aby margin działał */
+            margin: 20px auto; /* Wyśrodkowanie w poziomie */
+            padding: 12px 20px;
+            font-size: 1.1em;
+            background-color: rgba(119, 131, 83, 1);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-            margin: 20px 10px 0 10px;
+            transition: background-color 0.3s ease;
         }
 
             button:hover {
-                background-color: #2ecc71;
+                background-color: rgba(0, 0, 0, 0.2);
             }
 
-        .btn-back {
-            display: inline-block;
-            margin-top: 20px;
-            background-color: #2980b9;
-            color: white;
-            padding: 8px 12px;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
         }
 
-            .btn-back:hover {
-                background-color: #3498db;
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
             }
 
-        .alert-success {
-            background-color: #dff0d8;
-            color: #3c763d;
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            width: 80%;
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
+        .alert-success, .alert-danger {
+            width: 90%;
+            max-width: 800px;
+            padding: 15px;
             margin: 20px auto;
+            border-radius: 5px;
             text-align: left;
+        }
+
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
         }
 
         .alert-danger {
-            background-color: #f2dede;
-            color: #a94442;
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            width: 80%;
-            margin: 20px auto;
-            text-align: left;
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
         }
+
     </style>
     <script>
-        // Skrypt do aktualizacji etykiety wartości suwaka
         function updateSliderValue(slider, spanId) {
             const labels = ["Bardzo Niski", "Niski", "Średni", "Wysoki", "Bardzo Wysoki"];
             const value = parseInt(slider.value, 10);
@@ -141,91 +148,83 @@
     </script>
 </head>
 <body>
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
 
-    <h1>Zarządzanie Priorytetami Służb</h1>
+    <div class="content">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert-success">
+                @TempData["Success"]
+            </div>
+        }
 
-    @* Komunikat sukcesu *@
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert-success">
-            @TempData["Success"]
-        </div>
-    }
-
-    @* Komunikaty o błędach z ModelState *@
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="alert-danger">
-            <ul>
-                @foreach (var state in ViewData.ModelState)
-                {
-                    foreach (var error in state.Value.Errors)
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert-danger">
+                <ul>
+                    @foreach (var state in ViewData.ModelState)
                     {
-                        <li>@error.ErrorMessage</li>
+                        foreach (var error in state.Value.Errors)
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
                     }
-                }
-            </ul>
-        </div>
-    }
+                </ul>
+            </div>
+        }
 
-    @* Formularz *@
-    <form asp-action="ZarzadzajPriorytetami" method="post">
-        @Html.AntiForgeryToken()
+        <form asp-action="ZarzadzajPriorytetami" method="post">
+            @Html.AntiForgeryToken()
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Rodzaj Służby</th>
-                    <th>Priorytet (1-5)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (int i = 0; i < Model.Count; i++)
-                {
-                    var item = Model[i];
-                    // Tekstowa reprezentacja priorytetu
-                    string priorityLabel = item.PriorytetValue switch
-                    {
-                        1 => "Bardzo Niski",
-                        2 => "Niski",
-                        3 => "Średni",
-                        4 => "Wysoki",
-                        5 => "Bardzo Wysoki",
-                        _ => "Nieokreślony"
-                    };
-
+            <table>
+                <thead>
                     <tr>
-                        <td>
-                            @* Nazwa służby *@
-                            @(item.Sluzba?.Rodzaj ?? "Brak")
-
-                            @* Ukryte pola *@
-                            <input type="hidden" name="[@i].ID_Priorytetu" value="@item.ID_Priorytetu" />
-                            <input type="hidden" name="[@i].ID_Zolnierza" value="@item.ID_Zolnierza" />
-                            <input type="hidden" name="[@i].ID_Sluzby" value="@item.ID_Sluzby" />
-                        </td>
-                        <td>
-                            <input type="range"
-                                   name="[@i].PriorytetValue"
-                                   min="1"
-                                   max="5"
-                                   value="@item.PriorytetValue"
-                                   class="slider"
-                                   id="slider_@i"
-                                   oninput="updateSliderValue(this, 'value_@i')" />
-                            <span id="value_@i">@priorityLabel</span>
-                        </td>
+                        <th>Rodzaj Służby</th>
+                        <th>Priorytet</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        var item = Model[i];
+                        string priorityLabel = item.PriorytetValue switch
+                        {
+                            1 => "Bardzo Niski",
+                            2 => "Niski",
+                            3 => "Średni",
+                            4 => "Wysoki",
+                            5 => "Bardzo Wysoki",
+                            _ => "Nieokreślony"
+                        };
 
-        <button type="submit">Zapisz</button>
-        <a class="btn-back" href="@Url.Action("HarmonogramKC", "Dowodca")">Powrót</a>
-    </form>
+                        <tr>
+                            <td>@(item.Sluzba?.Rodzaj ?? "Brak")</td>
+                            <td>
+                                <input type="range"
+                                       name="[@i].PriorytetValue"
+                                       min="1"
+                                       max="5"
+                                       value="@item.PriorytetValue"
+                                       class="slider"
+                                       id="slider_@i"
+                                       oninput="updateSliderValue(this, 'value_@i')" />
+                                <span id="value_@i">@priorityLabel</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
+            <button type="submit">Zapisz Priorytety</button>
+        </form>
+    </div>
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("HarmonogramKC", "Dowodca")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
     </footer>
 </body>
 </html>
