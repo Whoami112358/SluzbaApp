@@ -428,28 +428,60 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public IActionResult PrzydzielZastepce(int idHarmonogram)
         {
-            // Znajdź dany wpis w Harmonogramie
+            // Pobieramy aktualnie zalogowanego dowódcę
+            var dowodcaId = User.Identity.Name; // Zmienna zależna od sposobu autentykacji
+
+            // Rozdzielamy login na imię i nazwisko
+            var imieNazwisko = dowodcaId.Split('.'); // Zakładamy, że login ma postać Imie.Nazwisko
+            if (imieNazwisko.Length != 2)
+            {
+                return BadRequest("Niepoprawny format loginu.");
+            }
+
+            var imie = imieNazwisko[0]; // Imię
+            var nazwisko = imieNazwisko[1]; // Nazwisko
+
+            // Znajdź żołnierza w tabeli Zolnierze, który ma przypisane imię i nazwisko
+            var dowodca = _context.Zolnierze
+                .FirstOrDefault(z => z.Imie == imie && z.Nazwisko == nazwisko); // Porównanie z imieniem i nazwiskiem
+
+            // Sprawdzamy, czy dowódca istnieje
+            if (dowodca == null)
+            {
+                return NotFound("Nie znaleziono dowódcy o tym imieniu i nazwisku.");
+            }
+
+            // Pobieramy ID pododdziału dowódcy
+            var pododdzialId = dowodca.ID_Pododdzialu;
+
+            // Znajdź wpis w Harmonogramie
             var harmonogramItem = _context.Harmonogramy
                 .Include(h => h.Zolnierz)
                 .Include(h => h.Sluzba)
-                .Include(h => h.Zastepcy) // Dodane
-                    .ThenInclude(z => z.ZolnierzZastepowanego) // Dodane
+                .Include(h => h.Zastepcy)
+                    .ThenInclude(z => z.ZolnierzZastepowanego)
                 .FirstOrDefault(h => h.ID_Harmonogram == idHarmonogram);
 
             if (harmonogramItem == null)
+            {
                 return NotFound("Nie znaleziono wpisu w harmonogramie.");
+            }
 
             // Wykluczamy obecnie przypisanego żołnierza
             var obecnyZolnierzId = harmonogramItem.ID_Zolnierza;
+
+            // Pobieramy listę żołnierzy z tego samego pododdziału co dowódca, z wyłączeniem obecnego żołnierza
             var zolnierze = _context.Zolnierze
-                .Where(z => z.ID_Zolnierza != obecnyZolnierzId)
+                .Where(z => z.ID_Pododdzialu == pododdzialId && z.ID_Zolnierza != obecnyZolnierzId)
                 .ToList();
 
+            // Przekazanie danych do widoku
             ViewBag.HarmonogramItem = harmonogramItem;
             ViewBag.DostepniZolnierze = zolnierze;
 
             return View(); // przydzielzastepce.cshtml
         }
+
 
 
 
