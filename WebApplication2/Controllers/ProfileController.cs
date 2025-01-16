@@ -16,49 +16,18 @@ namespace WebApplication2.Controllers
             _context = context;
         }
 
+        // GET: /Profile/Index
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            int idZolnierza;
-            if (int.TryParse(User.FindFirst("ID_Zolnierza")?.Value, out idZolnierza))
+            // Odczyt ID_Zolnierza z claima
+            if (!int.TryParse(User.FindFirst("ID_Zolnierza")?.Value, out int idZolnierza))
             {
-                var zolnierz = await _context.Zolnierze
-                    .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
-
-                if (zolnierz == null)
-                {
-                    return NotFound("Nie znaleziono żołnierza.");
-                }
-
-                ViewBag.Imie = zolnierz.Imie;
-                ViewBag.Nazwisko = zolnierz.Nazwisko;
-                ViewBag.Stopien = zolnierz.Stopien;
-                ViewBag.Wiek = zolnierz.Wiek;
-                ViewBag.Adres = zolnierz.Adres;
-                ViewBag.ImieOjca = zolnierz.ImieOjca;
-                ViewBag.Punkty = zolnierz.Punkty;
-
-
-                return View();
-            }
-            else
-            {
+                // Jeśli brak claimu lub nie da się sparsować -> przekieruj do Logout
                 return RedirectToAction("Logout", "Account");
             }
-        }
 
-        // GET: /Profile/Edit
-        [HttpGet]
-        public async Task<IActionResult> Edit()
-        {
-            var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
-
-            if (idZolnierzaClaim == null)
-            {
-                return NotFound("Nie znaleziono żołnierza.");
-            }
-
-            var idZolnierza = int.Parse(idZolnierzaClaim);
-
+            // Pobranie żołnierza z bazy
             var zolnierz = await _context.Zolnierze
                 .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
 
@@ -67,40 +36,39 @@ namespace WebApplication2.Controllers
                 return NotFound("Nie znaleziono żołnierza.");
             }
 
+            // Zwróć widok Index z modelem
             return View(zolnierz);
         }
 
-
-        // POST: /Profile/Edit
+        // POST: /Profile/Index
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string Stopien, int Wiek, string Adres)
+        public async Task<IActionResult> Index(string Stopien, int Wiek, string Adres)
         {
+            // Odczyt ID
             var idZolnierzaClaim = User.FindFirst("ID_Zolnierza")?.Value;
-
-            if (idZolnierzaClaim == null)
+            if (string.IsNullOrEmpty(idZolnierzaClaim))
             {
                 return NotFound("Nie znaleziono żołnierza.");
             }
 
+            // Walidacja
             if (string.IsNullOrWhiteSpace(Stopien))
             {
                 ModelState.AddModelError("Stopien", "Stopień jest wymagany.");
             }
-
             if (Wiek < 18 || Wiek > 100)
             {
-                ModelState.AddModelError("Wiek", "Wiek musi być w zakresie od 18 do 100.");
+                ModelState.AddModelError("Wiek", "Wiek musi być w zakresie 18-100.");
             }
-
             if (string.IsNullOrWhiteSpace(Adres))
             {
                 ModelState.AddModelError("Adres", "Adres jest wymagany.");
             }
 
+            // Jeśli błędy -> ponownie ładujemy widok z obiektem
             if (!ModelState.IsValid)
             {
-                // Pobierz pełne dane żołnierza, aby wyświetlić w widoku
                 var idZolnierza = int.Parse(idZolnierzaClaim);
                 var zolnierzDbFull = await _context.Zolnierze
                     .FirstOrDefaultAsync(z => z.ID_Zolnierza == idZolnierza);
@@ -110,7 +78,7 @@ namespace WebApplication2.Controllers
                     return NotFound("Nie znaleziono żołnierza.");
                 }
 
-                // Aktualizuj tylko edytowane pola w obiekcie modelu
+                // Podmieniamy w polach do edycji, żeby user zobaczył, co wpisał
                 zolnierzDbFull.Stopien = Stopien;
                 zolnierzDbFull.Wiek = Wiek;
                 zolnierzDbFull.Adres = Adres;
@@ -118,13 +86,12 @@ namespace WebApplication2.Controllers
                 return View(zolnierzDbFull);
             }
 
-            // Aktualizacja danych w bazie
-            var id = int.Parse(idZolnierzaClaim);
-            var zolnierzToUpdate = await _context.Zolnierze.FindAsync(id);
-
+            // Jeśli OK -> zapis
+            int idZ = int.Parse(idZolnierzaClaim);
+            var zolnierzToUpdate = await _context.Zolnierze.FindAsync(idZ);
             if (zolnierzToUpdate == null)
             {
-                return NotFound("Nie znaleziono żołnierza.");
+                return NotFound("Nie znaleziono żołnierza do aktualizacji.");
             }
 
             zolnierzToUpdate.Stopien = Stopien;
@@ -137,14 +104,13 @@ namespace WebApplication2.Controllers
             }
             catch (DbUpdateException ex)
             {
-                ModelState.AddModelError("", "Nie udało się zapisać zmian: " + ex.Message);
+                // Obsługa ewentualnych wyjątków DB
+                ModelState.AddModelError("", "Błąd zapisu: " + ex.Message);
                 return View(zolnierzToUpdate);
             }
 
-            return RedirectToAction("Index", "Profile");
+            // Po zapisaniu -> redirect z GET, by user zobaczył odświeżone dane
+            return RedirectToAction("Index");
         }
-
-
-
     }
 }
