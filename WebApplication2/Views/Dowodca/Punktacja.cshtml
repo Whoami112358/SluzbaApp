@@ -1,6 +1,6 @@
 @{
     <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 }
 <!DOCTYPE html>
 <html lang="pl">
@@ -35,7 +35,6 @@
             margin: 25px 0;
             color: #ffffff;
         }
-
 
         footer {
             text-align: center;
@@ -84,7 +83,7 @@
 
             table th, table td {
                 padding: 10px;
-                text-align: left;
+                text-align: center; /* Wyśrodkowanie zawartości */
                 border: 1px solid #ddd;
             }
 
@@ -99,26 +98,37 @@
 
         form {
             display: flex;
+            justify-content: center; /* Wypośrodkowanie elementów w kolumnie */
             align-items: center;
         }
 
             form input[type="number"] {
                 padding: 5px;
-                margin-right: 10px;
-                width: 50px; /* Większe pole wejściowe */
+                margin-right: 5px;
+                width: 50px; /* Szerokość pola wejściowego */
+                height: 40px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                background-color: lightgray;
+                text-align: center; /* Wyśrodkowanie tekstu w polu */
             }
 
             form button {
                 padding: 5px 10px;
-                background-color: rgba(119, 131, 83, 1);
+                background: none;
                 border: none;
-                color: white;
+                color: #333;
                 cursor: pointer;
-                transition: background-color 0.3s ease;
+                transition: color 0.3s ease;
             }
 
-                form button:hover {
-                    background-color: rgba(0, 0, 0, 0.2);
+                form button i {
+                    font-size: 25px; /* Rozmiar ikony */
+                    color: white;
+                }
+
+                form button:hover i {
+                    color: rgba(172, 174, 165, 0.7); /* Kolor po najechaniu */
                 }
     </style>
 </head>
@@ -130,7 +140,6 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID Żołnierza</th>
                     <th>Imię</th>
                     <th>Nazwisko</th>
                     <th>Stopień</th>
@@ -142,7 +151,6 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.ID_Zolnierza</td>
                         <td>@item.Imie</td>
                         <td>@item.Nazwisko</td>
                         <td>@item.Stopien</td>
@@ -151,7 +159,9 @@
                             <form method="post" action="/Dyzurny/ZaktualizujPunkty">
                                 <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
                                 <input type="number" name="punkty" step="1" />
-                                <button type="submit">Dodaj/Usuń Punkty</button>
+                                <button type="submit">
+                                    <i class="fa fa-save text-white ms-2"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>
