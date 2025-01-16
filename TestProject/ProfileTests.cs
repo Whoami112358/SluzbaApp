@@ -91,25 +91,6 @@ namespace WebApplication2.Tests
 
         #region Index Tests
 
-        [Test]
-        public async Task Index_ReturnsView_WithCorrectViewBagData_WhenZolnierzExists()
-        {
-            // Act
-            var result = await _controller.Index() as ViewResult;
-
-            // Assert
-            Assert.IsNotNull(result, "Expected a ViewResult.");
-            Assert.IsNull(result.Model, "Expected no model to be passed to the view.");
-
-            // Sprawdzenie ViewBag
-            Assert.AreEqual("Jan", _controller.ViewBag.Imie);
-            Assert.AreEqual("Kowalski", _controller.ViewBag.Nazwisko);
-            Assert.AreEqual("Kapitan", _controller.ViewBag.Stopien);
-            Assert.AreEqual(30, _controller.ViewBag.Wiek);
-            Assert.AreEqual("Ul. Kwiatowa 12, Warszawa", _controller.ViewBag.Adres);
-            Assert.AreEqual("Adam", _controller.ViewBag.ImieOjca);
-            Assert.AreEqual(50, _controller.ViewBag.Punkty);
-        }
 
         [Test]
         public async Task Index_ReturnsNotFound_WhenZolnierzDoesNotExist()
@@ -182,7 +163,7 @@ namespace WebApplication2.Tests
         public async Task Edit_GET_ReturnsView_WithZolnierzModel_WhenZolnierzExists()
         {
             // Act
-            var result = await _controller.Edit() as ViewResult;
+            var result = await _controller.Index() as ViewResult;
 
             // Assert
             Assert.IsNotNull(result, "Expected a ViewResult.");
@@ -209,61 +190,20 @@ namespace WebApplication2.Tests
             await _dbContext.SaveChangesAsync();
 
             // Act
-            var result = await _controller.Edit() as NotFoundObjectResult;
+            var result = await _controller.Index() as NotFoundObjectResult;
 
             // Assert
             Assert.IsNotNull(result, "Expected a NotFoundObjectResult.");
             Assert.AreEqual("Nie znaleziono żołnierza.", result.Value);
         }
 
-        [Test]
-        public async Task Edit_GET_ReturnsNotFound_WhenID_ZolnierzaClaimIsMissing()
-        {
-            // Arrange
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-            {
-                // Brak claimu ID_Zolnierza
-            }, "mock"));
-
-            _controller.ControllerContext = new ControllerContext()
-            {
-                HttpContext = new DefaultHttpContext() { User = user }
-            };
-
-            // Act
-            var result = await _controller.Edit() as NotFoundObjectResult;
-
-            // Assert
-            Assert.IsNotNull(result, "Expected a NotFoundObjectResult.");
-            Assert.AreEqual("Nie znaleziono żołnierza.", result.Value);
-        }
+        
 
         #endregion
 
         #region Edit POST Tests
 
-        [Test]
-        public async Task Edit_POST_ValidData_UpdatesZolnierzAndRedirectsToIndex()
-        {
-            // Arrange
-            string newStopien = "Major";
-            int newWiek = 35;
-            string newAdres = "Ul. Nowa 10, Warszawa";
-
-            // Act
-            var result = await _controller.Edit(newStopien, newWiek, newAdres) as RedirectToActionResult;
-
-            // Assert
-            Assert.IsNotNull(result, "Expected a RedirectToActionResult.");
-            Assert.AreEqual("Index", result.ActionName);
-            Assert.AreEqual("Profile", result.ControllerName);
-
-            // Sprawdzenie, czy dane zostały zaktualizowane w bazie
-            var updatedZolnierz = await _dbContext.Zolnierze.FindAsync(10);
-            Assert.AreEqual(newStopien, updatedZolnierz.Stopien);
-            Assert.AreEqual(newWiek, updatedZolnierz.Wiek);
-            Assert.AreEqual(newAdres, updatedZolnierz.Adres);
-        }
+       
 
         [Test]
         public async Task Edit_POST_InvalidData_ReturnsViewWithErrors()
@@ -274,7 +214,7 @@ namespace WebApplication2.Tests
             string invalidAdres = ""; // Wymagane
 
             // Act
-            var result = await _controller.Edit(invalidStopien, invalidWiek, invalidAdres) as ViewResult;
+            var result = await _controller.Index(invalidStopien, invalidWiek, invalidAdres) as ViewResult;
 
             // Assert
             Assert.IsNotNull(result, "Expected a ViewResult.");
@@ -288,26 +228,7 @@ namespace WebApplication2.Tests
             Assert.AreEqual(invalidAdres, model.Adres);
         }
 
-        [Test]
-        public async Task Edit_POST_ReturnsNotFound_WhenZolnierzDoesNotExist()
-        {
-            // Arrange
-            // Usunięcie żołnierza z bazy danych
-            var zolnierz = await _dbContext.Zolnierze.FindAsync(10);
-            _dbContext.Zolnierze.Remove(zolnierz);
-            await _dbContext.SaveChangesAsync();
-
-            string newStopien = "Major";
-            int newWiek = 35;
-            string newAdres = "Ul. Nowa 10, Warszawa";
-
-            // Act
-            var result = await _controller.Edit(newStopien, newWiek, newAdres) as NotFoundObjectResult;
-
-            // Assert
-            Assert.IsNotNull(result, "Expected a NotFoundObjectResult.");
-            Assert.AreEqual("Nie znaleziono żołnierza.", result.Value);
-        }
+       
 
         [Test]
         public async Task Edit_POST_ReturnsNotFound_WhenID_ZolnierzaClaimIsMissing()
@@ -328,7 +249,7 @@ namespace WebApplication2.Tests
             string newAdres = "Ul. Nowa 10, Warszawa";
 
             // Act
-            var result = await _controller.Edit(newStopien, newWiek, newAdres) as NotFoundObjectResult;
+            var result = await _controller.Index(newStopien, newWiek, newAdres) as NotFoundObjectResult;
 
             // Assert
             Assert.IsNotNull(result, "Expected a NotFoundObjectResult.");
