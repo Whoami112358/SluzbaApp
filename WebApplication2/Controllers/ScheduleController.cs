@@ -49,6 +49,70 @@ namespace WebApplication2.Controllers
             return View(harmonogramy);
         }
 
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ZmienHarmonogram(int idHarmonogram, Harmonogram nowyHarmonogram)
+        {
+            // Pobierz istniejący harmonogram z bazy
+            var harmonogram = await _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                .Include(h => h.Zolnierz.Pododdzial) // Dowódca związany z pododdziałem
+                .FirstOrDefaultAsync(h => h.ID_Harmonogram == idHarmonogram);
+
+            if (harmonogram == null)
+            {
+                return NotFound("Nie znaleziono harmonogramu.");
+            }
+
+            // Sprawdź, czy nastąpiły zmiany w harmonogramie
+            bool czyZmieniono = harmonogram.Data != nowyHarmonogram.Data ||
+                                harmonogram.ID_Sluzby != nowyHarmonogram.ID_Sluzby;
+
+            if (czyZmieniono)
+            {
+                // Aktualizuj dane harmonogramu
+                harmonogram.Data = nowyHarmonogram.Data;
+                harmonogram.ID_Sluzby = nowyHarmonogram.ID_Sluzby;
+
+                // Pobierz dowódcę pododdziału
+                var dowodca = await _context.Zolnierze
+                    .FirstOrDefaultAsync(z => z.ID_Pododdzialu == harmonogram.Zolnierz.ID_Pododdzialu && z.Stopien == "Dowódca");
+
+                if (dowodca != null)
+                {
+                    // Tworzenie powiadomienia dla dowódcy
+                    var powiadomienie = new Powiadomienie
+                    {
+                        ID_Zolnierza = dowodca.ID_Zolnierza,
+                        TrescPowiadomienia = $"Zmiana w harmonogramie: Żołnierz {harmonogram.Zolnierz.Imie} {harmonogram.Zolnierz.Nazwisko} pełni służbę dnia {nowyHarmonogram.Data:yyyy-MM-dd}.",
+                        TypPowiadomienia = "Zmiana harmonogramu",
+                        DataIGodzinaWyslania = DateTime.Now,
+                        Status = "Wysłano"
+                    };
+
+                    _context.Powiadomienia.Add(powiadomienie);
+                }
+            }
+
+            // Zapisz zmiany w bazie danych
+            _context.Harmonogramy.Update(harmonogram);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("ListaHarmonogramow"); // Przekierowanie do widoku z listą harmonogramów
+        }
+
+
+
+
+
+
+
+
+
+
         // POST: /Schedule/ZlozWniosekZmianyTerminu
         [HttpPost]
         [ValidateAntiForgeryToken]
