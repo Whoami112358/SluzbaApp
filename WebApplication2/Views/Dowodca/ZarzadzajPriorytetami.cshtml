@@ -198,9 +198,15 @@
                             5 => "Bardzo Wysoki",
                             _ => "Nieokreślony"
                         };
-
                         <tr>
-                            <td>@(item.Sluzba?.Rodzaj ?? "Brak")</td>
+                            <td>
+                                @(item.Sluzba?.Rodzaj ?? "Brak")
+
+                                <!-- KONIECZNIE wstawiamy ukryte pola dla ModelBinder'a -->
+                                <input type="hidden" name="[@i].ID_Priorytetu" value="@item.ID_Priorytetu" />
+                                <input type="hidden" name="[@i].ID_Zolnierza" value="@item.ID_Zolnierza" />
+                                <input type="hidden" name="[@i].ID_Sluzby" value="@item.ID_Sluzby" />
+                            </td>
                             <td>
                                 <input type="range"
                                        name="[@i].PriorytetValue"
