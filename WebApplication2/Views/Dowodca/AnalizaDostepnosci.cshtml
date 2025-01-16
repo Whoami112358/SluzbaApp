@@ -1,0 +1,338 @@
+﻿@{
+    ViewData["Title"] = "DYSPOZYCYJNOŚĆ";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+}
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: auto; /* Usunięcie białego paska */
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
+          
+        }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            margin: 25px 0;
+            color: #ffffff;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 20px;
+        }
+
+        form {
+            background-color: rgba(172, 174, 165, 0.7);
+            padding: 20px;
+            max-width: 600px;
+            width: 90%;
+            margin: 20px auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+            font-size: 14px;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: rgba(119, 131, 83, 1);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+            button:hover {
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+
+        #calendar {
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            color: #000;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+            .close-btn:hover {
+                color: red;
+            }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        #listDostepni, #listNiedostepni {
+            margin: 0;
+            padding: 0;
+            list-style-type: square;
+            text-align: left;
+        }
+
+            #listDostepni li, #listNiedostepni li {
+                margin-left: 18px;
+                margin-bottom: 5px;
+            }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
+
+    <div class="container">
+
+        <!-- Sekcja błędów ModelState -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div style="color: red;">
+                <ul>
+                    @foreach (var state in ViewData.ModelState)
+                    {
+                        foreach (var err in state.Value.Errors)
+                        {
+                            <li>@err.ErrorMessage</li>
+                        }
+                    }
+                </ul>
+            </div>
+        }
+
+        <!-- Form do wyboru miesiąca/roku -->
+        <form asp-action="AnalizaDostepnosci" method="post">
+            @Html.AntiForgeryToken()
+            <label>Miesiąc:</label>
+            <select name="month">
+                @foreach (var m in ViewBag.Months as List<int>)
+                {
+                    bool selected = (m == (ViewBag.CurrentMonth ?? 0));
+                    <option value="@m" selected="@(selected)">@m</option>
+                }
+            </select>
+
+            <label>Rok:</label>
+            <select name="year">
+                @foreach (var y in ViewBag.Years as List<int>)
+                {
+                    bool selected = (y == (ViewBag.CurrentYear ?? 0));
+                    <option value="@y" selected="@(selected)">@y</option>
+                }
+            </select>
+
+            <button type="submit">Pokaż</button>
+        </form>
+
+        <!-- Kalendarz, tylko jeśli mamy eventy w ViewBag.EventsJson -->
+        @if (ViewBag.EventsJson != null)
+        {
+            <div id="calendar"></div>
+        }
+    </div>
+
+    <!-- Modal z listą dostępnych / niedostępnych -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2>Detale dnia</h2>
+            <p><strong>Dostępni żołnierze:</strong></p>
+            <ul id="listDostepni"></ul>
+            <p><strong>Niedostępni żołnierze:</strong></p>
+            <ul id="listNiedostepni"></ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("DowodcaView", "Dowodca")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
+
+    @if (ViewBag.EventsJson != null)
+    {
+        <!-- Ładujemy skrypt FullCalendar TYLKO gdy mamy events -->
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var calendarEl = document.getElementById('calendar');
+
+                var calendarEvents = @Html.Raw(ViewBag.EventsJson);
+                var dayInfo = @Html.Raw(ViewBag.DayInfoJson);
+
+                // Składamy datę: YYYY-MM-01
+                var initDate = '@(ViewBag.CurrentYear + "-" + (ViewBag.CurrentMonth.ToString("D2")) + "-01")';
+
+                // Zakres dozwolony, by uniemożliwić przejście do innego miesiąca
+                // Załóżmy, że w 'CurrentMonth' +1 jest koniec widocznego okresu
+                var startRange = initDate; // np. 2025-02-01
+                var endRange = '@(ViewBag.CurrentYear + "-" + ((ViewBag.CurrentMonth < 12 ? ViewBag.CurrentMonth + 1 : 1).ToString("D2")) + "-01")';
+
+                // Tworzymy kalendarz
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    // Zamiast headerToolbar – nasz styling w CSS .fc-header-toolbar { display:none }
+                    headerToolbar: false,
+                    // Wypełniamy eventy
+                    events: calendarEvents,
+                    // Ustawiamy datę startową, np. 2025-02-01
+                    initialDate: initDate,
+                    // Zablokuj nawigację na inny miesiąc
+                    validRange: {
+                        start: startRange,  // włącznie
+                        end: endRange       // niewłącznie, jeśli chcemy zablokować przejście
+                    },
+                    // Po kliknięciu eventu – pokaż modal
+                    eventClick: function(info) {
+                        var dateObj = info.event.start;
+                        var yyyy = dateObj.getFullYear();
+                        var mm = String(dateObj.getMonth()+1).padStart(2, '0');
+                        var dd = String(dateObj.getDate()).padStart(2, '0');
+                        var dateKey = yyyy + "-" + mm + "-" + dd;
+                        if (dayInfo[dateKey]) {
+                            showModal(dayInfo[dateKey].Dostepni, dayInfo[dateKey].Niedostepni);
+                        }
+                    },
+                });
+
+                calendar.render();
+
+                // Obsługa modala
+                var overlay = document.getElementById('modalOverlay');
+                var closeBtn = document.getElementById('closeModal');
+
+                closeBtn.addEventListener('click', function() {
+                    overlay.style.display = 'none';
+                });
+
+                function showModal(dostepni, niedostepni) {
+                    var listD = document.getElementById('listDostepni');
+                    var listN = document.getElementById('listNiedostepni');
+                    listD.innerHTML = "";
+                    listN.innerHTML = "";
+
+                    // Wypełniamy listy w modalce
+                    if (dostepni) {
+                        dostepni.forEach(function(z) {
+                            var li = document.createElement('li');
+                            li.textContent = z;
+                            listD.appendChild(li);
+                        });
+                    }
+                    if (niedostepni) {
+                        niedostepni.forEach(function(z) {
+                            var li = document.createElement('li');
+                            li.textContent = z;
+                            listN.appendChild(li);
+                        });
+                    }
+                    overlay.style.display = 'flex'; // Pokaż modal
+                }
+            });
+        </script>
+    }
+</body>
+</html>

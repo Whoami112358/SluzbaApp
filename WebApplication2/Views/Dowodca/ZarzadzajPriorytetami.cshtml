@@ -1,0 +1,236 @@
+﻿@model List<WebApplication2.Models.Priorytet>
+
+@{
+    ViewData["Title"] = "ZARZĄDZANIE PRIORYTETAMI SŁUŻB";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+}
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            margin: 25px 0;
+            color: #ffffff;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        table {
+            width: 90%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: rgba(172, 174, 165, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+        }
+
+        td {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .slider {
+            width: 90%;
+        }
+
+        button {
+            display: block; /* Ustaw blokowy model, aby margin działał */
+            margin: 20px auto; /* Wyśrodkowanie w poziomie */
+            padding: 12px 20px;
+            font-size: 1.1em;
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            button:hover {
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
+        }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
+        .alert-success, .alert-danger {
+            width: 90%;
+            max-width: 800px;
+            padding: 15px;
+            margin: 20px auto;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .alert-danger {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+    </style>
+    <script>
+        function updateSliderValue(slider, spanId) {
+            const labels = ["Bardzo Niski", "Niski", "Średni", "Wysoki", "Bardzo Wysoki"];
+            const value = parseInt(slider.value, 10);
+            document.getElementById(spanId).innerText = labels[value - 1] || "Nieokreślony";
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
+
+    <div class="content">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert-success">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert-danger">
+                <ul>
+                    @foreach (var state in ViewData.ModelState)
+                    {
+                        foreach (var error in state.Value.Errors)
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    }
+                </ul>
+            </div>
+        }
+
+        <form asp-action="ZarzadzajPriorytetami" method="post">
+            @Html.AntiForgeryToken()
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rodzaj Służby</th>
+                        <th>Priorytet</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        var item = Model[i];
+                        string priorityLabel = item.PriorytetValue switch
+                        {
+                            1 => "Bardzo Niski",
+                            2 => "Niski",
+                            3 => "Średni",
+                            4 => "Wysoki",
+                            5 => "Bardzo Wysoki",
+                            _ => "Nieokreślony"
+                        };
+                        <tr>
+                            <td>
+                                @(item.Sluzba?.Rodzaj ?? "Brak")
+
+                                <!-- KONIECZNIE wstawiamy ukryte pola dla ModelBinder'a -->
+                                <input type="hidden" name="[@i].ID_Priorytetu" value="@item.ID_Priorytetu" />
+                                <input type="hidden" name="[@i].ID_Zolnierza" value="@item.ID_Zolnierza" />
+                                <input type="hidden" name="[@i].ID_Sluzby" value="@item.ID_Sluzby" />
+                            </td>
+                            <td>
+                                <input type="range"
+                                       name="[@i].PriorytetValue"
+                                       min="1"
+                                       max="5"
+                                       value="@item.PriorytetValue"
+                                       class="slider"
+                                       id="slider_@i"
+                                       oninput="updateSliderValue(this, 'value_@i')" />
+                                <span id="value_@i">@priorityLabel</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <button type="submit">Zapisz Priorytety</button>
+        </form>
+    </div>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("HarmonogramKC", "Dowodca")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
+</body>
+</html>

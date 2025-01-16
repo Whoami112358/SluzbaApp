@@ -1,8 +1,9 @@
 ﻿@model IEnumerable<WebApplication2.Models.Powiadomienie>
 
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Moje Powiadomienia";
+    ViewData["Title"] = "POWIADOMIENIA";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+
 }
 
 <!DOCTYPE html>
@@ -11,59 +12,99 @@
     <meta charset="utf-8" />
     <title>@ViewData["Title"]</title>
     <style>
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            background-color: #34495e;
-            padding: 20px;
-            border: 2px solid #27ae60;
-            border-radius: 8px;
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Ensures the body takes up the full viewport height */
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            flex-shrink: 0; /* Prevents header from shrinking */
+        }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .container {
+            flex: 1; /* This makes the container stretch to fill available space */
+            overflow-y: auto; /* Allows scrolling if content overflows */
+            margin: 40px auto;
+            padding: 20px;
+            max-width: 800px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
         th, td {
+            background-color: rgba(172, 174, 165, 0.7);
+            border: 1px solid #ddd;
             padding: 10px;
-            border-bottom: 1px solid #27ae60;
         }
 
         th {
-            background-color: #27ae60;
+            background-color: rgba(119, 131, 83, 1);
             color: #fff;
         }
 
         tr:hover {
-            background-color: #616f39;
+            background-color: rgba(0, 0, 0, 0.2);
         }
 
-        a.button-link {
-            text-decoration: none;
-            color: #1abc9c;
-            font-weight: bold;
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            flex-shrink: 0; /* Prevents footer from shrinking */
         }
 
-            a.button-link:hover {
-                color: #34495e;
+            footer button {
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
             }
 
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
+
         .status-odebrane {
-            color: #2ecc71; /* zielony */
+            color: #2ecc71;
             font-weight: bold;
         }
 
         .status-wyslano {
-            color: #e74c3c; /* czerwony */
+            color: #e74c3c;
         }
     </style>
 </head>
 <body>
+    <header><h1>@ViewData["Title"]</h1></header>
     <div class="container">
-        <h2>@ViewData["Title"]</h2>
 
         @if (Model == null || !Model.Any())
         {
@@ -105,8 +146,9 @@
                                 {
                                     <!-- ZAMIENIAMY tag helper na bezpośrednie href -->
                                     <a href="/Powiadomienia/Odbierz?idPowiadomienia=@p.ID_Powiadomienia"
-                                       class="button-link">
-                                        Odbierz
+                                       class="button-link"
+                                       style="color: #2ecc71;">
+                                        Potwierdź
                                     </a>
                                 }
                             </td>
@@ -116,5 +158,12 @@
             </table>
         }
     </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("Index", "Home")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
 </body>
 </html>

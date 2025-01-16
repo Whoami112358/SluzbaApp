@@ -1,37 +1,104 @@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+@{
+    ViewData["Title"] = "HARMONOGRAM SŁUŻB";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"]</title>
     <style>
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            background-color: #34495e;
-            padding: 20px;
-            border: 2px solid #27ae60;
-            border-radius: 8px;
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            height: 10%;
+        }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            text-align: center;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            color: #ffffff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
+        }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: auto;
+            padding: 20px;
         }
 
         table {
-            width: 100%;
+            width: 90%;
+            max-width: 1000px;
+            margin: auto;
             border-collapse: collapse;
-            margin-top: 20px;
+            background-color: rgba(172, 174, 165, 0.7);
+            overflow: hidden;
+
         }
 
         th, td {
+            text-align: center; /* Horizontally centers the content */
+            vertical-align: middle;
+            border: 1px solid #ddd;
             padding: 10px;
-            border-bottom: 1px solid #27ae60;
+            border-bottom: 1px solid #ffffff;
         }
 
         th {
-            background-color: #27ae60;
+            background-color: rgba(119, 131, 83, 1);
             color: #fff;
         }
 
         tr:hover {
-            background-color: #616f39;
+            background-color: rgba(0, 0, 0, 0.2);
         }
 
         .btn {
@@ -43,24 +110,35 @@
             font-weight: bold;
         }
 
-        .btn-warning {
-            background-color: #e67e22;
-            color: #ecf0f1;
+        .action-button {
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            background-color: rgba(119, 131, 83, 1);
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+
         }
 
-            .btn-warning:hover {
-                background-color: #d35400;
+            .action-button:hover {
+                background-color: rgba(0, 0, 0, 0.2);
             }
 
         .btn-primary {
-            background-color: #27ae60;
+            background-color: rgba(119, 131, 83, 1);
             color: #ecf0f1;
+            font-size: 16px;
         }
 
             .btn-primary:hover {
-                background-color: #1e8449;
+                background-color: rgba(0, 0, 0, 0.2);
             }
-
         /* Modal styl */
         .modal {
             display: none;
@@ -76,18 +154,18 @@
         }
 
         .modal-content {
-            background-color: #34495e;
+            border-radius: 15px;
+            background-color: rgba(119, 131, 83, 0.7);
             margin: 5% auto;
             padding: 20px;
-            border: 2px solid #27ae60;
-            border-radius: 8px;
-            width: 50%;
+            width: 30%;
             color: #ecf0f1;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
 
             .modal-content h2 {
-                color: #27ae60;
+                font-family: 'Korolev Military Stencil W00 Rg';
+                color: rgba(255, 255, 255, 1);
             }
 
             .modal-content label {
@@ -96,15 +174,16 @@
                 font-weight: bold;
             }
 
-            .modal-content textarea,
-            .modal-content input {
+            .modal-content input[type="range"],
+            .modal-content input[type="date"],
+            .modal-content input[type="time"],
+            .modal-content select {
+                border-radius: 15px;
                 width: 100%;
                 padding: 8px;
                 margin-top: 5px;
                 margin-bottom: 15px;
-                border: 1px solid #27ae60;
-                border-radius: 4px;
-                background-color: #ecf0f1;
+                background-color: rgba(172, 174, 165, 1);
                 color: #2c3e50;
             }
 
@@ -126,7 +205,7 @@
             text-align: center;
             margin-top: 20px;
             font-size: 18px;
-            color: #2ecc71;
+            color: rgba(172, 174, 165, 1);
             font-weight: bold;
         }
 
@@ -134,21 +213,66 @@
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #27ae60;
+            background-color: rgba(172, 174, 165, 1);
             color: #ecf0f1;
             text-decoration: none;
             border-radius: 5px;
         }
 
             .return-button:hover {
-                background-color: #1e8449;
+                background-color: rgba(172, 174, 165, 0.7);
             }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        /* Styl układu dla modalu priorytetu – dwie kolumny z pionową kreską */
+        .priorytet-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .priorytet-col {
+            flex: 1;
+            padding: 5px;
+        }
+
+        .separator {
+            width: 1px;
+            background-color: #ecf0f1;
+            height: 40px;
+            margin: 0 10px;
+        }
+
+        textarea{
+            resize: none;
+            background-color: rgba(172, 174, 165, 0.7);
+            height: 100px;
+            width: 300px;
+        }
     </style>
 </head>
 <body>
+    <h1>@ViewData["Title"]</h1>
+    <div class="button-container">
+        <button class="action-button" onclick="openFeedbackModal()">
+            Zgłoś sugestię odnośnie przydzielania służb
+        </button>
+        &nbsp;
+        <button class="action-button" onclick="openConflictModal()">
+            Zgłoś konflikt służbowy
+        </button>
+        &nbsp;
+        <button class="action-button" onclick="openPriorytetModal()">
+            Priorytet służby
+        </button>
+   </div>
+    
     <div class="container">
-        <h2 style="color: #27ae60;">Twój Harmonogram Służb</h2>
-
         <table>
             <thead>
                 <tr>
@@ -161,25 +285,59 @@
             <tbody>
                 @foreach (var item in Model)
                 {
+                    // Przyjmijmy stałe wartości:
+                    // - start służby: item.Data, godzina 09:00
+                    // - koniec służby: 8 godzin później, tj. 17:00
+
+                    // Data w formacie "yyyyMMdd" + "T090000"
+                    var startStr = item.Data.ToString("yyyyMMdd") + "T090000";
+                    var endStr = item.Data.ToString("yyyyMMdd") + "T330000";
+
+                    // Tytuł = "Służba: <rodzaj>"
+                    var nazwaSluzby = (item.Sluzba != null)
+                    ? item.Sluzba.Rodzaj
+                    : "Służba";
+                    var title = $"Służba: {nazwaSluzby}";
+
+                    // Szczegóły/Opis (opcjonalnie)
+                    var details = $"Szczegóły służby: {nazwaSluzby}";
+
+                    // Konstruujemy URL do Google Kalendarza
+                    // UWAGA:
+                    //  - Używamy Uri.EscapeDataString(...) do kodowania
+                    //  - Konstruujemy parametry: action=TEMPLATE, text=..., dates=..., details=...
+                    var googleCalendarUrl = "https://calendar.google.com/calendar/render?" +
+                    "action=TEMPLATE" +
+                    "&text=" + Uri.EscapeDataString(title) +
+                    "&dates=" + startStr + "/" + endStr +
+                    "&details=" + Uri.EscapeDataString(details);
+
                     <tr>
                         <td>@item.Data.ToShortDateString()</td>
-                        <td>@(item.Sluzba != null ? item.Sluzba.Rodzaj : "Brak")</td>
+                        <td>@nazwaSluzby</td>
                         <td>
-                            <a href="@Url.Action("AddReminder", "Schedule", new { idHarmonogram = item.ID_Harmonogram })"
-                               class="btn btn-primary">
+                            <!-- Bezpośredni link do Google Kalendarza -->
+                            <a href="@googleCalendarUrl"
+                               class="btn btn-primary"
+                               target="_blank">
                                 Dodaj przypomnienie
                             </a>
+
                         </td>
                         <td>
-                            <button class="btn btn-warning" onclick="openModal(@item.ID_Harmonogram)">Złóż wniosek o zmianę terminu</button>
+                            <button class="btn btn-warning"
+                                    onclick="openModal(@item.ID_Harmonogram)">
+                                Złóż wniosek o zmianę terminu
+                            </button>
                         </td>
+
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 
-    <!-- Modal do składania wniosku -->
+    <!-- Modal do składania wniosku o zmianę terminu -->
     <div id="changeRequestModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -189,36 +347,131 @@
                 <input type="hidden" id="harmonogramId" name="ID_Harmonogramu" />
                 <label for="uzasadnienie">Uzasadnienie wniosku:</label>
                 <textarea id="uzasadnienie" name="Uzasadnienie" required></textarea>
-
                 <label for="proponowanaData">Proponowana data:</label>
                 <input type="date" id="proponowanaData" name="ProponowanaData" required />
-
                 <button type="submit" class="btn btn-primary">Wyślij wniosek</button>
             </form>
             <div id="messageBox" class="message-box" style="display: none;">
-                Twój wniosek został wysłany!
-                <br />
+                Twój wniosek został wysłany!<br />
                 <a href="@Url.Action("Index", "Schedule")" class="return-button">Powrót do harmonogramu</a>
             </div>
         </div>
     </div>
 
+    <!-- Modal do zgłaszania feedbacku -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFeedbackModal()">&times;</span>
+            <h2>Feedback dotyczący przydziału służb</h2>
+            <form id="feedbackForm" method="post">
+                @Html.AntiForgeryToken()
+                <textarea id="TrescFeedback" name="Tresc" placeholder="Np. Proponuję zmniejszyć liczbę żołnierzy na nocnych służbach, aby zoptymalizować zasoby." required></textarea>
+                <div style="margin-top: 10px;">
+                <button type="submit" class="btn btn-primary">Wyślij</button>
+                <button type="button" class="btn btn-primary" onclick="closeFeedbackModal()" style="margin-left: 5px;">Wróć</button>
+                </div>
+            </form>
+            <div id="feedbackMessage" class="message-box" style="display: none;">
+                Feedback został zapisany. Dziękujemy za Twoje sugestie.<br />
+                <a href="#" onclick="closeFeedbackModal()" class="return-button">Powrót do harmonogramu</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do zgłaszania konfliktu służbowego -->
+    <div id="conflictModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeConflictModal()">&times;</span>
+            <h2>Zgłoś konflikt służbowy</h2>
+            <form id="conflictForm" method="post">
+                @Html.AntiForgeryToken()
+                <label for="konfliktDzien">Wybierz dzień:</label>
+                <input type="date" id="konfliktDzien" name="Dzien" required />
+                <label for="odGodziny">Od godziny:</label>
+                <input type="time" id="odGodziny" name="OdGodziny" required />
+                <label for="doGodziny">Do godziny:</label>
+                <input type="time" id="doGodziny" name="DoGodziny" required />
+                <label for="powodKonfliktu">Powód konfliktu:</label>
+                <textarea id="powodKonfliktu" name="PowodKonfliktu" placeholder="Np. Konflikt związany z organizacją służby..." required></textarea>
+                <div style="margin-top: 10px;">
+                    <button type="submit" class="btn btn-primary">Wyślij</button>
+                    <button type="button" class="btn btn btn-primary" onclick="closeConflictModal()" style="margin-left: 5px;">Wróć</button>
+                </div>
+            </form>
+            <div id="conflictMessage" class="message-box" style="display: none;">
+                Konflikt został zgłoszony. Powiadomienie zostało wysłane w odpowiednie miejsce.<br />
+                <a href="#" onclick="closeConflictModal()" class="return-button">Powrót do harmonogramu</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do ustawiania priorytetu służby (2 kolumny, 3 wiersze) -->
+    <div id="priorytetModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePriorytetModal()">&times;</span>
+            <h2>Ustaw Priorytet Służby</h2>
+            <!-- Formularz priorytetu -->
+            <form id="priorytetForm" method="post">
+                @Html.AntiForgeryToken()
+                <!-- Wiersz dla Warty -->
+                <div class="priorytet-row">
+                    <div class="priorytet-col">
+                        <strong>Warta</strong>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="priorytet-col">
+                        <label for="priorytetWarta">Priorytet (1-5):</label>
+                        <input type="range" id="priorytetWarta" name="PriorytetWarta" min="1" max="5" value="3" oninput="document.getElementById('wartaValue').innerText = this.value" required />
+                        <span id="wartaValue">3</span>
+                    </div>
+                </div>
+                <!-- Wiersz dla Patrolu -->
+                <div class="priorytet-row">
+                    <div class="priorytet-col">
+                        <strong>Patrol</strong>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="priorytet-col">
+                        <label for="priorytetPatrol">Priorytet (1-5):</label>
+                        <input type="range" id="priorytetPatrol" name="PriorytetPatrol" min="1" max="5" value="3" oninput="document.getElementById('patrolValue').innerText = this.value" required />
+                        <span id="patrolValue">3</span>
+                    </div>
+                </div>
+                <!-- Wiersz dla Pododdzialu -->
+                <div class="priorytet-row">
+                    <div class="priorytet-col">
+                        <strong>Pododdział</strong>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="priorytet-col">
+                        <label for="priorytetPododdzial">Priorytet (1-5):</label>
+                        <input type="range" id="priorytetPododdzial" name="PriorytetPododdzial" min="1" max="5" value="3" oninput="document.getElementById('pododdzialValue').innerText = this.value" required />
+                        <span id="pododdzialValue">3</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Wyślij</button>
+                <button type="button" class="btn btn btn-primary" onclick="closePriorytetModal()">Wróć</button>
+            </form>
+            <div id="priorytetMessage" class="message-box" style="display: none;">
+                Priorytet służby został zapisany.<br />
+                <a href="#" onclick="closePriorytetModal()" class="return-button">Powrót do harmonogramu</a>
+            </div>
+        </div>
+    </div>
     <script>
+        // --- Funkcje dla modalu wniosku o zmianę terminu ---
         function openModal(id) {
             document.getElementById("harmonogramId").value = id;
             document.getElementById("changeRequestModal").style.display = "block";
         }
-
         function closeModal() {
             document.getElementById("changeRequestModal").style.display = "none";
             document.getElementById("messageBox").style.display = "none";
             document.getElementById("changeRequestForm").style.display = "block";
         }
-
         document.getElementById("changeRequestForm").onsubmit = function (event) {
             event.preventDefault();
             var formData = new FormData(this);
-
             fetch('@Url.Action("ZlozWniosekZmianyTerminu", "Schedule")', {
                 method: 'POST',
                 body: formData
@@ -236,6 +489,102 @@
                 console.error(error);
             });
         };
+
+        // --- Funkcje dla modalu feedbacku ---
+        function openFeedbackModal() {
+            document.getElementById("feedbackModal").style.display = "block";
+        }
+        function closeFeedbackModal() {
+            document.getElementById("feedbackModal").style.display = "none";
+            document.getElementById("feedbackMessage").style.display = "none";
+            document.getElementById("feedbackForm").style.display = "block";
+        }
+        document.getElementById("feedbackForm").onsubmit = function (event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('@Url.Action("ZglosFeedback", "Schedule")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("feedbackMessage").style.display = "block";
+                    document.getElementById("feedbackForm").style.display = "none";
+                } else {
+                    alert('Wystąpił błąd przy wysyłaniu feedbacku.');
+                }
+            })
+            .catch(error => {
+                alert('Wystąpił błąd.');
+                console.error(error);
+            });
+        };
+
+        // --- Funkcje dla modalu konfliktu służbowego ---
+        function openConflictModal() {
+            document.getElementById("conflictModal").style.display = "block";
+        }
+        function closeConflictModal() {
+            document.getElementById("conflictModal").style.display = "none";
+            document.getElementById("conflictMessage").style.display = "none";
+            document.getElementById("conflictForm").style.display = "block";
+        }
+        document.getElementById("conflictForm").onsubmit = function (event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('@Url.Action("ZglosKonflikt", "Schedule")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("conflictMessage").style.display = "block";
+                    document.getElementById("conflictForm").style.display = "none";
+                } else {
+                    alert('Wystąpił błąd przy zgłaszaniu konfliktu.');
+                }
+            })
+            .catch(error => {
+                alert('Wystąpił błąd.');
+                console.error(error);
+            });
+        };
+
+        // --- Funkcje dla modalu priorytetu służby ---
+        function openPriorytetModal() {
+            document.getElementById("priorytetModal").style.display = "block";
+        }
+        function closePriorytetModal() {
+            document.getElementById("priorytetModal").style.display = "none";
+            document.getElementById("priorytetMessage").style.display = "none";
+            document.getElementById("priorytetForm").style.display = "block";
+        }
+        document.getElementById("priorytetForm").onsubmit = function (event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('@Url.Action("ZglosPriorytet", "Schedule")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("priorytetMessage").style.display = "block";
+                    document.getElementById("priorytetForm").style.display = "none";
+                } else {
+                    alert('Wystąpił błąd przy ustawianiu priorytetu.');
+                }
+            })
+            .catch(error => {
+                alert('Wystąpił błąd.');
+                console.error(error);
+            });
+        };
     </script>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("Index", "Home")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
 </body>
 </html>

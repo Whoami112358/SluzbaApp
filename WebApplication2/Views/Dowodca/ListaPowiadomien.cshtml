@@ -1,98 +1,165 @@
 ﻿@model IEnumerable<WebApplication2.Models.Powiadomienie>
 
 @{
-
-    ViewData["Title"] = "Lista Powiadomień";
-    // Wczytujemy aktualne parametry z ViewBag
+    ViewData["Title"] = "LISTA POWIADOMIEŃ";
     string currentSortColumn = ViewBag.CurrentSortColumn as string ?? "Data";
     string currentSortOrder = ViewBag.CurrentSortOrder as string ?? "desc";
 
-    // Pomocnicza funkcja do generowania linków sortowania
     Func<string, string> sortLink = (columnName) =>
     {
-        // Jeśli klikamy na tą samą kolumnę, odwracamy sortOrder
         var nextOrder = (currentSortColumn == columnName && currentSortOrder == "asc") ? "desc" : "asc";
-        return Url.Action("ListaPowiadomien", "Dowodca",
-            new { sortColumn = columnName, sortOrder = nextOrder });
+        return Url.Action("ListaPowiadomien", "Dowodca", new { sortColumn = columnName, sortOrder = nextOrder });
     };
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <style>
-        .container {
-            max-width: 1000px;
-            margin: 30px auto;
-            background-color: #34495e;
-            padding: 20px;
-            border: 2px solid #27ae60;
-            border-radius: 8px;
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../listabg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            margin: 25px 0;
+            color: #ffffff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
+        }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
+        .content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            padding: 20px;
         }
 
         table {
-            width: 100%;
+            width: 90%;
+            max-width: 800px;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: rgba(172, 174, 165, 0.7);
+            border-radius: 8px;
         }
 
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #27ae60;
-        }
-
-        th {
-            background-color: #27ae60;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        tr:hover {
-            background-color: #616f39;
-        }
-
-        a.sort-link {
-            color: #ecf0f1;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-            a.sort-link:hover {
-                color: #1abc9c;
+            table th, table td {
+                padding: 10px;
+                text-align: left;
+                border: 1px solid #ddd;
             }
 
+            table th {
+                background-color: rgba(119, 131, 83, 1);
+                color: white;
+                cursor: pointer;
+            }
+
+            table td {
+                background-color: rgba(172, 174, 165, 0.7);
+            }
+
+            table th a {
+                color: #ffffff;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+                table th a:hover {
+                    color: #1abc9c;
+                }
+
         .status-odebrane {
-            color: #2ecc71; /* zielony */
+            color: #2ecc71; /* Zielony */
             font-weight: bold;
         }
 
         .status-wyslano {
-            color: #e74c3c; /* czerwony */
+            color: #e74c3c; /* Czerwony */
         }
+
+        button {
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            position: absolute;
+            bottom: 35px;
+            left: 10px;
+        }
+
+            button img {
+                width: 25px;
+                height: 24px;
+            }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>@ViewData["Title"]</h2>
-
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
+    <div class="content">
         <table>
             <thead>
                 <tr>
-                    <!-- Każdy nagłówek linkiem do sortowania -->
                     <th>
-                        <a href="@sortLink("Zolnierz")" class="sort-link">Żołnierz (otrzymujący powiadomienie)</a>
+                        <a href="@sortLink("Zolnierz")">Żołnierz</a>
                     </th>
                     <th>
-                        <a href="@sortLink("Tresc")" class="sort-link">Treść</a>
+                        <a href="@sortLink("Tresc")">Treść</a>
                     </th>
                     <th>
-                        <a href="@sortLink("Data")" class="sort-link">Data i godzina wysłania</a>
+                        <a href="@sortLink("Data")">Data i godzina wysłania</a>
                     </th>
                     <th>
-                        <a href="@sortLink("Status")" class="sort-link">Status</a>
+                        <a href="@sortLink("Status")">Status</a>
                     </th>
                 </tr>
             </thead>
@@ -122,5 +189,11 @@
             </tbody>
         </table>
     </div>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("DowodcaView", "Dowodca")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
 </body>
 </html>

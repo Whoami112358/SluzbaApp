@@ -18,6 +18,8 @@ namespace WebApplication2.Models
         public DbSet<Powiadomienie> Powiadomienia { get; set; }
         public DbSet<Przewinienie> Przewinienia { get; set; }
         public DbSet<Login> Login_dane { get; set; }
+        public DbSet<Zastepca> Zastepcy { get; set; }
+        public DbSet<Urlop> Urlopy { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

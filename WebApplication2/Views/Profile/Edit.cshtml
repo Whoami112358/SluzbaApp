@@ -1,7 +1,8 @@
 ﻿@model WebApplication2.Models.Zolnierz
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Edytuj Profil";
+    ViewData["Title"] = "EDYTUJ PROFIL";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+
 }
 
 <!DOCTYPE html>
@@ -12,113 +13,127 @@
     <title>Edytuj Profil - Twoja Aplikacja</title>
     <link rel="stylesheet" href="/css/site.css" />
     <style>
-        /* Ogólne style dla strony */
         body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #ffffff; /* Biały tekst */
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../profil.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
         }
 
         header {
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            padding: 15px;
             text-align: center;
-            border-bottom: 2px solid #ffffff;
+            padding: 20px 0;
+            height: 10%;
         }
 
-            header nav ul {
-                list-style-type: none;
-                padding: 0;
-                margin: 0;
-            }
-
-                header nav ul li {
-                    display: inline;
-                    margin-right: 20px;
-                }
-
-                    header nav ul li a {
-                        color: #ffffff;
-                        text-decoration: none;
-                        font-size: 1.2em;
-                    }
-
-                        header nav ul li a:hover {
-                            color: #1abc9c; /* Jasny zielony przy hover */
-                        }
-
-        .content {
-            margin: 30px auto;
-            padding: 20px;
-            width: 600px;
-            background-color: #34495e; /* Ciemny odcień zieleni */
-            border: 2px solid #27ae60; /* Jasny zielony */
-            border-radius: 8px;
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
             text-align: center;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            color: #ffffff;
         }
-
-            .content h1 {
-                color: #27ae60; /* Jasny zielony */
-                font-size: 2.5em;
-            }
-
-            .content form {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-                margin-top: 20px;
-            }
-
-            .content label {
-                font-size: 1.1em;
-                color: #27ae60; /* Ciemniejszy odcień zieleni */
-                font-weight: bold;
-            }
-
-            .content input {
-                padding: 10px;
-                font-size: 1.1em;
-                border: 2px solid #27ae60; /* Zielona ramka */
-                border-radius: 5px;
-                background-color: #2c3e50; /* Ciemny odcień zieleni */
-                color: #ffffff;
-            }
-
-                .content input[type="number"] {
-                    width: 100%;
-                }
-
-            .content button {
-                padding: 12px;
-                font-size: 1.1em;
-                background-color: #1abc9c; /* Jasny zielony */
-                color: #ffffff;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-                .content button:hover {
-                    background-color: #16a085; /* Ciemniejszy zielony przy hover */
-                }
 
         footer {
-            background-color: #2c3e50; /* Ciemny odcień zieleni */
-            color: #ffffff;
             text-align: center;
             padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
         }
 
-            footer p {
-                margin: 0;
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
             }
 
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
+        button {
+            background-color: rgba(172, 174, 165, 0.7);
+            color: white; /* Kolor tekstu */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 90%;
+            width: 100%;
+            overflow: auto;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .table-container {
+            background-color: rgba(119, 131, 83, 1);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+
+            .table-container h1 {
+                text-align: center;
+                font-size: 24px;
+                color: #ffffff; /* Kolor tekstu */
+                margin-bottom: 20px;
+            }
+
+        .table-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+            .table-row label {
+                font-size: 16px;
+                color: #ffffff; /* Kolor tekstu etykiety */
+                flex: 1;
+            }
+
+            .table-row input {
+                flex: 2;
+                padding: 8px;
+                border: none;
+                border-radius: 5px;
+                background-color: rgba(172, 174, 165, 0.7);
+                color: #ffffff; /* Kolor tekstu */
+                font-size: 14px;
+                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+            }
+
+                .table-row input:focus {
+                    outline: none;
+                    background-color: #9ba874; /* Kolor po kliknięciu */
+                }
         /* Styl dla wiadomości o błędach */
         .error-message {
             background-color: rgba(231, 76, 60, 0.1); /* Jasno-czerwony z delikatną przezroczystością */
@@ -131,22 +146,26 @@
     </style>
 </head>
 <body>
+    <h1>@ViewData["Title"]</h1>
     <div class="content">
+
         <h1>Edytuj Mój Profil</h1>
+
+        @* Komunikaty o błędach *@
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="error-message">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            </div>
+        }
 
         <form method="post" asp-action="Edit">
             @Html.AntiForgeryToken()
 
-            <div>
-                <label for="Imie">Imię:</label>
-                <input type="text" id="Imie" name="Imie" value="@Model.Imie" required />
-            </div>
-
-            <div>
-                <label for="Nazwisko">Nazwisko:</label>
-                <input type="text" id="Nazwisko" name="Nazwisko" value="@Model.Nazwisko" required />
-            </div>
-
+            <!-- Edytowane pola -->
             <div>
                 <label for="Stopien">Stopień:</label>
                 <input type="text" id="Stopien" name="Stopien" value="@Model.Stopien" required />
@@ -154,7 +173,7 @@
 
             <div>
                 <label for="Wiek">Wiek:</label>
-                <input type="number" id="Wiek" name="Wiek" value="@Model.Wiek" required />
+                <input type="number" id="Wiek" name="Wiek" value="@Model.Wiek" required min="18" max="100" />
             </div>
 
             <div>
@@ -162,16 +181,52 @@
                 <input type="text" id="Adres" name="Adres" value="@Model.Adres" required />
             </div>
 
-            <div>
-                <label for="ImieOjca">Imię Ojca:</label>
-                <input type="text" id="ImieOjca" name="ImieOjca" value="@Model.ImieOjca" required />
+            <div style="display: flex; justify-content: space-between;">
+                <button type="submit">Zapisz zmiany</button>
+                <button type="button" onclick="window.location.href='@Url.Action("Index", "Profile")'">Anuluj</button>
             </div>
 
-            <button type="submit">Zapisz zmiany</button>
+        <form method="post" asp-action="Edit">
+            @Html.AntiForgeryToken()
+            <div class="table-container">
+                <div class="table-row">
+                    <label for="Imie">Imię:</label>
+                    <input type="text" id="Imie" value="@ViewBag.Imie" required />
+                </div>
+                <div class="table-row">
+                    <label for="Nazwisko">Nazwisko:</label>
+                    <input type="text" id="Nazwisko" value="@ViewBag.Nazwisko" required />
+                </div>
+                <div class="table-row">
+                    <label for="Stopien">Stopień:</label>
+                    <input type="text" id="Stopien" value="@ViewBag.Stopien" required />
+                </div>
+                <div class="table-row">
+                    <label for="Wiek">Wiek:</label>
+                    <input type="text" id="Wiek" value="@ViewBag.Wiek" required />
+                </div>
+                <div class="table-row">
+                    <label for="Adres">Adres:</label>
+                    <input type="text" id="Adres" value="@ViewBag.Adres" required />
+                </div>
+                <div class="table-row">
+                    <label for="ImieOjca">Imię Ojca:</label>
+                    <input type="text" id="ImieOjca" value="@ViewBag.ImieOjca" required />
+                </div>
+                <div class="table-row">
+                    <label for="Punkty">Punkty:</label>
+                    <input type="text" id="Punkty" value="@ViewBag.Punkty" required />
+                </div>
+                <button onclick="window.location.href='/Profile/Index'" type="submit" style="margin-left: auto;margin-right: auto; display: block;">Zapisz zmiany</button>
+            </div>
+
         </form>
     </div>
     <footer>
-        <p>&copy; 2024 Twoja Aplikacja</p>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("Index", "Profile")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -1,0 +1,252 @@
+﻿@model WebApplication2.Models.PrzydzielAutomatycznieViewModel
+@{
+    ViewData["Title"] = "PRZYDZIEL AUTOMATYCZNIE";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+    var harmonogram = ViewBag.Harmonogram as List<WebApplication2.Models.Harmonogram>;
+}
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            margin: 25px 0;
+            color: #ffffff;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        form {
+            background-color: rgba(172, 174, 165, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 1.1em;
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            button:hover {
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+
+        table {
+            width: 90%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: rgba(172, 174, 165, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+        }
+
+        td {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
+        }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
+        .validation-summary-errors {
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            position: absolute;
+            bottom: 35px;
+            left: 10px;
+        }
+
+            .back-btn img {
+                width: 25px;
+                height: 24px;
+            }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
+
+    <div class="content">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="validation-summary-errors">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        <form method="post" asp-action="PrzydzielAutomatycznie">
+            @Html.AntiForgeryToken()
+            <div>
+                <label for="WybraneKryterium">Kryterium przydziału:</label>
+                <select id="WybraneKryterium" name="WybraneKryterium" required>
+                    <option value="">-- Wybierz Kryterium --</option>
+                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kryteria)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label for="Miesiac">Miesiąc (MM-yyyy):</label>
+                <input type="text" id="Miesiac" name="Miesiac" placeholder="np. 01-2025" value="@Model.Miesiac" required />
+            </div>
+            <div>
+                <label for="IdSluzby">Typ służby:</label>
+                <select id="IdSluzby" name="IdSluzby" required>
+                    <option value="">-- Wybierz Służbę --</option>
+                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Sluzby)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="buttons">
+                <button type="submit" name="submitAction" value="wyswietl">Wyświetl Harmonogram</button>
+                <button type="submit" name="submitAction" value="przydziel">Przydziel służby automatycznie</button>
+            </div>
+        </form>
+
+        @if (harmonogram != null)
+        {
+            <h2>Harmonogram dla miesiąca @Model.Miesiac oraz służby ID = @Model.IdSluzby</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Harmonogramu</th>
+                        <th>Data</th>
+                        <th>Żołnierz</th>
+                        <th>Służba</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in harmonogram)
+                    {
+                        <tr>
+                            <td>@item.ID_Harmonogram</td>
+                            <td>@item.Data.ToString("yyyy-MM-dd")</td>
+                            <td>@(item.Zolnierz != null ? item.Zolnierz.Imie + " " + item.Zolnierz.Nazwisko : "Brak")</td>
+                            <td>@(item.Sluzba != null ? item.Sluzba.Rodzaj : "Brak")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("HarmonogramKC", "Dowodca")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
+</body>
+</html>
