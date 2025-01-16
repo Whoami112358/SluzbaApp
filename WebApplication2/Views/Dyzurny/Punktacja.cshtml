@@ -1,5 +1,7 @@
 @{
     <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
 }
 <!DOCTYPE html>
@@ -120,6 +122,23 @@
                 form button:hover {
                     background-color: rgba(0, 0, 0, 0.2);
                 }
+
+        th a {
+            display: inline-block;
+            text-decoration: none;
+            margin: 0 2px;
+        }
+
+        .fa-arrow-up, .fa-arrow-down {
+            font-size: 14px;
+            color: #000000;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+            .fa-arrow-up:hover, .fa-arrow-down:hover {
+                color: #000000;
+            }
     </style>
 </head>
 <body>
@@ -130,11 +149,34 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID Żołnierza</th>
-                    <th>Imię</th>
-                    <th>Nazwisko</th>
+                    <th>
+                        Imię
+                        <a href="@Url.Action("Punktacja", "Dyzurny", new { sortBy = "Imie", isDescending = false })" style="margin-left: 5px;">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                        <a href="@Url.Action("Punktacja", "Dyzurny", new { sortBy = "Imie", isDescending = true })">
+                            <i class="fa fa-arrow-down"></i>
+                        </a>
+                    </th>
+                    <th>
+                        Nazwisko
+                        <a href="@Url.Action("Punktacja", "Dyzurny", new { sortBy = "Nazwisko", isDescending = false })" style="margin-left: 5px;">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                        <a href="@Url.Action("Punktacja", "Dyzurny", new { sortBy = "Nazwisko", isDescending = true })">
+                            <i class="fa fa-arrow-down"></i>
+                        </a>
+                    </th>
                     <th>Stopień</th>
-                    <th>Punkty</th>
+                    <th>
+                        Punkty
+                        <a href="@Url.Action("Punktacja", "Dyzurny", new { sortBy = "Punkty", isDescending = false })" style="margin-left: 5px;">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                        <a href="@Url.Action("Punktacja", "Dyzurny", new { sortBy = "Punkty", isDescending = true })">
+                            <i class="fa fa-arrow-down"></i>
+                        </a>
+                    </th>
                     <th>Dodaj/Usuń Punkty</th>
                 </tr>
             </thead>
@@ -142,7 +184,6 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.ID_Zolnierza</td>
                         <td>@item.Imie</td>
                         <td>@item.Nazwisko</td>
                         <td>@item.Stopien</td>
@@ -166,4 +207,5 @@
         </button>
     </footer>
 </body>
+
 </html>
