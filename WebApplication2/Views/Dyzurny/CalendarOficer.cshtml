@@ -1,9 +1,10 @@
 ﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
 
 @{
-    ViewData["Title"] = "KALENDARZ SŁUŻB";
+    ViewData["Title"] = "Kalendarz Oficera Dyżurnego";
     <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -42,9 +43,10 @@
         }
 
         #calendar {
-            max-width: 100%;
-            position: center;
+            width: 70%; /* Zmniejszona szerokość kalendarza */
+            margin: auto; /* Wyśrodkowanie kalendarza */
             background-color: rgba(119, 131, 83, 0.6);
+            border-radius: 15px;
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
@@ -126,7 +128,7 @@
 
             var eventsData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(item => new
             {
-                title = $"{item.Sluzba?.Rodzaj ?? "Służba"}",
+                title = $"{item.Zolnierz.Imie} {item.Zolnierz.Nazwisko} - {item.Sluzba?.Rodzaj ?? "Służba"}",
                 start = item.Data.ToString("yyyy-MM-dd"),
                 allDay = true
             })));
@@ -150,7 +152,6 @@
             calendar.render();
         });
     </script>
-
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
     </footer>

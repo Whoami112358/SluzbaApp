@@ -32,7 +32,7 @@ namespace WebApplication2.Controllers
                     .ToListAsync();
 
                 // Zwracamy widok z pełną ścieżką
-                return View("~/Views/Calendar/IndexOficer.cshtml", harmonogramy);
+                return View("~/Views/Dyzurny/CalendarOficer.cshtml", harmonogramy);
             }
 
             // Jeśli użytkownik nie ma roli "Officer", zwracamy błąd dostępu
