@@ -1,7 +1,7 @@
 ﻿@model WebApplication2.Models.PrzydzielAutomatycznieViewModel
 @{
-    ViewData["Title"] = "Przydziel Automatycznie";
-    // Jeśli w ViewBag przekazaliśmy listę harmonogramu, przypiszemy ją do zmiennej (opcjonalnie)
+    ViewData["Title"] = "PRZYDZIEL AUTOMATYCZNIE";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
     var harmonogram = ViewBag.Harmonogram as List<WebApplication2.Models.Harmonogram>;
 }
 
@@ -10,88 +10,81 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"] - Twoja Aplikacja</title>
+    <title>@ViewData["Title"]</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            box-sizing: border-box;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../harmonogrambg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px 20px;
-        }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 20px;
-        }
-
-            nav ul li {
-                display: inline;
-            }
-
-                nav ul li a {
-                    color: white;
-                    text-decoration: none;
-                    font-weight: bold;
-                    transition: color 0.3s ease;
-                }
-
-                    nav ul li a:hover {
-                        color: #1abc9c;
-                    }
-
-        .content {
-            padding: 20px;
-            margin: 30px auto;
-            max-width: 900px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 20px 0;
         }
 
         h1 {
-            text-align: center;
-            margin-bottom: 20px;
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 48px;
+            margin: 25px 0;
+            color: #ffffff;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow: auto;
         }
 
         form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            background-color: rgba(172, 174, 165, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         label {
             font-weight: bold;
-            font-size: 1.1em;
-            color: #333;
+            color: #ffffff;
+            margin-bottom: 5px;
+            display: block;
         }
 
-        input, select {
+        select, input {
+            width: 100%;
             padding: 10px;
-            font-size: 1em;
-            border: 2px solid #ccc;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 5px;
-            background-color: #f9f9f9;
+            background-color: rgba(119, 131, 83, 1);
+            color: white;
+            font-size: 14px;
         }
 
         .buttons {
             display: flex;
-            gap: 15px;
+            justify-content: center;
+            gap: 20px;
         }
 
         button {
-            padding: 12px;
+            padding: 12px 20px;
             font-size: 1.1em;
-            background-color: #2c3e50;
+            background-color: rgba(119, 131, 83, 1);
             color: white;
             border: none;
             border-radius: 5px;
@@ -100,45 +93,87 @@
         }
 
             button:hover {
-                background-color: #1abc9c;
+                background-color: rgba(0, 0, 0, 0.2);
             }
 
         table {
-            width: 100%;
-            margin-top: 30px;
+            width: 90%;
+            max-width: 800px;
             border-collapse: collapse;
+            margin: 20px auto;
+            background-color: rgba(172, 174, 165, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         th, td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
+            padding: 15px;
             text-align: center;
+            border-bottom: 1px solid #ddd;
         }
 
         th {
-            background-color: #34495e;
+            background-color: rgba(119, 131, 83, 1);
             color: white;
         }
 
+        td {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
+        }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
         .validation-summary-errors {
-            color: red;
+            color: #e74c3c;
             margin-bottom: 15px;
         }
+
+        .back-btn {
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            position: absolute;
+            bottom: 35px;
+            left: 10px;
+        }
+
+            .back-btn img {
+                width: 25px;
+                height: 24px;
+            }
     </style>
 </head>
 <body>
     <header>
-        <nav>
-            <ul>
-                <li><a href="/Dowodca/HarmonogramKC">Wróć do Harmonogramu</a></li>
-                <li><a href="@Url.Action("PrzydzielAutomatycznie", "Dowodca")">Przydziel automatycznie</a></li>
-            </ul>
-        </nav>
-    </header>
-    <div class="content">
         <h1>@ViewData["Title"]</h1>
+    </header>
 
-        @* Wyświetlanie błędów walidacji *@
+    <div class="content">
         @if (!ViewData.ModelState.IsValid)
         {
             <div class="validation-summary-errors">
@@ -155,7 +190,6 @@
                 <label for="WybraneKryterium">Kryterium przydziału:</label>
                 <select id="WybraneKryterium" name="WybraneKryterium" required>
                     <option value="">-- Wybierz Kryterium --</option>
-                    @* Iterujemy po ViewBag.Kryteria jako IEnumerable<SelectListItem> *@
                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Kryteria)
                     {
                         <option value="@item.Value">@item.Text</option>
@@ -170,7 +204,6 @@
                 <label for="IdSluzby">Typ służby:</label>
                 <select id="IdSluzby" name="IdSluzby" required>
                     <option value="">-- Wybierz Służbę --</option>
-                    @* Iterujemy po ViewBag.Sluzby jako IEnumerable<SelectListItem> *@
                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Sluzby)
                     {
                         <option value="@item.Value">@item.Text</option>
@@ -178,14 +211,11 @@
                 </select>
             </div>
             <div class="buttons">
-                <!-- Przycisk wyświetlający harmonogram -->
                 <button type="submit" name="submitAction" value="wyswietl">Wyświetl Harmonogram</button>
-                <!-- Przycisk uruchamiający automatyczny przydział -->
                 <button type="submit" name="submitAction" value="przydziel">Przydziel służby automatycznie</button>
             </div>
         </form>
 
-        @* Jeśli w ViewBag przekazano listę harmonogramu, wyświetlamy ją poniżej *@
         @if (harmonogram != null)
         {
             <h2>Harmonogram dla miesiąca @Model.Miesiac oraz służby ID = @Model.IdSluzby</h2>
@@ -212,9 +242,11 @@
             </table>
         }
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("HarmonogramKC", "Dowodca")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
 </body>
 </html>
