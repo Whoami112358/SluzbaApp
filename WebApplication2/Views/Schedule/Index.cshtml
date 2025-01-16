@@ -45,26 +45,48 @@
             padding: 10px;
             color: #ffffff;
             font-size: 14px;
+            position: relative;
+            margin-top: auto;
         }
 
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
         .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
             overflow: auto;
-            height: 90%;
-            max-width: 800px;
-            margin: 40px auto;
-            background-color: rgba(172, 174, 165, 0.7);
             padding: 20px;
-            border-radius: 8px;
-            color: #ecf0f1;
         }
 
         table {
-            width: 100%;
+            width: 90%;
+            max-width: 1000px;
+            margin: auto;
             border-collapse: collapse;
-            margin-top: 20px;
+            background-color: rgba(172, 174, 165, 0.7);
+            overflow: hidden;
+
         }
 
         th, td {
+            text-align: center; /* Horizontally centers the content */
+            vertical-align: middle;
             border: 1px solid #ddd;
             padding: 10px;
             border-bottom: 1px solid #ffffff;
@@ -101,6 +123,7 @@
             transition: background-color 0.3s ease;
             text-decoration: none;
             display: inline-block;
+
         }
 
             .action-button:hover {
@@ -114,7 +137,7 @@
         }
 
             .btn-primary:hover {
-                background-color: rgba(119, 131, 83, 1);
+                background-color: rgba(0, 0, 0, 0.2);
             }
         /* Modal styl */
         .modal {
@@ -135,7 +158,7 @@
             background-color: rgba(119, 131, 83, 0.7);
             margin: 5% auto;
             padding: 20px;
-            width: 50%;
+            width: 30%;
             color: #ecf0f1;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
@@ -160,7 +183,7 @@
                 padding: 8px;
                 margin-top: 5px;
                 margin-bottom: 15px;
-                background-color: rgba(119, 131, 83, 0.7);
+                background-color: rgba(172, 174, 165, 1);
                 color: #2c3e50;
             }
 
@@ -182,7 +205,7 @@
             text-align: center;
             margin-top: 20px;
             font-size: 18px;
-            color: rgba(119, 131, 83, 1);
+            color: rgba(172, 174, 165, 1);
             font-weight: bold;
         }
 
@@ -199,6 +222,13 @@
             .return-button:hover {
                 background-color: rgba(172, 174, 165, 0.7);
             }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
         /* Styl układu dla modalu priorytetu – dwie kolumny z pionową kreską */
         .priorytet-row {
             display: flex;
@@ -217,25 +247,32 @@
             height: 40px;
             margin: 0 10px;
         }
+
+        textarea{
+            resize: none;
+            background-color: rgba(172, 174, 165, 0.7);
+            height: 100px;
+            width: 300px;
+        }
     </style>
 </head>
 <body>
     <h1>@ViewData["Title"]</h1>
-    <button class="action-button" onclick="openFeedbackModal()">
-        Zgłoś sugestię odnośnie przydzielania służb
-    </button>
-    &nbsp;
-    <button class="action-button" onclick="openConflictModal()">
-        Zgłoś konflikt służbowy
-    </button>
-    &nbsp;
-    <button class="action-button" onclick="openPriorytetModal()">
-        Priorytet służby
-    </button>
+    <div class="button-container">
+        <button class="action-button" onclick="openFeedbackModal()">
+            Zgłoś sugestię odnośnie przydzielania służb
+        </button>
+        &nbsp;
+        <button class="action-button" onclick="openConflictModal()">
+            Zgłoś konflikt służbowy
+        </button>
+        &nbsp;
+        <button class="action-button" onclick="openPriorytetModal()">
+            Priorytet służby
+        </button>
+   </div>
+    
     <div class="container">
-        <div style="text-align: right; margin-bottom: 20px;">
-        </div>
-
         <table>
             <thead>
                 <tr>
@@ -297,10 +334,11 @@
             <h2>Feedback dotyczący przydziału służb</h2>
             <form id="feedbackForm" method="post">
                 @Html.AntiForgeryToken()
-                <label for="TrescFeedback">Treść feedbacku:</label>
                 <textarea id="TrescFeedback" name="Tresc" placeholder="Np. Proponuję zmniejszyć liczbę żołnierzy na nocnych służbach, aby zoptymalizować zasoby." required></textarea>
+                <div style="margin-top: 10px;">
                 <button type="submit" class="btn btn-primary">Wyślij</button>
-                <button type="button" class="btn btn-warning" onclick="closeFeedbackModal()">Wróć</button>
+                <button type="button" class="btn btn-primary" onclick="closeFeedbackModal()" style="margin-left: 5px;">Wróć</button>
+                </div>
             </form>
             <div id="feedbackMessage" class="message-box" style="display: none;">
                 Feedback został zapisany. Dziękujemy za Twoje sugestie.<br />
@@ -324,8 +362,10 @@
                 <input type="time" id="doGodziny" name="DoGodziny" required />
                 <label for="powodKonfliktu">Powód konfliktu:</label>
                 <textarea id="powodKonfliktu" name="PowodKonfliktu" placeholder="Np. Konflikt związany z organizacją służby..." required></textarea>
-                <button type="submit" class="btn btn-primary">Wyślij</button>
-                <button type="button" class="btn btn-warning" onclick="closeConflictModal()">Wróć</button>
+                <div style="margin-top: 10px;">
+                    <button type="submit" class="btn btn-primary">Wyślij</button>
+                    <button type="button" class="btn btn btn-primary" onclick="closeConflictModal()" style="margin-left: 5px;">Wróć</button>
+                </div>
             </form>
             <div id="conflictMessage" class="message-box" style="display: none;">
                 Konflikt został zgłoszony. Powiadomienie zostało wysłane w odpowiednie miejsce.<br />
@@ -379,7 +419,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Wyślij</button>
-                <button type="button" class="btn btn-warning" onclick="closePriorytetModal()">Wróć</button>
+                <button type="button" class="btn btn btn-primary" onclick="closePriorytetModal()">Wróć</button>
             </form>
             <div id="priorytetMessage" class="message-box" style="display: none;">
                 Priorytet służby został zapisany.<br />
@@ -509,12 +549,11 @@
             });
         };
     </script>
-    <button onclick="location.href='@Url.Action("Index", "Home")'"
-            style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; bottom: 35px; left: 10px;">
-        <img src="../back.png" style="width: 25px; height: 24px;" />
-    </button>
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("Index", "Home")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
     </footer>
 </body>
 </html>
