@@ -535,6 +535,7 @@ namespace WebApplication2.Controllers
             return View(powiadomienia);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PrzydzielZastepce(int ID_Harmonogram, int ZastepcaId)
@@ -626,6 +627,9 @@ namespace WebApplication2.Controllers
                 return View(); // przydzielzastepce.cshtml
             }
         }
+
+
+        
 
         public ActionResult Download()
         {

@@ -1,16 +1,18 @@
+@model WebApplication2.Models.Zolnierz
+
 @{
+    // Zachowujemy styl i link do fontu w sekcji HEAD
     ViewData["Title"] = "MÓJ PROFIL";
-    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
-
+    <link rel="stylesheet"
+          href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
-
 
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mój Profil - Twoja Aplikacja</title>
+    <title>@ViewData["Title"] - Twoja Aplikacja</title>
     <link rel="stylesheet" href="/css/site.css" />
     <style>
         body {
@@ -67,9 +69,10 @@
                     height: 24px;
                     display: block;
                 }
-        button{
+
+        button {
             background-color: rgba(172, 174, 165, 0.7);
-            color: white; /* Kolor tekstu */
+            color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -91,17 +94,17 @@
         }
 
         .table-container {
-            background-color: rgba(119, 131, 83, 1);
+            background-color: rgba(119,131,83,1);
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             width: 300px;
         }
 
             .table-container h1 {
                 text-align: center;
                 font-size: 24px;
-                color: #ffffff; /* Kolor tekstu */
+                color: #ffffff;
                 margin-bottom: 20px;
             }
 
@@ -114,7 +117,7 @@
 
             .table-row label {
                 font-size: 16px;
-                color: #ffffff; /* Kolor tekstu etykiety */
+                color: #ffffff;
                 flex: 1;
             }
 
@@ -123,20 +126,33 @@
                 padding: 8px;
                 border: none;
                 border-radius: 5px;
-                background-color: rgba(172, 174, 165, 0.7);
-                color: #ffffff; /* Kolor tekstu */
+                background-color: rgba(172,174,165,0.7);
+                color: #ffffff;
                 font-size: 14px;
-                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+                box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
             }
 
                 .table-row input:focus {
                     outline: none;
-                    background-color: #9ba874; /* Kolor po kliknięciu */
+                    background-color: #9ba874;
                 }
-        /* Styl dla wiadomości o błędach */
+
+        /* Pola tylko do odczytu – brak obramowania, tła itd. */
+        .readonly-field {
+            background-color: transparent;
+            border: none;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+            .readonly-field:focus {
+                outline: none;
+            }
+
+        /* Błędy walidacji */
         .error-message {
-            background-color: rgba(231, 76, 60, 0.1); /* Jasno-czerwony z delikatną przezroczystością */
-            color: #e74c3c; /* Czerwony tekst */
+            background-color: rgba(231,76,60,0.1);
+            color: #e74c3c;
             padding: 10px;
             border: 1px solid #e74c3c;
             border-radius: 5px;
@@ -146,38 +162,74 @@
 </head>
 <body>
     <h1>@ViewData["Title"]</h1>
+
+    <!-- Obsługa błędów walidacji -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="error-message">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        </div>
+    }
+
     <div class="content">
-    <div class="table-container">
-         <div class="table-row">
-            <label for="Imie">Imię:</label>
-            <input type="text" id="Imie" value="@ViewBag.Imie" />
+        <div class="table-container">
+            <!-- Jedna forma: GET/POST do Profile/Index -->
+            <form asp-action="Index" asp-controller="Profile" method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- Pola nieedytowalne (bez name) -->
+                <div class="table-row">
+                    <label>Imię:</label>
+                    <input class="readonly-field"
+                           value="@Model.Imie"
+                           readonly />
+                </div>
+                <div class="table-row">
+                    <label>Nazwisko:</label>
+                    <input class="readonly-field"
+                           value="@Model.Nazwisko"
+                           readonly />
+                </div>
+                <div class="table-row">
+                    <label>Imię Ojca:</label>
+                    <input class="readonly-field"
+                           value="@Model.ImieOjca"
+                           readonly />
+                </div>
+                <div class="table-row">
+                    <label>Punkty:</label>
+                    <input class="readonly-field"
+                           value="@Model.Punkty"
+                           readonly />
+                </div>
+
+                <!-- Pola edytowalne (z name=...) -->
+                <div class="table-row">
+                    <label for="Stopien">Stopień:</label>
+                    <input type="text" id="Stopien" name="Stopien"
+                           value="@Model.Stopien" />
+                </div>
+                <div class="table-row">
+                    <label for="Wiek">Wiek:</label>
+                    <input type="number" id="Wiek" name="Wiek"
+                           value="@Model.Wiek"
+                           min="18" max="100" />
+                </div>
+                <div class="table-row">
+                    <label for="Adres">Adres:</label>
+                    <input type="text" id="Adres" name="Adres"
+                           value="@Model.Adres" />
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit">Zapisz zmiany</button>
+                    <button type="button" onclick="history.back()">Powrót</button>
+                </div>
+            </form>
         </div>
-        <div class="table-row">
-            <label for="Nazwisko">Nazwisko:</label>
-            <input type="text" id="Nazwisko" value="@ViewBag.Nazwisko" />
-        </div>
-        <div class="table-row">
-            <label for="Stopien">Stopień:</label>
-            <input type="text" id="Stopien" value="@ViewBag.Stopien" />
-        </div>
-        <div class="table-row">
-            <label for="Wiek">Wiek:</label>
-            <input type="text" id="Wiek" value="@ViewBag.Wiek" />
-        </div>
-        <div class="table-row">
-            <label for="Adres">Adres:</label>
-            <input type="text" id="Adres" value="@ViewBag.Adres" />
-        </div>
-        <div class="table-row">
-            <label for="ImieOjca">Imię Ojca:</label>
-            <input type="text" id="ImieOjca" value="@ViewBag.ImieOjca" />
-        </div>
-        <div class="table-row">
-            <label for="Punkty">Punkty:</label>
-            <input type="text" id="Punkty" value="@ViewBag.Punkty" />
-        </div>
-            <button onclick="window.location.href='/Profile/Edit'" style="margin-left: auto;margin-right: auto; display: block;">Edytuj Profil</button>
-    </div>
     </div>
 
     <footer>
@@ -186,7 +238,6 @@
             <img src="../back.png" alt="Powrót" />
         </button>
     </footer>
-
     <script src="/_framework/aspnetcore-browser-refresh.js"></script>
 </body>
 </html>
