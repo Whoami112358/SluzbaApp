@@ -134,6 +134,7 @@
     <div class="content">
         <h1>Edytuj Mój Profil</h1>
 
+        @* Komunikaty o błędach *@
         @if (!ViewData.ModelState.IsValid)
         {
             <div class="error-message">
@@ -146,21 +147,6 @@
 
         <form method="post" asp-action="Edit">
             @Html.AntiForgeryToken()
-
-            <!-- Ukryte pola dla wymaganych właściwości -->
-            <input type="hidden" name="ID_Zolnierza" value="@Model.ID_Zolnierza" />
-            <input type="hidden" name="Imie" value="@Model.Imie" />
-            <input type="hidden" name="Nazwisko" value="@Model.Nazwisko" />
-            <input type="hidden" name="Pesel" value="@Model.Pesel" />
-            <input type="hidden" name="ImieOjca" value="@Model.ImieOjca" />
-            <input type="hidden" name="Pododdzial" value="@Model.Pododdzial?.ID_Pododdzialu" />
-            <input type="hidden" name="LoginData" value="@Model.LoginData?.LoginName" />
-            <input type="hidden" name="Urlopy" value="@Model.Urlopy?.Count()" />
-            <input type="hidden" name="Zwolnienia" value="@Model.Zwolnienia?.Count()" />
-            <input type="hidden" name="Harmonogramy" value="@Model.Harmonogramy?.Count()" />
-            <input type="hidden" name="Przewinienia" value="@Model.Przewinienia?.Count()" />
-            <input type="hidden" name="Powiadomienia" value="@Model.Powiadomienia?.Count()" />
-            <input type="hidden" name="Priorytety" value="@Model.Priorytety?.Count()" />
 
             <!-- Edytowane pola -->
             <div>
