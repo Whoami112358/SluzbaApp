@@ -1,3 +1,5 @@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
 @{
     ViewData["Title"] = "HARMONOGRAM SŁUŻB";
     <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
@@ -97,6 +99,7 @@
         .btn-primary {
             background-color: rgba(119, 131, 83, 1);
             color: #ecf0f1;
+            font-size: 16px;
         }
 
             .btn-primary:hover {
@@ -240,14 +243,16 @@
                         <td>@(item.Sluzba != null ? item.Sluzba.Rodzaj : "Brak")</td>
                         <td>
                             <a href="@Url.Action("AddReminder", "Schedule", new { idHarmonogram = item.ID_Harmonogram })" class="btn btn-primary">
-                                Dodaj przypomnienie
+                                dodaj <i class="fa fa-calendar-plus text-white"></i>
                             </a>
+
                         </td>
                         <td>
-                            <button class="btn btn-warning" onclick="openModal(@item.ID_Harmonogram)">
-                                Złóż wniosek o zmianę terminu
+                            <button class="btn btn-primary" onclick="openModal(@item.ID_Harmonogram)">
+                                złóż wniosek <i class="fa fa-envelope text-white"></i>
                             </button>
                         </td>
+
                     </tr>
                 }
             </tbody>
