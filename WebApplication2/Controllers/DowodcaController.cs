@@ -236,12 +236,11 @@ namespace WebApplication2.Controllers
                         new MySqlParameter("@ID_Zolnierza", harmonogram.ID_Zolnierza),
                         new MySqlParameter("@ID_Sluzby", harmonogram.ID_Sluzby),
                         new MySqlParameter("@Data", harmonogram.Data),  // Zakładając, że Data jest typu DateTime
-                        new MySqlParameter("@Miesiac", harmonogram.Miesiac));  // Miesiac to string
+                        new MySqlParameter("@Miesiac", "styczeń"));  // Miesiac to string
 
                     Console.WriteLine($"ID_Zolnierza: {harmonogram.ID_Zolnierza}");
                     Console.WriteLine($"ID_Sluzby: {harmonogram.ID_Sluzby}");
                     Console.WriteLine($"Data: {harmonogram.Data}");
-                    Console.WriteLine($"Miesiac: {harmonogram.Miesiac}");
 
                     return RedirectToAction("HarmonogramKC");
                 }

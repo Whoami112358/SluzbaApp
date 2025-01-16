@@ -63,6 +63,7 @@
         }
 
         th, td {
+            border: 1px solid #ddd;
             padding: 10px;
             border-bottom: 1px solid #ffffff;
         }
@@ -85,13 +86,23 @@
             font-weight: bold;
         }
 
-        .btn-warning {
+        .action-button {
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
             background-color: rgba(119, 131, 83, 1);
-            color: #ecf0f1;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
 
-            .btn-warning:hover {
-                background-color: rgba(119, 131, 83, 1);
+            .action-button:hover {
+                background-color: rgba(0, 0, 0, 0.2);
             }
 
         .btn-primary {
@@ -207,20 +218,19 @@
 </head>
 <body>
     <h1>@ViewData["Title"]</h1>
-    <div class="container">   
-        <!-- Przyciski otwierające modale: Feedback, Konflikt, Priorytet -->
+    <button class="action-button" onclick="openFeedbackModal()">
+        Zgłoś sugestię odnośnie przydzielania służb
+    </button>
+    &nbsp;
+    <button class="action-button" onclick="openConflictModal()">
+        Zgłoś konflikt służbowy
+    </button>
+    &nbsp;
+    <button class="action-button" onclick="openPriorytetModal()">
+        Priorytet służby
+    </button>
+    <div class="container">
         <div style="text-align: right; margin-bottom: 20px;">
-            <button class="btn btn-warning" onclick="openFeedbackModal()">
-                Zgłoś sugestię odnośnie przydzielania służb
-            </button>
-            &nbsp;
-            <button class="btn btn-warning" onclick="openConflictModal()">
-                Zgłoś konflikt służbowy
-            </button>
-            &nbsp;
-            <button class="btn btn-warning" onclick="openPriorytetModal()">
-                Priorytet służby
-            </button>
         </div>
 
         <table>
