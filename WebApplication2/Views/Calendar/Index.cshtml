@@ -17,6 +17,7 @@
             margin: 0 auto;
             padding: 0;
             background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../kalendarzbg.png');
+            background-attachment: fixed;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -34,18 +35,44 @@
             margin-bottom: 40px;
         }
 
+
         footer {
+            position: relative;
             text-align: center;
             padding: 10px;
             color: #ffffff;
             font-size: 14px;
+            position: relative;
+            margin-top: auto;
         }
 
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
         #calendar {
+<<<<<<< HEAD
             width: 70%; /* Zmniejszona szerokość kalendarza */
             margin: auto; /* Wyśrodkowanie kalendarza */
             background-color: rgba(119, 131, 83, 0.6);
             border-radius: 15px;
+=======
+            max-width: 100%;
+            position: center;
+            background-color: rgba(172, 174, 165, 0.5);
+>>>>>>> 194e393cadfb58933c04dcf61620ccf2fb17a732
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
@@ -154,10 +181,9 @@
 
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("Index", "Home")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
     </footer>
-    <button onclick="location.href='@Url.Action("Index", "Home")'"
-            style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; bottom: 35px; left: 10px;">
-        <img src="../back.png" style="width: 25px; height: 24px;" />
-    </button>
 </body>
 </html>
