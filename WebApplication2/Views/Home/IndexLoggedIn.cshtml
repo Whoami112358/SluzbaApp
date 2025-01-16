@@ -1,5 +1,7 @@
 ﻿@{
-    ViewData["Title"] = "Strona główna";
+    ViewData["Title"] = "PANEL ŻOŁNIERZA";
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+
 }
 
 
@@ -43,8 +45,8 @@
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 1);
             text-align: center;
-            height: 250px;
-            width: 250px;
+            height: 200px;
+            width: 200px;
             padding: 30px;
             color: #ffffff;
             font-size: 24px;
@@ -52,23 +54,64 @@
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
+            .card:hover {
+                transform: scale(1.1); /* Slightly enlarges the card */
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8); /* Enhances the shadow */
+                background-color: rgba(139, 155, 95, 0.8); /* Lightens the background */
+                color: #e2e2e2; /* Changes text color for contrast */
+            }
+
+            /* Optional Focus Effect for Accessibility */
+            .card:focus {
+                outline: none;
+                box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8); /* Highlight card on focus */
+            }
+
         footer {
             text-align: center;
             color: #ffffff;
             font-size: 14px;
         }
 
-            footer p {
-                margin: 0;
-            }
+        footer p {
+            margin: 0;
+        }
+
+        .hover-image {
+            transition: filter 0.3s ease, transform 0.3s ease;
+            width: 49px;
+            height: 49px;
+        }
+
+        /* Change color on hover using hue-rotate */
+        .hover-image:hover {
+            filter: hue-rotate(90deg) brightness(0.7); /* Adjust to desired color and brightness */
+            transform: scale(1.1); /* Optional scaling effect */
+        }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 64px;
+            text-align: center;
+            margin-top: 50px;
+            color: #ffffff;
+        }
     </style>
 
 </head>
 <body>
-    <button onclick="location.href='/Account/Logout'"
-            style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; top: 10px; right: 10px;">
-        <img src="../Wyloguj.png" style="width: 28px; height: 32px;" alt="Wyloguj" />
-    </button>
+    <div id="logout">
+        <button onclick="location.href='/Account/Logout'"
+                style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; top: 25px; right: 50px;">
+            <img src="../Wyloguj.png" class="hover-image" alt="Wyloguj" />
+        </button>
+    </div>
+    
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
+    <!--
+        
     <button onclick="location.href='@Url.Action("Index", "Profile")'"
             style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; top: 10px; right: 110px;">
         <img src="../avatar.png" style="width: 28px; height: 32px;" alt="Profil" />
@@ -76,19 +119,31 @@
     <button onclick="location.href='@Url.Action("Index", "Powiadomienia")'"
             style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; top: 10px; right: 60px;">
         <img src="../powiadomienia.png" style="width:28px; height: 32px;" alt="Powiadomienia" />
-    </button>
+    </button>-->
 
     <div class="content">
         <div class="card">
             <button onclick="location.href='@Url.Action("Index", "Schedule")'" style="border: none; background: none; padding: 0; cursor: pointer;">
                 <img src="../harmonogram.png" alt="Harmonogram" style="width: 108px; height: 124px;" />
-                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Harmonogram</span>
+                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 25px;">Harmonogram</span>
             </button>
         </div>
         <div class="card">
             <button onclick="location.href='@Url.Action("Index", "Calendar")'" style="border: none; background: none; padding: 0; cursor: pointer;">
                 <img src="../kalendarz.png" alt="Kalendarz" style="width: 108px; height: 124px;" />
-                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 10px;">Kalendarz</span>
+                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 25px;">Kalendarz</span>
+            </button>
+        </div>
+        <div class="card">
+            <button onclick="location.href='@Url.Action("Index", "Profile")'" style="border: none; background: none; padding: 0; cursor: pointer;">
+                <img src="../avatar1.png" alt="Mój Profil" style="width: 108px; height: 124px;" />
+                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 25px;">Mój Profil</span>
+            </button>
+        </div>
+        <div class="card">
+            <button onclick="location.href='@Url.Action("Index", "Powiadomienia")'" style="border: none; background: none; padding: 0; cursor: pointer;">
+                <img src="../powiadomienia.png" alt="Powiadomienia" style="width: 108px; height: 124px;" />
+                <span style="display: block; color: #ffffff; font-size: 24px; margin-top: 25px;">Powiadomienia</span>
             </button>
         </div>
     </div>
