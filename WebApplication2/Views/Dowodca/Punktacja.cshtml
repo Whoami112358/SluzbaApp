@@ -116,22 +116,40 @@
             }
 
             form button {
+                margin-left: 10px;
+                margin-right: 10px;
                 padding: 5px 10px;
-                background: none;
-                border: none;
-                color: #333;
+                width: 40px; /* Make buttons square */
+                height: 40px;
+                font-size: 30px; /* Big font size for plus and minus */
+                font-weight: bold;
+                color: white;
+                background-color: rgba(119, 131, 83, 1);
+                border-radius: 10px; /* Rounded corners */
                 cursor: pointer;
-                transition: color 0.3s ease;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition for hover */
             }
 
-                form button i {
-                    font-size: 25px; /* Rozmiar ikony */
-                    color: white;
+                /* Hover effect */
+                form button:hover {
+                    background-color: rgba(0, 0, 0, 0.2);
+                    transform: scale(1.1); /* Slightly enlarge on hover */
                 }
 
-                form button:hover i {
-                    color: rgba(172, 174, 165, 0.7); /* Kolor po najechaniu */
+                /* Active (clicked) state for a button */
+                form button:active {
+                    background-color: rgba(0, 0, 0, 0.2);
+                    transform: scale(1); /* No scale on click */
                 }
+
+                /* Optional: Focus outline for accessibility */
+                form button:focus {
+                    outline: 3px solid #333; /* Focus border */
+                }
+
 
         th a {
             display: inline-block;
@@ -187,7 +205,6 @@
                             <i class="fa fa-arrow-down"></i>
                         </a>
                     </th>
-                    <th>Dodaj/Usuń Punkty</th>
                 </tr>
             </thead>
             <tbody>
@@ -197,23 +214,36 @@
                         <td>@item.Imie</td>
                         <td>@item.Nazwisko</td>
                         <td>@item.Stopien</td>
-                        <td>@item.Punkty</td>
                         <td>
-                            <form method="post" action="/Dyzurny/ZaktualizujPunkty">
-                                <input type="number" name="punkty" step="1" />
-                                <button type="submit">
-                                    <i class="fa fa-save text-white ms-2"></i>
-                                </button>
+                            <form id="punktyForm" method="post" action="/Dowodca/ZaktualizujPunkty">
+                                <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
+                                <input id="punkty" type="hidden" name="punkty" step="1" value="0" />
+                                <button type="button" onclick="updatePunkty(this, 1)">+</button>
+                                @item.Punkty
+                                <button type="button" onclick="updatePunkty(this, -1)">-</button>
                             </form>
+
+                            <script>
+                                function updatePunkty(button, changeValue) {
+                                    // Znajdź formularz nadrzędny
+                                    let form = button.closest('form');
+
+                                    // Pobierz pole 'punkty' i zaktualizuj jego wartość
+                                    let punktyInput = form.querySelector('#punkty');
+                                    punktyInput.value = parseInt(punktyInput.value) + changeValue;
+
+                                    // Wyślij formularz
+                                    form.submit();
+                                }
+                            </script>
                         </td>
+
                     </tr>
                 }
             </tbody>
         </table>
-
-
-
     </div>
+
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
         <button onclick="location.href='@Url.Action("DowodcaView", "Dowodca")'">
@@ -221,4 +251,5 @@
         </button>
     </footer>
 </body>
+
 </html>
