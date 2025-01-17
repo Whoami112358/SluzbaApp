@@ -284,21 +284,20 @@ namespace WebApplication2.Controllers
 
         // Akcja POST do aktualizacji punktów (dodawanie/usuwanie)
         [HttpPost]
-        public IActionResult ZaktualizujPunkty(int ID_Zolnierza, int punkty)
+        public IActionResult ZaktualizujPunkty(int ID_Zolnierza, int punkty, string rola)
         {
             // Znajdź żołnierza w bazie danych
             var zolnierz = _context.Zolnierze.FirstOrDefault(z => z.ID_Zolnierza == ID_Zolnierza);
             if (zolnierz == null)
             {
                 TempData["Error"] = "Żołnierz o podanym identyfikatorze nie został znaleziony.";
-                return RedirectToAction("Punktacja");
+                return RedirectToAction("Punktacja", rola);
             }
 
-            // Jeśli punkty są ujemne - próbujemy je odjąć
+            // Dodaj lub usuń punkty
             if (punkty < 0)
             {
                 int punktyDoUsuniecia = Math.Abs(punkty);
-                // Sprawdź, czy żołnierz ma wystarczającą liczbę punktów
                 if (zolnierz.Punkty >= punktyDoUsuniecia)
                 {
                     zolnierz.Punkty -= punktyDoUsuniecia;
@@ -306,13 +305,15 @@ namespace WebApplication2.Controllers
                 else
                 {
                     TempData["Error"] = "Nie można usunąć więcej punktów niż aktualnie posiadane.";
-                    return RedirectToAction("Punktacja");
+                    return RedirectToAction("Punktacja", rola);
                 }
             }
-            else // W przeciwnym przypadku dodaj punkty
+            else
             {
                 zolnierz.Punkty += punkty;
             }
+
+            // Dodaj powiadomienie
             var powiadomienie = new Powiadomienie
             {
                 ID_Zolnierza = ID_Zolnierza,
@@ -321,14 +322,14 @@ namespace WebApplication2.Controllers
                 DataIGodzinaWyslania = DateTime.Now,
                 Status = "Wysłano"
             };
+
             _context.Powiadomienia.Add(powiadomienie);
             _context.SaveChanges();
-            // Zapisz zmiany w bazie danych
-           
 
-            // Przekieruj z powrotem do listy żołnierzy/ekranu punktacji
-            return RedirectToAction("Punktacja");
+            // Przekierowanie na odpowiedni widok w zależności od roli
+            return RedirectToAction("Punktacja", rola);
         }
+
 
         // ----------------------------------
         // Lista i Dodawanie Zwolnień
