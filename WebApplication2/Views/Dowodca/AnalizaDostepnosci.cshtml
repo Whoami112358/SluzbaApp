@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "DYSPOZYCYJNOŚĆ";
-    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+        <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
 
 <!DOCTYPE html>
@@ -40,7 +40,25 @@
             padding: 10px;
             color: #ffffff;
             font-size: 14px;
+            position: relative;
+            margin-top: auto;
         }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
 
         #calendar {
             width: 70%;
@@ -120,123 +138,112 @@
             bottom: -20px;
             left: 10px;
             z-index: 1;
+
+        }
+        .action-button {
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            background-color: rgba(119, 131, 83, 1);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+    }
+
+        .action-button:hover {
+            background-color: rgba(93, 100, 80, 0.9); /* Lekko ciemniejszy odcień */
         }
     </style>
 </head>
 <body>
     <h1>@ViewData["Title"]</h1>
 
-    <div class="container">
-        <!-- Sekcja błędów ModelState -->
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div style="color: red;">
-                <ul>
-                    @foreach (var state in ViewData.ModelState)
-                    {
-                        foreach (var err in state.Value.Errors)
-                        {
-                            <li>@err.ErrorMessage</li>
-                        }
-                    }
-                </ul>
-            </div>
-        }
-
+<div style="display: flex; justify-content: center; align-items: center;">
+    <div class="form-container">
         <!-- Form do wyboru miesiąca/roku -->
-        <form asp-action="AnalizaDostepnosci" method="post" id="monthYearForm">
+        <form asp-action="AnalizaDostepnosci" method="post" style="display: flex; align-items: center; gap: 15px;">
             @Html.AntiForgeryToken()
-            <label>Miesiąc:</label>
-            <select name="month" id="month-select">
-                @foreach (var m in ViewBag.Months as List<int>)
-                {
-                    bool selected = (m == (ViewBag.CurrentMonth ?? 0));
-                    <option value="@m" selected="@(selected)">@m</option>
-                }
-            </select>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <label for="month-select">Miesiąc:</label>
+                <select name="month" id="month-select" style="
+                    font-size: 16px;
+                    padding: 10px 20px;
+                    margin-bottom: 15px;
+                    background-color: rgba(172, 174, 165, 1);
+                    color: #2c3e50;
+                    border: none;
+                    border-radius: 5px;">
+                    @foreach (var m in ViewBag.Months as List<int>)
+                    {
+                        bool selected = (m == (ViewBag.CurrentMonth ?? DateTime.Now.Month));
+                        <option value="@m" selected="@(selected)">@m</option>
+                    }
+                </select>
+            </div>
 
-            <label>Rok:</label>
-            <select name="year" id="year-select">
-                @foreach (var y in ViewBag.Years as List<int>)
-                {
-                    bool selected = (y == (ViewBag.CurrentYear ?? 0));
-                    <option value="@y" selected="@(selected)">@y</option>
-                }
-            </select>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <label for="year-select">Rok:</label>
+                <select name="year" id="year-select" style="
+                    font-size: 16px;
+                    margin-bottom: 15px;
+                    padding: 10px 20px;
+                    background-color: rgba(172, 174, 165, 1);
+                    color: #2c3e50;
+                    border: none;
+                    border-radius: 5px;">
+                    @foreach (var y in ViewBag.Years as List<int>)
+                    {
+                        bool selected = (y == (ViewBag.CurrentYear ?? DateTime.Now.Year));
+                        <option value="@y" selected="@(selected)">@y</option>
+                    }
+                </select>
+            </div>
 
-            <button type="submit">Pokaż</button>
+            <button class="action-button" type="submit" >
+                Pokaż
+            </button>
         </form>
-
-        <!-- Kalendarz, tylko jeśli mamy eventy w ViewBag.EventsJson -->
-        @if (ViewBag.EventsJson != null)
-        {
-            <div id="calendar"></div>
-        }
     </div>
+</div>
+
+
+
+
+    <!-- Kontener kalendarza -->
+    <div id="calendar"></div>
 
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
-        <div class="goback-butt">
-            <button onclick="location.href='@Url.Action("DowodcaView", "Dowodca")'">
-                <img src="../back.png" alt="Powrót" style="width: 25px; height: 24px;" />
-            </button>
-        </div>
+        <button onclick="location.href='@Url.Action("DowodcaView", "Dowodca")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
     </footer>
 
-    @if (ViewBag.EventsJson != null)
-    {
-        <!-- Ładujemy skrypt FullCalendar TYLKO gdy mamy events -->
-        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var calendarEl = document.getElementById('calendar');
-                var calendarEvents = @Html.Raw(ViewBag.EventsJson);
-                var dayInfo = @Html.Raw(ViewBag.DayInfoJson);
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
 
-                // Składamy datę: YYYY-MM-01
-                var initDate = '@(ViewBag.CurrentYear + "-" + (ViewBag.CurrentMonth.ToString("D2")) + "-01")';
+            // Pobrane dane z ViewBag (pusta tablica, jeśli brak danych)
+            var calendarEvents = @Html.Raw(ViewBag.EventsJson ?? "[]");
 
-                var startRange = initDate;
-                var endRange = '@(ViewBag.CurrentYear + "-" + ((ViewBag.CurrentMonth < 12 ? ViewBag.CurrentMonth + 1 : 1).ToString("D2")) + "-01")';
-
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'dayGridMonth',
-                    headerToolbar: {
-                        left: 'prev,next',
-                        center: 'title',
-                        right: ''
-                    },
-                    locale: 'pl',
-                    buttonText: {
-                        today: 'Dzisiaj'
-                    },
-                    events: calendarEvents,
-                    validRange: {
-                        start: startRange,
-                        end: endRange
-                    },
-                    eventClick: function(info) {
-                        var dateObj = info.event.start;
-                        var yyyy = dateObj.getFullYear();
-                        var mm = String(dateObj.getMonth()+1).padStart(2, '0');
-                        var dd = String(dateObj.getDate()).padStart(2, '0');
-                        var dateKey = yyyy + "-" + mm + "-" + dd;
-                        if (dayInfo[dateKey]) {
-                            showModal(dayInfo[dateKey].Dostepni, dayInfo[dateKey].Niedostepni);
-                        }
-                    },
-                });
-
-                calendar.render();
-
-                function showModal(dostepni, niedostepni) {
-                    var modal = document.getElementById('modal');
-                    modal.innerHTML = "<h3>Dostępni: " + dostepni.join(', ') + "</h3><h3>Niedostępni: " + niedostepni.join(', ') + "</h3>";
-                    var overlay = document.getElementById('modalOverlay');
-                    overlay.style.display = 'block';
-                }
+            // Inicjalizacja kalendarza
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    center: 'title',
+                    right: ''
+                },
+                locale: 'pl',
+                events: calendarEvents, // Domyślnie puste wydarzenia
             });
-        </script>
-    }
+
+            calendar.render();
+        });
+    </script>
 </body>
 </html>
