@@ -284,21 +284,20 @@ namespace WebApplication2.Controllers
 
         // Akcja POST do aktualizacji punktów (dodawanie/usuwanie)
         [HttpPost]
-        public IActionResult ZaktualizujPunkty(int ID_Zolnierza, int punkty)
+        public IActionResult ZaktualizujPunkty(int ID_Zolnierza, int punkty, string rola)
         {
             // Znajdź żołnierza w bazie danych
             var zolnierz = _context.Zolnierze.FirstOrDefault(z => z.ID_Zolnierza == ID_Zolnierza);
             if (zolnierz == null)
             {
                 TempData["Error"] = "Żołnierz o podanym identyfikatorze nie został znaleziony.";
-                return RedirectToAction("Punktacja");
+                return RedirectToAction("Punktacja", rola);
             }
 
-            // Jeśli punkty są ujemne - próbujemy je odjąć
+            // Dodaj lub usuń punkty
             if (punkty < 0)
             {
                 int punktyDoUsuniecia = Math.Abs(punkty);
-                // Sprawdź, czy żołnierz ma wystarczającą liczbę punktów
                 if (zolnierz.Punkty >= punktyDoUsuniecia)
                 {
                     zolnierz.Punkty -= punktyDoUsuniecia;
@@ -306,13 +305,15 @@ namespace WebApplication2.Controllers
                 else
                 {
                     TempData["Error"] = "Nie można usunąć więcej punktów niż aktualnie posiadane.";
-                    return RedirectToAction("Punktacja");
+                    return RedirectToAction("Punktacja", rola);
                 }
             }
-            else // W przeciwnym przypadku dodaj punkty
+            else
             {
                 zolnierz.Punkty += punkty;
             }
+
+            // Dodaj powiadomienie
             var powiadomienie = new Powiadomienie
             {
                 ID_Zolnierza = ID_Zolnierza,
@@ -321,14 +322,14 @@ namespace WebApplication2.Controllers
                 DataIGodzinaWyslania = DateTime.Now,
                 Status = "Wysłano"
             };
+
             _context.Powiadomienia.Add(powiadomienie);
             _context.SaveChanges();
-            // Zapisz zmiany w bazie danych
-           
 
-            // Przekieruj z powrotem do listy żołnierzy/ekranu punktacji
-            return RedirectToAction("Punktacja");
+            // Przekierowanie na odpowiedni widok w zależności od roli
+            return RedirectToAction("Punktacja", rola);
         }
+
 
         // ----------------------------------
         // Lista i Dodawanie Zwolnień
@@ -634,7 +635,7 @@ namespace WebApplication2.Controllers
         }
 
 
-        
+
 
         public ActionResult Download()
         {
@@ -1124,22 +1125,30 @@ namespace WebApplication2.Controllers
         }
 
         [HttpGet]
-        public IActionResult AnalizaDostepnosci()
+        public IActionResult AnalizaDostepnosci(int? month, int? year)
         {
-            // 1) Generujemy listę miesięcy i lat do wyboru (np. bieżący rok i kolejny?)
+            // Jeśli miesiąc lub rok nie zostały przekazane, ustawiamy bieżące
+            if (!month.HasValue || !year.HasValue)
+            {
+                month = DateTime.Now.Month;
+                year = DateTime.Now.Year;
+            }
+
+            // 1) Generujemy listę miesięcy i lat do wyboru
             var months = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
             var years = new List<int> { DateTime.Now.Year, DateTime.Now.Year + 1 };
 
             ViewBag.Months = months; // do <select>
             ViewBag.Years = years;
 
-            // 2) Możemy ustawić domyślny wybór: aktualny miesiąc/rok
-            ViewBag.SelectedMonth = DateTime.Now.Month;
-            ViewBag.SelectedYear = DateTime.Now.Year;
+            // Ustawiamy wybrany miesiąc i rok
+            ViewBag.SelectedMonth = month;
+            ViewBag.SelectedYear = year;
 
-            // Na razie brak eventów w widoku → user wybierze i wciśnie "Pokaż"
-            return View(); // AnalizaDostepnosci.cshtml (formularz i/lub kalendarz)
+            // Zwracamy widok, by użytkownik mógł wybrać miesiąc i rok
+            return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1166,7 +1175,6 @@ namespace WebApplication2.Controllers
             }
 
             // 2) Wyznacz zakres (pierwszy i ostatni dzień wybranego miesiąca)
-            // Sprawdzamy poprawność month/year w razie czego
             if (month < 1 || month > 12 || year < 2000 || year > 2100)
             {
                 ModelState.AddModelError("", "Niepoprawny zakres miesiąca/roku.");
@@ -1209,7 +1217,6 @@ namespace WebApplication2.Controllers
                 };
             }
 
-            // ...
             // 7) Dla każdej doby i każdego żołnierza → sprawdzamy dostępność
             for (int i = 0; i < totalDays; i++)
             {
@@ -1237,7 +1244,6 @@ namespace WebApplication2.Controllers
                 }
             }
 
-
             // 8) Budujemy eventy (po jednym na każdy dzień)
             var events = new List<object>();
             for (int i = 0; i < totalDays; i++)
@@ -1249,8 +1255,7 @@ namespace WebApplication2.Controllers
                 int countNied = details.Niedostepni.Count;
 
                 string title = $"Dost. {countDost}, Nied. {countNied}";
-                // Kolory – ciemna czcionka, by lepiej widać
-                string bgColor = "#f9c74f";  // np. żółtawy
+                string bgColor = "#f9c74f"; // np. żółtawy
                 string txtColor = "#000000"; // czarny
 
                 events.Add(new
@@ -1332,6 +1337,7 @@ namespace WebApplication2.Controllers
             public List<string> Dostepni { get; set; }
             public List<string> Niedostepni { get; set; }
         }
+
 
 
     }
