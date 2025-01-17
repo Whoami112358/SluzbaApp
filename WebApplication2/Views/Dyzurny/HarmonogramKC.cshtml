@@ -5,6 +5,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap' rel="stylesheet">
 }
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -111,7 +112,6 @@
                 color: #d0d0d0;
             }
 
-        /* Styl przekreślenia starego żołnierza */
         .strikethrough {
             text-decoration: line-through;
             color: red;
@@ -126,41 +126,64 @@
             border: none;
             border-radius: 30px;
             padding: 10px 20px;
-            transition: background-color 0.3s ease, transform 0.3s ease; /* Add smooth transition */
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
             .zastepca-butt:hover {
-                background-color: rgba(0, 0, 0, 0.2); /* Change background color on hover */
-                transform: scale(1.05); /* Optional: Slightly enlarge the button on hover */
+                background-color: rgba(0, 0, 0, 0.2);
+                transform: scale(1.05);
             }
 
-        .head-content{
+        .head-content {
             margin-left: 50px;
         }
 
-        .download-butt:hover{
+        .download-butt:hover {
             filter: hue-rotate(90deg) brightness(0.7);
             scale(1.1);
+        }
+
+        /* --- DODANE --- */
+        #chartContainer {
+            width: 80%;
+            margin: 20px auto;
+            display: none; /* Początkowo ukrywamy wykres */
+        }
+
+        canvas {
+            background-color: #ffffff;
         }
     </style>
 </head>
 <body>
     @{
-        // Odczytujemy słownik z kontrolera, w którym jest info o starym żołnierzu
         var replacedSoldiers = ViewBag.ReplacedSoldiers as Dictionary<int, int>;
-        // Ewentualnie pełna lista żołnierzy do odnalezienia starego soldiera
         var zolnierzeDb = ViewBag.ZolnierzeDb as List<WebApplication2.Models.Zolnierz>;
     }
+
     <div class="head-content">
         <h1>@ViewData["Title"]</h1>
-    <button class="download-butt" onclick="location.href='@Url.Action("Download")'"
+
+        <!-- Przycisk "Pobierz plik" -->
+        <button class="download-butt" onclick="location.href='@Url.Action("Download")'"
                 style="border: none; background: none; padding: 0; cursor: pointer; margin-bottom: 20px; transition: filter 0.3s ease, transform 0.3s ease;">
-        <span style="font-family: Poppins; font-size: 24px; color: #ffffff;">
-            Pobierz plik
-        </span>
-        <img src="../download2.png" />
-    </button>
+            <span style="font-family: Poppins; font-size: 24px; color: #ffffff;">
+                Pobierz plik
+            </span>
+            <img src="../download2.png" />
+        </button>
+
+        <!-- Przycisk "Pokaż raport porównawczy" --> <!-- <--- DODANE! -->
+        <button id="showChartBtn" class="zastepca-butt" style="margin-left: 20px;">
+            Pokaż raport porównawczy
+        </button>
     </div>
+
+    <!-- Kontener na wykres słupkowy (Chart.js) -->  <!-- <--- DODANE! -->
+    <div id="chartContainer">
+        <canvas id="myChart"></canvas>
+    </div>
+
     <div class="content">
         <table>
             <thead>
@@ -212,7 +235,6 @@
                     </tr>
                 }
             </tbody>
-
         </table>
     </div>
     <footer>
@@ -221,6 +243,67 @@
             <img src="../back.png" alt="Powrót" />
         </button>
     </footer>
-</body>
 
+    <!-- Ładowanie biblioteki Chart.js i skrypt do generowania wykresu --> <!-- <--- DODANE! -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Zmienna do przechowywania instancji wykresu (aby go nie przeładowywać za każdym razem)
+        let myChart;
+
+        // Funkcja asynchroniczna pobierająca dane z kontrolera w formacie JSON
+        async function loadChartData() {
+            const response = await fetch('@Url.Action("GetRaportPorownawczyData", "Dyzurny")');
+            const data = await response.json();
+
+            // data: [{ pododdzialId: 1, count: 10 }, { pododdzialId: 2, count: 7 }, ...]
+            const labels = data.map(item => 'Pododdział ' + item.pododdzialId);
+            const counts = data.map(item => item.count);
+
+            // Inicjalizacja wykresu Chart.js
+            const ctx = document.getElementById('myChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Liczba osób na służbie (w tym miesiącu)',
+                        data: counts,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Obsługa kliknięcia w przycisk: wyświetlenie lub ukrycie wykresu
+        const showChartBtn = document.getElementById('showChartBtn');
+        const chartContainer = document.getElementById('chartContainer');
+        let chartVisible = false;
+
+        showChartBtn.addEventListener('click', async () => {
+            chartVisible = !chartVisible;
+            if (chartVisible) {
+                chartContainer.style.display = 'block';
+                showChartBtn.textContent = 'Ukryj';
+
+                // Załaduj dane tylko raz, jeśli wykres jeszcze nie istnieje
+                if (!myChart) {
+                    await loadChartData();
+                }
+            } else {
+                chartContainer.style.display = 'none';
+                showChartBtn.textContent = 'Pokaż raport porównawczy';
+            }
+        });
+    </script>
+</body>
 </html>
