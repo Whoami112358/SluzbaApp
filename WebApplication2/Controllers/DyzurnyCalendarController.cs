@@ -30,7 +30,11 @@ namespace WebApplication2.Controllers
                     .OrderBy(h => h.Data)
                     .ToListAsync();
 
-                return View("~/Views/Calendar/IndexOficer.cshtml", harmonogramy);
+
+                // Zwracamy widok z pełną ścieżką
+                return View("~/Views/Dyzurny/CalendarOficer.cshtml", harmonogramy);
+
+
             }
 
             return Forbid();

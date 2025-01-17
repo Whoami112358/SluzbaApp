@@ -18,7 +18,8 @@ namespace WebApplication2.Models
         public string TrescPowiadomienia { get; set; }
 
         [Column("Typ_powiadomienia")]
-        public string TypPowiadomienia { get; set; }
+        public string? TypPowiadomienia { get; set; }
+
 
         [Column("Data_i_godzina_wyslania")]
         public DateTime? DataIGodzinaWyslania { get; set; }
