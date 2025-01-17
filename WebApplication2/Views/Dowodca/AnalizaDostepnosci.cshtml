@@ -150,7 +150,7 @@
             <select name="month" id="month-select">
                 @foreach (var m in ViewBag.Months as List<int>)
                 {
-                    bool selected = (m == (ViewBag.CurrentMonth ?? 0));
+                    bool selected = (m == (ViewBag.CurrentMonth ?? DateTime.Now.Month));
                     <option value="@m" selected="@(selected)">@m</option>
                 }
             </select>
@@ -159,7 +159,7 @@
             <select name="year" id="year-select">
                 @foreach (var y in ViewBag.Years as List<int>)
                 {
-                    bool selected = (y == (ViewBag.CurrentYear ?? 0));
+                    bool selected = (y == (ViewBag.CurrentYear ?? DateTime.Now.Year));
                     <option value="@y" selected="@(selected)">@y</option>
                 }
             </select>
@@ -193,14 +193,15 @@
                 var calendarEvents = @Html.Raw(ViewBag.EventsJson);
                 var dayInfo = @Html.Raw(ViewBag.DayInfoJson);
 
-                // Składamy datę: YYYY-MM-01
+                // Ustalamy datę startową jako pierwszy dzień bieżącego miesiąca
                 var initDate = '@(ViewBag.CurrentYear + "-" + (ViewBag.CurrentMonth.ToString("D2")) + "-01")';
 
                 var startRange = initDate;
                 var endRange = '@(ViewBag.CurrentYear + "-" + ((ViewBag.CurrentMonth < 12 ? ViewBag.CurrentMonth + 1 : 1).ToString("D2")) + "-01")';
 
                 var calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'dayGridMonth',
+                    initialView: 'dayGridMonth',  // Widok miesiąca
+                    initialDate: initDate,  // Ustalamy datę startową na pierwszy dzień bieżącego miesiąca
                     headerToolbar: {
                         left: 'prev,next',
                         center: 'title',
