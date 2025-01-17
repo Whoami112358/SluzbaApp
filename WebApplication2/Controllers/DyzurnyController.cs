@@ -675,5 +675,30 @@ namespace WebApplication2.Controllers
                 return View(); // przydzielzastepce.cshtml
             }
         }
+
+        [HttpGet]
+        public IActionResult GetRaportPorownawczyData()
+        {
+            // Na potrzeby przykładu bierzemy aktualny miesiąc i rok
+            var currentMonth = DateTime.Now.Month;
+            var currentYear = DateTime.Now.Year;
+
+            // Grupa: Zolnierz -> ID_Pododdzialu
+            // Liczba osób na służbie dla danego pododdziału = Count()
+            var data = (from h in _context.Harmonogramy
+                        join z in _context.Zolnierze on h.ID_Zolnierza equals z.ID_Zolnierza
+                        where h.Data.Month == currentMonth && h.Data.Year == currentYear
+                        group h by z.ID_Pododdzialu into g
+                        select new
+                        {
+                            pododdzialId = g.Key,
+                            count = g.Count()
+                        })
+                       .ToList();
+
+            // Zwracamy wynik w formie JSON
+            return Json(data);
+        }
+
     }
 }

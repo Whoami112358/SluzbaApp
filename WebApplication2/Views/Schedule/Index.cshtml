@@ -270,7 +270,13 @@
         <button class="action-button" onclick="openPriorytetModal()">
             Priorytet służby
         </button>
-   </div>
+        &nbsp;
+        <!-- Przycisk do pobierania raportu PDF -->
+        <button class="action-button" onclick="window.location.href='@Url.Action("DownloadReport", "Schedule")'">
+            Pobierz raport (ostatnie 6 miesięcy)
+        </button>
+    </div>
+
     
     <div class="container">
         <table>
