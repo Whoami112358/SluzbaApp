@@ -1,4 +1,11 @@
-﻿@model IEnumerable<WebApplication2.Models.Powiadomienie>
+﻿@{
+    <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap' rel="stylesheet">
+}
+
+@model IEnumerable<WebApplication2.Models.Powiadomienie>
 
 @{
 
@@ -16,87 +23,200 @@
             new { sortColumn = columnName, sortOrder = nextOrder });
     };
 }
-
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-    <meta charset="utf-8" />
-    <title>@ViewData["Title"]</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Powiadomień - Twoja Aplikacja</title>
+    <link rel="stylesheet" href="~/css/site.css" />
     <style>
-        .container {
-            max-width: 1000px;
-            margin: 30px auto;
-            background-color: #34495e;
-            padding: 20px;
-            border: 2px solid #27ae60;
-            border-radius: 8px;
+        body {
+            font-family: Poppins;
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(45deg, rgba(3, 34, 40, 0.6) 0%, rgba(15, 24, 16, 0.6) 100%), url('../zolniez.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-family: 'Korolev Military Stencil W00 Rg';
+            font-size: 58px;
+            margin: 25px 0;
+            color: #ffffff;
+        }
+
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            position: relative;
+            margin-top: auto;
+        }
+
+            footer button {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                border: none;
+                background: none;
+                padding: 0;
+                cursor: pointer;
+            }
+
+                footer button img {
+                    width: 25px;
+                    height: 24px;
+                    display: block;
+                }
+
+        .content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto; /* Przesuwalność zawartości */
+            padding: 20px;
         }
 
         table {
-            width: 100%;
+            width: 90%;
+            max-width: 800px;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: auto; /* Wyśrodkowanie tabeli */
+            overflow: auto; /* Przesuwalność tabeli */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: rgba(172, 174, 165, 0.7);
+            border-radius: 8px; /* Zaokrąglone rogi */
         }
 
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #27ae60;
+            table th, table td {
+                padding: 10px;
+                text-align: left;
+                border: 1px solid #ddd;
+            }
+
+            table th {
+                background-color: rgba(119, 131, 83, 1);
+                color: white;
+            }
+
+            table td {
+                background-color: rgba(172, 174, 165, 0.7);
+            }
+
+        form {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        th {
-            background-color: #27ae60;
-            color: #fff;
+            form button {
+                margin-left: 10px;
+                margin-right: 10px;
+                padding: 5px 10px;
+                width: 40px; /* Make buttons square */
+                height: 40px;
+                font-size: 30px; /* Big font size for plus and minus */
+                font-weight: bold;
+                color: white;
+                background-color: rgba(119, 131, 83, 1);
+                border-radius: 10px; /* Rounded corners */
+                cursor: pointer;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition for hover */
+            }
+
+                /* Hover effect */
+                form button:hover {
+                    background-color: rgba(0, 0, 0, 0.2);
+                    transform: scale(1.1); /* Slightly enlarge on hover */
+                }
+
+                /* Active (clicked) state for a button */
+                form button:active {
+                    background-color: rgba(0, 0, 0, 0.2);
+                    transform: scale(1); /* No scale on click */
+                }
+
+                /* Optional: Focus outline for accessibility */
+                form button:focus {
+                    outline: 3px solid #333; /* Focus border */
+                }
+
+        }
+
+        th a {
+            display: inline-block;
+            text-decoration: none;
+            margin: 0 2px;
+        }
+
+        .fa-arrow-up, .fa-arrow-down {
+            font-size: 14px;
+            color: #ffffff;
+            margin-left: 5px;
             cursor: pointer;
         }
 
-        tr:hover {
-            background-color: #616f39;
-        }
-
-        a.sort-link {
-            color: #ecf0f1;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-            a.sort-link:hover {
-                color: #1abc9c;
+            .fa-arrow-up:hover, .fa-arrow-down:hover {
+                color: #d0d0d0;
             }
 
-        .status-odebrane {
-            color: #2ecc71; /* zielony */
-            font-weight: bold;
+        thead {
+            text-align: center; /* Center the text within the table header */
         }
 
-        .status-wyslano {
-            color: #e74c3c; /* czerwony */
-        }
+            thead a {
+                font-size: 24px;
+                color: #ffffff;
+                text-decoration: none; /* Remove underline */
+                padding: 5px 10px; /* Add some padding for better clickability */
+                display: inline-block; /* Make the link an inline block to support padding */
+                cursor: pointer;
+                border-radius: 4px; /* Round the corners a bit for a nicer look */
+                transition: all 0.3s ease; /* Smooth transition for hover effects */
+            }
+
+                thead a:hover {
+                    filter: hue-rotate(90deg) brightness(0.7);
+                    transform: scale(1.1); /* Apply scaling effect on hover */
+                    background-color: rgba(255, 255, 255, 0.2); /* Light background on hover for better contrast */
+                }
     </style>
 </head>
 <body>
     <header>
-        <nav>
-            <ul>
-                <li><a href="/Dyzurny/DyzurnyView" style="color: #1abc9c;">Wróć do Strony głównej</a></li>
-            </ul>
-        </nav>
+        <h1>@ViewData["Title"]</h1>
     </header>
-    <div class="container">
-        <h2>@ViewData["Title"]</h2>
-
+    <div class="content">
         <table>
             <thead>
                 <tr>
                     <!-- Każdy nagłówek linkiem do sortowania -->
                     <th>
-                        <a href="@sortLink("Zolnierz")" class="sort-link">Żołnierz (otrzymujący powiadomienie)</a>
+                        <a href="@sortLink("Zolnierz")" class="sort-link">Żołnierz</a>
                     </th>
                     <th>
                         <a href="@sortLink("Tresc")" class="sort-link">Treść</a>
                     </th>
                     <th>
-                        <a href="@sortLink("Data")" class="sort-link">Data i godzina wysłania</a>
+                        <a href="@sortLink("Data")" class="sort-link">Data wysłania</a>
                     </th>
                     <th>
                         <a href="@sortLink("Status")" class="sort-link">Status</a>
@@ -129,5 +249,13 @@
             </tbody>
         </table>
     </div>
+
+    <footer>
+        <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <button onclick="location.href='@Url.Action("DyzurnyView", "Dyzurny")'">
+            <img src="../back.png" alt="Powrót" />
+        </button>
+    </footer>
 </body>
+
 </html>

@@ -17,8 +17,12 @@ namespace WebApplication2.Controllers
 
         public async Task<IActionResult> Index()
         {
-            if (User.Identity.IsAuthenticated)
+            //if (User.Identity.IsAuthenticated)
+            if(HttpContext.User.Identity.IsAuthenticated)
             {
+                if (HttpContext.User.IsInRole("Officer")) {
+                    return RedirectToAction("DyzurnyView", "Dyzurny");
+                }
                 int idZolnierza;
                 if (int.TryParse(User.FindFirst("ID_Zolnierza")?.Value, out idZolnierza))
                 {

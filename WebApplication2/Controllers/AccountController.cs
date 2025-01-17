@@ -103,8 +103,9 @@ namespace WebApplication2.Controllers
             }
 
             // Jeśli dane logowania są niepoprawne
-            ViewBag.Error = "Niepoprawny login lub hasło.";
-            return View("/Views/Home/Index.cshtml");
+            TempData["error"] = "Niepoprawny login lub hasło.";
+            return RedirectToAction("Index", "Home");
+            //return View("/Views/Home/Index.cshtml");
         }
 
         // GET: /Account/Logout
