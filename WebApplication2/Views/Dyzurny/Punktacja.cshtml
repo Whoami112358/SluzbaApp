@@ -100,12 +100,13 @@
         form {
             display: flex;
             align-items: center;
+            justify-content: center;
         }
 
-            form input[type="number"] {
+        /*form input[type="number"] {
                 padding: 5px;
                 margin-right: 10px;
-                width: 50px; /* Większe pole wejściowe */
+                width: 50px; /* Większe pole wejściowe 
             }
 
             form button {
@@ -119,7 +120,42 @@
 
                 form button:hover {
                     background-color: rgba(0, 0, 0, 0.2);
-                }
+                }*/
+
+        form button {
+            margin-left: 10px;
+            margin-right: 10px;
+            padding: 5px 10px;
+            width: 40px; /* Make buttons square */
+            height: 40px;
+            font-size: 30px; /* Big font size for plus and minus */
+            font-weight: bold;
+            color: white;
+            background-color: rgba(119, 131, 83, 1);
+            border-radius: 10px; /* Rounded corners */
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition for hover */
+        }
+
+            /* Hover effect */
+        form button:hover {
+                background-color: rgba(0, 0, 0, 0.2);
+                transform: scale(1.1); /* Slightly enlarge on hover */
+            }
+
+            /* Active (clicked) state for a button */
+        form button:active {
+                    background-color: rgba(0, 0, 0, 0.2);
+                transform: scale(1); /* No scale on click */
+            }
+
+            /* Optional: Focus outline for accessibility */
+        form button:focus {
+                outline: 3px solid #333; /* Focus border */
+            }
     </style>
 </head>
 <body>
@@ -135,7 +171,7 @@
                     <th>Nazwisko</th>
                     <th>Stopień</th>
                     <th>Punkty</th>
-                    <th>Dodaj/Usuń Punkty</th>
+                    <!--<th>Dodaj/Usuń Punkty</th>-->
                 </tr>
             </thead>
             <tbody>
@@ -146,19 +182,37 @@
                         <td>@item.Imie</td>
                         <td>@item.Nazwisko</td>
                         <td>@item.Stopien</td>
-                        <td>@item.Punkty</td>
                         <td>
-                            <form method="post" action="/Dyzurny/ZaktualizujPunkty">
+                            <form id="punktyForm" method="post" action="/Dyzurny/ZaktualizujPunkty">
                                 <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
-                                <input type="number" name="punkty" step="1" />
-                                <button type="submit">Dodaj/Usuń Punkty</button>
+                                <input id="punkty" type="hidden" name="punkty" step="1" value="0"/>
+                                <button type="button" onclick="updatePunkty(this, 1)">+</button>
+                                @item.Punkty
+                                <button type="button" onclick="updatePunkty(this, -1)">-</button>
                             </form>
+
+                            <script>
+                                function updatePunkty(button, changeValue) {
+                                    // Find the parent form of the button clicked
+                                    let form = button.closest('form');
+
+                                    // Get the 'punkty' input field within that form
+                                    let punktyInput = form.querySelector('#punkty');
+
+                                    // Update the value by adding or subtracting the changeValue
+                                    punktyInput.value = parseInt(punktyInput.value) + changeValue;
+
+                                    // Submit the same form after the value is updated
+                                    form.submit();
+                                }
+                            </script>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+    
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
         <button onclick="location.href='@Url.Action("DyzurnyView", "Dyzurny")'">
@@ -166,4 +220,5 @@
         </button>
     </footer>
 </body>
+
 </html>
