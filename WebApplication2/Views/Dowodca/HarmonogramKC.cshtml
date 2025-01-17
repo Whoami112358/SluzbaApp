@@ -148,8 +148,8 @@
 
     <!-- Dodano kontener z przyciskami -->
     <div class="button-container">
-        <a href="@Url.Action("DodajHarmonogramKC", "Dowodca")" class="action-button">Dodaj Harmonogram</a>
-        <a href="@Url.Action("ZarzadzajPriorytetami", "Dowodca")" class="action-button">Zarządzaj Priorytetami</a>
+        <a href="@Url.Action("DodajHarmonogramKC", "Dowodca")" class="action-button">Dodaj służbę</a>
+        <a href="@Url.Action("ZarzadzajPriorytetami", "Dowodca")" class="action-button">Zarządzaj priorytetami</a>
     </div>
 
     <div class="content">
@@ -187,7 +187,7 @@
                         <td>
                             @if (item.Zastepcy == null || !item.Zastepcy.Any())
                             {
-                                <button onclick="location.href='@Url.Action("PrzydzielZastepce", "Dowodca", new { idHarmonogram = item.ID_Harmonogram })'">
+                                <button class="action-button" onclick="location.href='@Url.Action("PrzydzielZastepce", "Dowodca", new { idHarmonogram = item.ID_Harmonogram })'">
                                     Przydziel zastępcę
                                 </button>
                             }

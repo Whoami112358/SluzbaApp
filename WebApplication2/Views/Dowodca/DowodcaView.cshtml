@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "PANEL DOWÓDCY";
+    ViewData["Title"] = "PANEL DOWÓDCY PODODDZIAŁU";
     <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
 }
 
@@ -57,14 +57,27 @@
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 1);
             text-align: center;
-            height: 250px;
-            width: 250px;
+            height: 200px;
+            width: 200px;
             padding: 30px;
             color: #ffffff;
             font-size: 24px;
             font-family: 'Poppins', Arial, sans-serif;
             transition: transform 0.3s, box-shadow 0.3s;
         }
+
+            .card:hover {
+                transform: scale(1.1); /* Slightly enlarges the card */
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8); /* Enhances the shadow */
+                background-color: rgba(139, 155, 95, 0.8); /* Lightens the background */
+                color: #e2e2e2; /* Changes text color for contrast */
+            }
+
+            /* Optional Focus Effect for Accessibility */
+            .card:focus {
+                outline: none;
+                box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8); /* Highlight card on focus */
+            }
 
         footer {
             text-align: center;
