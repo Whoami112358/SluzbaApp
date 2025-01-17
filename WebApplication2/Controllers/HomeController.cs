@@ -23,6 +23,10 @@ namespace WebApplication2.Controllers
                 if (HttpContext.User.IsInRole("Officer")) {
                     return RedirectToAction("DyzurnyView", "Dyzurny");
                 }
+                if (HttpContext.User.IsInRole("Dowodca"))
+                {
+                    return RedirectToAction("DowodcaView", "Dowodca");
+                }
                 int idZolnierza;
                 if (int.TryParse(User.FindFirst("ID_Zolnierza")?.Value, out idZolnierza))
                 {
