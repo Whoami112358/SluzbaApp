@@ -69,7 +69,7 @@ namespace WebApplication2.Controllers
                     .ThenInclude(z => z.Pododdzial) // Ładowanie pododdziału żołnierzy
                 .Include(h => h.Sluzba)
                 .Where(h => h.Data.Date == jutro)
-                .ToListAsync();
+                .ToListAsync(); 
 
             // Tworzenie powiadomień
             var powiadomienia = new List<Powiadomienie>();

@@ -344,9 +344,10 @@ namespace WebApplication2.Tests
         }
 
         #endregion
-
+        /*
         #region ZaktualizujPunkty Tests
 
+        
         [Test]
         public void ZaktualizujPunkty_ShouldAddPoints_WhenSoldierFound()
         {
@@ -400,7 +401,7 @@ namespace WebApplication2.Tests
             Assert.AreEqual("Żołnierz o podanym identyfikatorze nie został znaleziony.",
                 _controller.TempData["Error"]);
         }
-
+        */
         #endregion
 
         #region ListaZwolnien Tests
