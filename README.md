@@ -21,7 +21,7 @@ System Zarządzania Służbami to aplikacja internetowa mająca na celu automaty
 - **Harmonogram służb**: przegląd harmonogramu przez żołnierzy.
 - **Kontrola służb**: oficer dyżurny może sprawdzić listę żołnierzy aktualnie pełniących służbę.
 
-- ### Zrealizowane w Sprint 3:
+### Zrealizowane w Sprint 3:
 - **Wysyłanie powiadomień**: system wysyła powiadomienia w oparciu o zdarzenia wybrane przez użytkowników.
 - **Personalizacja reguł**: wprowadzenie możliwości zmiany reguł automatycznego przydzielania służb w oparciu o preferencje.
 - **Raportowanie**: generowanie raportów w oparciu o statystyki systemu.
@@ -31,7 +31,6 @@ System Zarządzania Służbami to aplikacja internetowa mająca na celu automaty
 ### Plany na kolejne sprinty:
 - **Powiadomienia i przypomnienia o służbach.**
 - **Wprowadzanie poprawek w oparciu o recenzje użytkowników.**
-- ****
 
 ---
 
