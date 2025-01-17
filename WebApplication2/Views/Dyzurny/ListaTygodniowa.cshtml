@@ -1,8 +1,9 @@
 ﻿@model IEnumerable<WebApplication2.Models.Harmonogram>
 @{
-    ViewData["Title"] = "LISTA ŻOŁNIERZY PEŁNIĄCYCH SŁUŻBĘ W BIERZĄCYM TYGODNIU";
+    ViewData["Title"] = "LISTA ŻOŁNIERZY PEŁNIĄCYCH SŁUŻBĘ W BIEŻĄCYM TYGODNIU";
     <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 }
 
 <!DOCTYPE html>
@@ -46,7 +47,7 @@
         .content {
             display: flex;
             height: 90%;
-            width: 100%;   
+            width: 100%;
             margin: 0 auto;
             box-sizing: border-box;
         }
@@ -97,11 +98,27 @@
             table td {
                 background-color: rgba(172, 174, 165, 0.7);
             }
+
+        th a {
+            display: inline-block;
+            text-decoration: none;
+            margin: 0 2px;
+        }
+
+        .fa-arrow-up, .fa-arrow-down {
+            font-size: 14px;
+            color: #000000;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+            .fa-arrow-up:hover, .fa-arrow-down:hover {
+                color: #000000;
+            }
     </style>
 </head>
 
 <body>
-
     <header>
         <h1>@ViewData["Title"]</h1>
     </header>
@@ -110,22 +127,45 @@
         <table>
             <thead>
                 <tr>
-                    <!--<th>ID Harmonogramu</th>-->
-                    <th>Data</th>
-                    <th>Imię</th>
-                    <th>Nazwisko</th>
+                    <th>
+                        Data
+                        <a href="@Url.Action("ListaTygodniowa", "Dyzurny", new { sortBy = "Data", isDescending = false })">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                        <a href="@Url.Action("ListaTygodniowa", "Dyzurny", new { sortBy = "Data", isDescending = true })">
+                            <i class="fa fa-arrow-down"></i>
+                        </a>
+                    </th>
+                    <th>
+                        Imię
+                        <a href="@Url.Action("ListaTygodniowa", "Dyzurny", new { sortBy = "Imie", isDescending = false })">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                        <a href="@Url.Action("ListaTygodniowa", "Dyzurny", new { sortBy = "Imie", isDescending = true })">
+                            <i class="fa fa-arrow-down"></i>
+                        </a>
+                    </th>
+                    <th>
+                        Nazwisko
+                        <a href="@Url.Action("ListaTygodniowa", "Dyzurny", new { sortBy = "Nazwisko", isDescending = false })">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                        <a href="@Url.Action("ListaTygodniowa", "Dyzurny", new { sortBy = "Nazwisko", isDescending = true })">
+                            <i class="fa fa-arrow-down"></i>
+                        </a>
+                    </th>
                     <th>Służba</th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <!--<td>@item.ID_Harmonogram</td>-->
                         <td>@item.Data.ToString("yyyy-MM-dd")</td>
                         <td>@item.Zolnierz?.Imie</td>
-                        <td>@item.Zolnierz?.Nazwisko</td> <!-- Wyświetlenie imienia żołnierza -->
-                        <td>@item.Sluzba?.Rodzaj</td> <!-- Wyświetlenie nazwy służby -->
+                        <td>@item.Zolnierz?.Nazwisko</td>
+                        <td>@item.Sluzba?.Rodzaj</td>
                     </tr>
                 }
             </tbody>

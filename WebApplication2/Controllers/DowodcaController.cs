@@ -247,43 +247,27 @@ namespace WebApplication2.Controllers
         // ----------------------------------
         // Modyfikacja Punktów
         // ----------------------------------
-        public IActionResult Punktacja()
+        public IActionResult Punktacja(string sortBy, bool isDescending = false)
         {
-            // Pobieramy aktualnie zalogowanego dowódcę
-            var dowodcaId = User.Identity.Name; // Zmienna zależna od sposobu autentykacji
+            var zolnierze = _context.Zolnierze.AsQueryable(); // Pobranie danych z bazy
 
-            // Rozdzielamy login na imię i nazwisko
-            var imieNazwisko = dowodcaId.Split('.'); // Zakładamy, że login ma postać Imie.Nazwisko
-            if (imieNazwisko.Length != 2)
+            // Sortowanie według przekazanego parametru i kierunku
+            zolnierze = sortBy switch
             {
-                return BadRequest("Niepoprawny format loginu.");
-            }
+                "Imie" => isDescending ? zolnierze.OrderByDescending(z => z.Imie) : zolnierze.OrderBy(z => z.Imie),
+                "Nazwisko" => isDescending ? zolnierze.OrderByDescending(z => z.Nazwisko) : zolnierze.OrderBy(z => z.Nazwisko),
+                "Stopien" => isDescending ? zolnierze.OrderByDescending(z => z.Stopien) : zolnierze.OrderBy(z => z.Stopien),
+                "Punkty" => isDescending ? zolnierze.OrderByDescending(z => z.Punkty) : zolnierze.OrderBy(z => z.Punkty),
+                _ => zolnierze.OrderBy(z => z.Imie), // Domyślne sortowanie
+            };
 
-            var imie = imieNazwisko[0]; // Imię
-            var nazwisko = imieNazwisko[1]; // Nazwisko
+            // Przekazujemy aktualne kryteria sortowania do widoku
+            ViewBag.CurrentSortBy = sortBy;
+            ViewBag.IsDescending = isDescending;
 
-            // Znajdź żołnierza w tabeli Zolnierze, który ma przypisane imię i nazwisko
-            var zolnierz = _context.Zolnierze
-                .FirstOrDefault(z => z.Imie == imie && z.Nazwisko == nazwisko); // Porównanie z imieniem i nazwiskiem
-
-            // Sprawdzamy, czy żołnierz istnieje
-            if (zolnierz == null)
-            {
-                return NotFound("Nie znaleziono żołnierza o tym imieniu i nazwisku.");
-            }
-
-            // Pobieramy ID pododdziału przypisane temu żołnierzowi
-            var pododdzialId = zolnierz.ID_Pododdzialu;
-
-            // Pobieramy żołnierzy przypisanych do tego samego pododdziału
-            var zolnierzeWPododdziale = _context.Zolnierze
-                .Where(z => z.ID_Pododdzialu == pododdzialId) // Filtrowanie po pododdziale
-                .OrderBy(z => z.Nazwisko) // Sortowanie według nazwiska
-                .ToList();
-
-            // Przekazujemy listę żołnierzy do widoku
-            return View(zolnierzeWPododdziale);
+            return View(zolnierze.ToList()); // Przekazanie posortowanych danych do widoku
         }
+
 
 
         [HttpPost]

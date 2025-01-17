@@ -111,6 +111,77 @@ namespace WebApplication2.Controllers
 
             return View();
         }
+        public IActionResult Punktacja(string sortBy, bool isDescending = false)
+        {
+            // Pobranie danych żołnierzy
+            var zolnierze = _context.Zolnierze.AsQueryable();
+
+            // Obsługa sortowania
+            zolnierze = sortBy switch
+            {
+                "Imie" => isDescending ? zolnierze.OrderByDescending(z => z.Imie) : zolnierze.OrderBy(z => z.Imie),
+                "Nazwisko" => isDescending ? zolnierze.OrderByDescending(z => z.Nazwisko) : zolnierze.OrderBy(z => z.Nazwisko),
+                "Punkty" => isDescending ? zolnierze.OrderByDescending(z => z.Punkty) : zolnierze.OrderBy(z => z.Punkty),
+                _ => zolnierze.OrderBy(z => z.Imie) // Domyślne sortowanie po imieniu
+            };
+
+            // Przekazanie posortowanych danych do widoku
+            return View(zolnierze.ToList());
+        }
+
+        public IActionResult ListaZolnierzy(string sortBy, bool isDescending = false)
+        {
+            // Pobranie danych z bazy
+            var zolnierze = _context.Zolnierze.AsQueryable();
+
+            // Obsługa sortowania
+            zolnierze = sortBy switch
+            {
+                "Imie" => isDescending ? zolnierze.OrderByDescending(z => z.Imie) : zolnierze.OrderBy(z => z.Imie),
+                "Nazwisko" => isDescending ? zolnierze.OrderByDescending(z => z.Nazwisko) : zolnierze.OrderBy(z => z.Nazwisko),
+                "Punkty" => isDescending ? zolnierze.OrderByDescending(z => z.Punkty) : zolnierze.OrderBy(z => z.Punkty),
+                _ => zolnierze.OrderBy(z => z.Imie) // Domyślne sortowanie po imieniu
+            };
+
+            // Przekazanie danych do widoku
+            return View(zolnierze.ToList());
+        }
+ 
+
+
+        public IActionResult HarmonogramKC(string sortBy, bool isDescending = false)
+        {
+            var harmonogram = _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                .Include(h => h.Sluzba)
+                .Include(h => h.Zastepcy) // Dodano do wczytania kolekcji Zastepcy
+                .AsQueryable();
+
+            // Sortowanie
+            harmonogram = sortBy switch
+            {
+                "Data" => isDescending ? harmonogram.OrderByDescending(h => h.Data) : harmonogram.OrderBy(h => h.Data),
+                "Imie" => isDescending ? harmonogram.OrderByDescending(h => h.Zolnierz.Imie) : harmonogram.OrderBy(h => h.Zolnierz.Imie),
+                "Nazwisko" => isDescending ? harmonogram.OrderByDescending(h => h.Zolnierz.Nazwisko) : harmonogram.OrderBy(h => h.Zolnierz.Nazwisko),
+                _ => harmonogram.OrderBy(h => h.Data)
+            };
+
+            // Bezpieczne tworzenie słownika zastępców
+            var replacedSoldiers = harmonogram
+                .Where(h => h.Zastepcy != null && h.Zastepcy.Any()) // Upewnij się, że kolekcja Zastepcy nie jest pusta
+                .ToDictionary(
+                    h => h.ID_Harmonogram,
+                    h => h.Zastepcy.FirstOrDefault()?.ID_Zolnierza_Zastepowanego ?? 0 // Bezpieczne pobieranie wartości
+                );
+
+            var zolnierzeDb = _context.Zolnierze.ToList();
+
+            ViewBag.ReplacedSoldiers = replacedSoldiers;
+            ViewBag.ZolnierzeDb = zolnierzeDb;
+
+            return View(harmonogram.ToList());
+        }
+
 
 
 
@@ -165,31 +236,61 @@ namespace WebApplication2.Controllers
 
             return View(powiadomienia);
         }
+        public IActionResult HarmonogramSorted(string sortBy = "Data", bool isDescending = false)
+        {
+            var harmonogram = _context.Harmonogramy
+                .Include(h => h.Zolnierz)
+                .Include(h => h.Sluzba)
+                .AsQueryable();
+
+            // Sortowanie
+            harmonogram = sortBy switch
+            {
+                "Data" => isDescending ? harmonogram.OrderByDescending(h => h.Data) : harmonogram.OrderBy(h => h.Data),
+                "Imie" => isDescending
+                    ? harmonogram.OrderByDescending(h => h.Zolnierz.Imie)
+                    : harmonogram.OrderBy(h => h.Zolnierz.Imie),
+                "Nazwisko" => isDescending
+                    ? harmonogram.OrderByDescending(h => h.Zolnierz.Nazwisko)
+                    : harmonogram.OrderBy(h => h.Zolnierz.Nazwisko),
+                _ => harmonogram.OrderBy(h => h.Data) // Domyślne sortowanie
+            };
+
+            return View("HarmonogramKC", harmonogram.ToList());
+        }
 
 
 
-        public IActionResult ListaTygodniowa()
+        public IActionResult ListaTygodniowa(string sortBy = "Data", bool isDescending = false)
         {
             // Pobranie aktualnej daty
             var currentDate = DateTime.Now;
-            // Obliczanie daty początkowej i końcowej bieżącego tygodnia
-            var startOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek);
-            var endOfWeek = startOfWeek.AddDays(7);
 
-            // Pobranie harmonogramów, które mają daty w bieżącym tygodniu
-            var harmonogramy = _context.Harmonogramy
+            // Obliczenie daty początkowej i końcowej bieżącego tygodnia
+            var startOfWeek = currentDate.Date.AddDays(-(int)currentDate.DayOfWeek + 1); // Poniedziałek
+            var endOfWeek = startOfWeek.AddDays(6); // Niedziela
+
+            // Filtrowanie danych harmonogramu na bieżący tydzień
+            var harmonogram = _context.Harmonogramy
                 .Include(h => h.Zolnierz)
                 .Include(h => h.Sluzba)
-                .Where(h => h.Data >= startOfWeek && h.Data < endOfWeek) // Filtrowanie po dacie
-                .ToList();
+                .Where(h => h.Data >= startOfWeek && h.Data <= endOfWeek)
+                .AsQueryable();
 
-            return View(harmonogramy);
+            // Sortowanie
+            harmonogram = sortBy switch
+            {
+                "Data" => isDescending ? harmonogram.OrderByDescending(h => h.Data) : harmonogram.OrderBy(h => h.Data),
+                "Imie" => isDescending ? harmonogram.OrderByDescending(h => h.Zolnierz.Imie) : harmonogram.OrderBy(h => h.Zolnierz.Imie),
+                "Nazwisko" => isDescending ? harmonogram.OrderByDescending(h => h.Zolnierz.Nazwisko) : harmonogram.OrderBy(h => h.Zolnierz.Nazwisko),
+                _ => harmonogram.OrderBy(h => h.Data) // Domyślne sortowanie po dacie
+            };
+
+            // Przekazanie danych do widoku
+            return View(harmonogram.ToList());
         }
-        public IActionResult Punktacja()
-        {
-            var zolnierze = _context.Zolnierze.ToList();
-            return View(zolnierze);
-        }
+
+
 
         /*
         // Akcja POST do dodawania punktów
@@ -295,22 +396,7 @@ namespace WebApplication2.Controllers
         }
 
 
-        public IActionResult HarmonogramKC()
-        {
-
-
-            // Pobieramy wszystkie harmonogramy wraz z żołnierzami, służbami i zastępcami
-            var harmonogram = _context.Harmonogramy
-                .Include(h => h.Zolnierz)
-                .Include(h => h.Sluzba)
-                .Include(h => h.Zastepcy) // Dodane
-                    .ThenInclude(z => z.ZolnierzZastepowanego) // Dodane
-                .OrderBy(h => h.Data)
-                .ToList();
-
-            return View(harmonogram);
-
-        }
+       
 
         // GET: /Admin/AddSchedule
         [HttpGet]

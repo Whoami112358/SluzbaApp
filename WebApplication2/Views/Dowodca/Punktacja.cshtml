@@ -1,6 +1,8 @@
 @{
     <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/7aa6f23718712abc71a57b079ebadb52?family=Korolev+Military+Stencil+W00+Rg">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
 }
 <!DOCTYPE html>
 <html lang="pl">
@@ -130,6 +132,23 @@
                 form button:hover i {
                     color: rgba(172, 174, 165, 0.7); /* Kolor po najechaniu */
                 }
+
+        th a {
+            display: inline-block;
+            text-decoration: none;
+            margin: 0 2px;
+        }
+
+        .fa-arrow-up, .fa-arrow-down {
+            font-size: 14px;
+            color: #000000;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+            .fa-arrow-up:hover, .fa-arrow-down:hover {
+                color: #000000;
+            }
     </style>
 </head>
 <body>
@@ -140,10 +159,34 @@
         <table>
             <thead>
                 <tr>
-                    <th>Imię</th>
-                    <th>Nazwisko</th>
+                    <th>
+                        Imię
+                        <a href="@Url.Action("Punktacja", "Dowodca", new { sortBy = "Imie", isDescending = false })" style="margin-left: 5px;">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                        <a href="@Url.Action("Punktacja", "Dowodca", new { sortBy = "Imie", isDescending = true })">
+                            <i class="fa fa-arrow-down"></i>
+                        </a>
+                    </th>
+                    <th>
+                        Nazwisko
+                        <a href="@Url.Action("Punktacja", "Dowodca", new { sortBy = "Nazwisko", isDescending = false })" style="margin-left: 5px;">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                        <a href="@Url.Action("Punktacja", "Dowodca", new { sortBy = "Nazwisko", isDescending = true })">
+                            <i class="fa fa-arrow-down"></i>
+                        </a>
+                    </th>
                     <th>Stopień</th>
-                    <th>Punkty</th>
+                    <th>
+                        Punkty
+                        <a href="@Url.Action("Punktacja", "Dowodca", new { sortBy = "Punkty", isDescending = false })" style="margin-left: 5px;">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                        <a href="@Url.Action("Punktacja", "Dowodca", new { sortBy = "Punkty", isDescending = true })">
+                            <i class="fa fa-arrow-down"></i>
+                        </a>
+                    </th>
                     <th>Dodaj/Usuń Punkty</th>
                 </tr>
             </thead>
@@ -157,7 +200,6 @@
                         <td>@item.Punkty</td>
                         <td>
                             <form method="post" action="/Dyzurny/ZaktualizujPunkty">
-                                <input type="hidden" name="ID_Zolnierza" value="@item.ID_Zolnierza" />
                                 <input type="number" name="punkty" step="1" />
                                 <button type="submit">
                                     <i class="fa fa-save text-white ms-2"></i>
@@ -168,6 +210,9 @@
                 }
             </tbody>
         </table>
+
+
+
     </div>
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>

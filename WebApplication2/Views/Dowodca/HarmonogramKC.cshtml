@@ -156,7 +156,6 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID Harmonogramu</th>
                     <th>Data</th>
                     <th>Żołnierz</th>
                     <th>Służba</th>
@@ -167,7 +166,6 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.ID_Harmonogram</td>
                         <td>@item.Data.ToString("yyyy-MM-dd")</td>
                         <td>
                             @if (item.Zolnierz != null && item.Zastepcy != null && item.Zastepcy.Any())
@@ -209,6 +207,6 @@
             <img src="../back.png" alt="Powrót" />
         </button>
     </footer>
-
 </body>
+
 </html>
