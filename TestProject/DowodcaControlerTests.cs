@@ -401,8 +401,8 @@ namespace WebApplication2.Tests
             Assert.AreEqual("Żołnierz o podanym identyfikatorze nie został znaleziony.",
                 _controller.TempData["Error"]);
         }
-        */
         #endregion
+        */
 
         #region ListaZwolnien Tests
 
