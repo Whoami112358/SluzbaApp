@@ -89,6 +89,18 @@
             footer p {
                 margin: 0;
             }
+
+        .hover-image {
+            transition: filter 0.3s ease, transform 0.3s ease;
+            width: 49px;
+            height: 49px;
+        }
+
+            /* Change color on hover using hue-rotate */
+            .hover-image:hover {
+                filter: hue-rotate(90deg) brightness(0.7); /* Adjust to desired color and brightness */
+                transform: scale(1.1); /* Optional scaling effect */
+            }
     </style>
 </head>
 <body>
@@ -97,7 +109,7 @@
     </header>
     <button onclick="location.href='/Account/Logout'"
             style="border: none; background: none; padding: 0; cursor: pointer; position: absolute; top: 25px; right: 50px;">
-        <img src="../Wyloguj.png" style="width: 49px; height: 49px;" alt="Wyloguj" />
+        <img src="../Wyloguj.png" class="hover-image" alt="Wyloguj" />
     </button>
 
     <div class="content">

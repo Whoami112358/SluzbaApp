@@ -158,6 +158,13 @@
         .action-button:hover {
             background-color: rgba(93, 100, 80, 0.9); /* Lekko ciemniejszy odcień */
         }
+
+        .goback-butt {
+            position: fixed;
+            bottom: 0px;
+            left: 10px;
+            z-index: 1;
+        }
     </style>
 </head>
 <body>
@@ -219,9 +226,11 @@
 
     <footer>
         <p>&copy; 2024 Twoja Aplikacja. Wszystkie prawa zastrzeżone.</p>
+        <div class="goback-butt">
         <button onclick="location.href='@Url.Action("DowodcaView", "Dowodca")'">
             <img src="../back.png" alt="Powrót" />
         </button>
+        </div>
     </footer>
 
     <!-- FullCalendar JS -->
